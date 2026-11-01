@@ -1,12 +1,12 @@
 // إعدادات مشروع Firebase الجديد لنسخة SaaS (قيم عامة وليست أسراراً، تُنسخ من Firebase Console ← Project settings ← Your apps)
 // ⚠️ لا تضع هنا إعدادات مشروع منهل الحالي (manhal-49df0)
 export const FIREBASE_CONFIG = {
-  apiKey: "REPLACE_ME",
-  authDomain: "REPLACE_ME.firebaseapp.com",
-  projectId: "REPLACE_ME",
-  storageBucket: "REPLACE_ME.firebasestorage.app",
-  messagingSenderId: "REPLACE_ME",
-  appId: "REPLACE_ME"
+  apiKey: "AIzaSyBYB2p-84Xcz1X-e6iZnExl9wR4QMXNlpE",
+  authDomain: "fleet-sa-f0678.firebaseapp.com",
+  projectId: "fleet-sa-f0678",
+  storageBucket: "fleet-sa-f0678.firebasestorage.app",
+  messagingSenderId: "351010607604",
+  appId: "1:351010607604:web:fde4d65c07f3c23e13a9a1"
 };
 
 // مالك المنصة (Super Admin): يرى لوحة الشركات والاشتراكات. يجب أن يطابق superEmail() في firestore.rules
