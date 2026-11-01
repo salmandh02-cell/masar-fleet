@@ -1,12 +1,22 @@
-// إعدادات مشروع Firebase الخاص بالشركة
+// إعدادات مشروع Firebase الجديد لنسخة SaaS (قيم عامة وليست أسراراً، تُنسخ من Firebase Console ← Project settings ← Your apps)
+// ⚠️ لا تضع هنا إعدادات مشروع منهل الحالي (manhal-49df0)
 export const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDRFLMwVtSK4JXzsuAWpVDvglyQl9tDtx0",
-  authDomain: "manhal-49df0.firebaseapp.com",
-  projectId: "manhal-49df0",
-  storageBucket: "manhal-49df0.firebasestorage.app",
-  messagingSenderId: "159388168091",
-  appId: "1:159388168091:web:0b5591723ba98d30933b3e"
+  apiKey: "REPLACE_ME",
+  authDomain: "REPLACE_ME.firebaseapp.com",
+  projectId: "REPLACE_ME",
+  storageBucket: "REPLACE_ME.firebasestorage.app",
+  messagingSenderId: "REPLACE_ME",
+  appId: "REPLACE_ME"
 };
 
-// إيميل مالك النظام (مدير النظام الأساسي). يجب أن يطابق المكتوب في firestore.rules
-export const OWNER_EMAIL = "salmandh02@gmail.com";
+// مالك المنصة (Super Admin): يرى لوحة الشركات والاشتراكات. يجب أن يطابق superEmail() في firestore.rules
+export const SUPER_ADMIN_EMAIL = "salmandh02@gmail.com";
+
+// اسم المنصة كما يظهر في شاشة الدخول والتسجيل
+export const APP_NAME = "نظام أسطول الشركات";
+
+// مدة التجربة المجانية للشركات الجديدة (بالأيام)
+export const TRIAL_DAYS = 14;
+
+// وسيلة التواصل التي تظهر للشركة عند إيقاف اشتراكها
+export const SUPPORT_CONTACT = "salmandh02@gmail.com";

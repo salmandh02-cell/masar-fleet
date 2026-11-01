@@ -1,18 +1,18 @@
 // يخدم الصور والمرفقات المحفوظة في قاعدة البيانات عبر روابط _blob/<id>
-const VERSION = 'fleet-sw-2';
-let TOKEN = null, PROJECT = null; const waiters = [];
+const VERSION = 'fleet-sw-3';
+let TOKEN = null, PROJECT = null, CID = null; const waiters = [];
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 self.addEventListener('message', e => {
-  if (e.data && e.data.type === 'token') { TOKEN = e.data.token; PROJECT = e.data.project; while (waiters.length) waiters.shift()(); }
+  if (e.data && e.data.type === 'token') { TOKEN = e.data.token; PROJECT = e.data.project; CID = e.data.cid; while (waiters.length) waiters.shift()(); }
 });
 async function getToken() {
-  if (TOKEN) return;
+  if (TOKEN && CID) return;
   const cs = await self.clients.matchAll(); cs.forEach(c => c.postMessage({ type: 'need-token' }));
   await new Promise(r => { waiters.push(r); setTimeout(r, 8000); });
 }
 async function fsGet(id) {
-  const url = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/blobs/${encodeURIComponent(id)}`;
+  const url = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/companies/${encodeURIComponent(CID)}/blobs/${encodeURIComponent(id)}`;
   let r = await fetch(url, { headers: { Authorization: 'Bearer ' + TOKEN } });
   if (r.status === 401) { TOKEN = null; await getToken(); r = await fetch(url, { headers: { Authorization: 'Bearer ' + TOKEN } }); }
   if (!r.ok) throw new Error('blob ' + r.status);
@@ -22,12 +22,13 @@ async function fsGet(id) {
 function b64ToBytes(s) { const bin = atob(s); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
 async function serveBlob(req, id) {
   const cache = await caches.open(VERSION);
-  const hit = await cache.match(req.url); if (hit) return hit;
   await getToken();
+  const key = req.url + (req.url.includes('?') ? '&' : '?') + 'c=' + encodeURIComponent(CID);
+  const hit = await cache.match(key); if (hit) return hit;
   const head = await fsGet(id); let b64 = head.data;
   for (let i = 1; i < head.chunks; i++) b64 += (await fsGet(`${id}__${i}`)).data;
   const res = new Response(b64ToBytes(b64), { headers: { 'Content-Type': head.type || 'application/octet-stream', 'Cache-Control': 'max-age=31536000' } });
-  cache.put(req.url, res.clone()); return res;
+  cache.put(key, res.clone()); return res;
 }
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);

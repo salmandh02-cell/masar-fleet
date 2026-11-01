@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="الأسطول">
 <script src="i18n.js"></script>
 <script>window.__appReady=new Promise(r=>window.__appReadyResolve=r);</script>
-<script type="module">import {OWNER_EMAIL} from './config.js';window.OWNER_EMAIL=String(OWNER_EMAIL).toLowerCase();import('./fb.js');</script>
+<script type="module">import('./fb.js');</script>
 <title>نظام أسطول الشركة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -809,7 +809,7 @@ async function enablePush(){if(!pushSupported()){toast(isIOS?'على الآيف�
   try{const p=await Notification.requestPermission();if(p!=='granted'){toast('لم تُمنح صلاحية الإشعارات. فعّلها من إعدادات المتصفح');render();return}await savePushSub();toast(t('تم تفعيل الإشعارات على هذا الجهاز ✓'));render()}catch(e){console.warn(e);toast('تعذر تفعيل الإشعارات، حاول مرة أخرى')}}
 async function initPush(){try{if(pushSupported()&&Notification.permission==='granted'&&db&&myKey()){await savePushSub();schedule()}}catch(e){}}
 async function notify(keys,title,body,url,tag){try{keys=(keys||[]).filter(Boolean);if(!keys.length||!window.__fbIdToken)return;const t=await window.__fbIdToken();if(!t)return;
-  await fetch('/.netlify/functions/push',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},body:JSON.stringify({to:keys,title,body,url,tag})})}catch(e){}}
+  await fetch('/.netlify/functions/push',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},body:JSON.stringify({cid:window.__companyId,to:keys,title,body,url,tag})})}catch(e){}}
 function pushCard(compact){const st=pushState();if(st==='on')return compact?'':`<div class="push-card ok">${t('🔔 الإشعارات مفعّلة على هذا الجهاز')} <button class="btn sm ghost" data-act="push-test">${t('إرسال تجربة')}</button></div>`;
   if(st==='unsupported')return compact?'':`<div class="push-card">${t('هذا المتصفح لا يدعم الإشعارات.')}</div>`;
   if(st==='ios-install')return `<div class="push-card">${t('🔔 لتصلك الإشعارات على الآيفون: من Safari اضغط زر المشاركة ⬆️ ثم «إضافة إلى الشاشة الرئيسية»، وافتح النظام من الأيقونة.')}</div>`;
@@ -1424,7 +1424,7 @@ function stickerHTML(v){
   <div class="qrs-b"><div class="qrs-pl">${plate(v,1)}</div><div class="qrs-vn">${esc(vName(v))}${v.year?' · '+esc(v.year):''}</div>
     <div class="qrs-q"><i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i><img src="${qrData(vLink(v.id))}" alt=""></div>
     <div class="qrs-cap"><b>امسح الرمز بكاميرا الجوال</b><span>الفحص الأسبوعي · ملف السيارة · التسليم والاستلام</span></div></div>
-  <div class="qrs-f"><span dir="ltr">${esc(location.host||'manhalfleet.netlify.app')}</span>${v.serialNo?`<span>الرقم التسلسلي <b dir="ltr">${esc(v.serialNo)}</b></span>`:''}</div></div>`}
+  <div class="qrs-f"><span dir="ltr">${esc(location.host||'')}</span>${v.serialNo?`<span>الرقم التسلسلي <b dir="ltr">${esc(v.serialNo)}</b></span>`:''}</div></div>`}
 async function stickerPreview(vid){
   const v=vById(vid);if(!v)return;try{await qrLib()}catch(e){toast('تعذر تحميل مكتبة الرمز، تحقق من الاتصال');return}
   modal(`ملصق QR – ${plateTxt(v)}`,`<div class="mb" style="display:grid;place-items:center;gap:10px"><div class="qrs-wrap">${stickerHTML(v)}</div><p class="sub" style="text-align:center;margin:0">اطبعه والصقه على الزجاج الأمامي من الداخل أو بجانب باب السائق. عند مسحه يفتح لمستخدم المركبة نموذج الفحص مباشرة، وللإدارة ملف السيارة.</p></div>`,
@@ -1458,12 +1458,12 @@ function doVLink(){if(!PENDING_V)return;const id=PENDING_V;PENDING_V=null;const 
 
 /* ---------- التذكيرات التلقائية ---------- */
 async function fnCall(body){const t=window.__fbIdToken&&await window.__fbIdToken();if(!t)throw new Error('no token');
-  const r=await fetch('/.netlify/functions/push',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},body:JSON.stringify(body)});
+  const r=await fetch('/.netlify/functions/push',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},body:JSON.stringify({cid:window.__companyId,...body})});
   const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||('HTTP '+r.status));return j}
 async function remEnable(){
   try{toast('جارٍ تجهيز حساب التذكيرات…');const s=await fnCall({action:'sys-setup'});
     await db.doc('access/'+s.email).set({role:'viewer',name:'التذكيرات التلقائية',system:true,uid:s.uid,at:new Date().toISOString()});
-    await db.merge('settings','reminders',{enabled:true,sysEmail:s.email,updatedAt:new Date().toISOString()});toast('تم تفعيل التذكيرات التلقائية ✓')}
+    await db.merge('settings','reminders',{enabled:true,sysEmail:s.email,updatedAt:new Date().toISOString()});if(window.__companySetSys)await window.__companySetSys(s.email);toast('تم تفعيل التذكيرات التلقائية ✓')}
   catch(e){console.warn(e);toast('تعذر التفعيل: '+(e.message||''))}}
 async function remSet(k,v){try{await db.merge('settings','reminders',{[k]:v,updatedAt:new Date().toISOString()})}catch(e){handleWriteErr(e)}}
 async function remTest(k){try{const r=await fnCall({action:'remind-test',kinds:[k]});toast(r[k]?'أُرسل التذكير إلى جهازك ✓':'لا يوجد ما يُرسل لك في هذا التذكير الآن، أو الإشعارات غير مفعلة على جهازك')}catch(e){toast('تعذر الإرسال: '+(e.message||''))}}

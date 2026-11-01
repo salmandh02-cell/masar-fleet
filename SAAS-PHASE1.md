@@ -1,0 +1,56 @@
+# نسخة SaaS – المرحلة الأولى
+
+## ما تغيّر
+| الجزء | قبل | بعد |
+|---|---|---|
+| البيانات | مجموعات عامة: `vehicles`, `drivers`, … | تحت كل شركة: `companies/{companyId}/vehicles` … |
+| معرفة شركة المستخدم | — | `members/{email}` → `companyId` |
+| الدخول بالجوال | `logins/{phone}` → email | نفسه + `companyId` (ولا يمكن سرد الأرقام) |
+| مدير النظام الأساسي | إيميل ثابت في الكود | مؤسس كل شركة (`companies/{id}.ownerEmail`) |
+| مالك المنصة | — | `SUPER_ADMIN_EMAIL` في `config.js` و`superEmail()` في القواعد |
+| الصور | `blobs/{id}` | `companies/{id}/blobs/{id}` |
+| الدوال | تقرأ من الجذر | كل طلب يحمل `cid`، والتذكيرات تمر على كل شركة فعّلتها |
+
+## الملفات الجديدة والمعدّلة
+- `firestore.rules`: عزل كامل بين الشركات، والشركة الموقوفة لا يصل مستخدموها لبياناتها.
+- `fb.js`: كل المسارات تمر عبر `companies/{cid}/`، وشاشات: تسجيل شركة، إكمال بيانات الشركة، اشتراك موقوف، اختيار المالك.
+- `admin.html`: لوحة تحكم المالك (الشركات، الحالة، عدد السيارات، تفعيل/إيقاف/تمديد التجربة/تعديل).
+- `config.js`: إعدادات مشروع Firebase **الجديد** + إيميل مالك المنصة + مدة التجربة.
+- `tools/migrate-manhal.mjs`: نقل بيانات منهل كأول شركة (قراءة فقط من المشروع القديم).
+- `tools/deploy.py`: التوكن من `NETLIFY_AUTH_TOKEN` فقط، ويرفض النشر فوق موقع منهل الحالي.
+- `_redirects`: الرابط `/signup` يفتح صفحة تسجيل شركة جديدة مباشرة.
+
+## الاختبارات (على محاكي Firebase)
+- 58 اختبار لقواعد العزل: لا قراءة ولا كتابة بين الشركات، لا سحب لمستخدم من شركة أخرى، لا تعديل للحالة أو التجربة من مدير الشركة، الإيقاف يحجب كل مستخدمي الشركة فقط.
+- 14 خطوة في المتصفح: تسجيل شركة ← تأكيد البريد ← الدخول للنظام باسم الشركة ← حفظ سيارة تحت مسار الشركة ← ظهورها في لوحة المالك ← إيقاف ← رسالة الإيقاف ← إعادة التفعيل ← الدخول من جديد.
+- 10 اختبارات لسكربت النقل: كل المجموعات والرسائل الفرعية، ربط الجوال بالشركة، صلاحيات المالك والسائق بعد النقل، والمشروع القديم دون أي تعديل.
+
+## خطوات التشغيل
+1. **مشروع Firebase جديد** (المالك): Console ← Add project ← فعّل Authentication (Email/Password) و Firestore.
+   ثم Project settings ← Your apps ← Web، وانسخ الإعدادات إلى `config.js`.
+2. **قواعد الأمان**: الصق `firestore.rules` في Firestore ← Rules ← Publish.
+3. **موقع Netlify جديد** + متغيرات البيئة:
+   `FB_PROJECT` (معرّف المشروع الجديد)، `FB_API_KEY`، `VAPID_PUBLIC`، `VAPID_PRIVATE`، `VAPID_SUBJECT`، `SYS_EMAIL`، `SYS_PASS`، و`SMTP_*` عند تفعيل البريد.
+   (لم يعد `OWNER_EMAIL` مطلوباً في الدوال.) مفتاح VAPID العام يجب أن يطابق `PUSH_PUBLIC` في `index.html`.
+4. **النشر**:
+   ```
+   cd functions && npm i && cd ..
+   npx esbuild functions/push.js --bundle --platform=node --target=node18 --format=cjs --outfile=build/push.js
+   npx esbuild functions/remind.js --bundle --platform=node --target=node18 --format=cjs --outfile=build/remind.js
+   NETLIFY_AUTH_TOKEN=... NETLIFY_SITE_ID=... python3 tools/deploy.py build/push.js build/remind.js
+   ```
+5. **نقل منهل** (بعد اختبار النسخة الجديدة): مفتاح حساب خدمة لكل مشروع (Project settings ← Service accounts ← Generate key)،
+   ومعاملات تشفير كلمات المرور من المشروع القديم (Authentication ← Users ← ⋮ ← Password hash parameters):
+   ```
+   cd tools && npm i firebase-admin
+   OLD_SA=old.json NEW_SA=new.json HASH_KEY=... SALT_SEPARATOR=... ROUNDS=8 MEM_COST=14 \
+   node migrate-manhal.mjs --company manhal --owner salmandh02@gmail.com --dry-run   # عدّ فقط
+   ... نفس الأمر بدون --dry-run
+   ```
+   تنتقل حسابات المستخدمين بنفس uid وكلمات المرور، فيدخل الجميع كالمعتاد على الرابط الجديد.
+
+## ملاحظات
+- المستخدم ينتمي لشركة واحدة. إضافة إيميل مسجّل في شركة أخرى تُرفض برسالة واضحة.
+- رقم الجوال الواحد يُفعَّل في شركة واحدة.
+- انتهاء التجربة لا يوقف الشركة تلقائياً بعد؛ تظهر «تجربة منتهية» في لوحة المالك ويوقفها المالك يدوياً. الإيقاف التلقائي مع بوابة الدفع في المرحلة الثانية.
+- لوحة المالك تقرأ وثائق الشركات وقائمة السيارات (للعدّ والفوترة) فقط، ولا تصل لبقية بيانات الشركات.

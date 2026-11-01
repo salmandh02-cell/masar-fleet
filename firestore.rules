@@ -1,112 +1,169 @@
 rules_version = '2';
-// قواعد أمان نظام أسطول الشركة
-// غيّر الإيميل في ownerEmail() ليطابق config.js
+// قواعد أمان نظام الأسطول السحابي (متعدد الشركات)
+// كل بيانات الشركة تحت companies/{companyId}/... ولا يصل إليها إلا مستخدمو تلك الشركة
+// غيّر superEmail() ليطابق SUPER_ADMIN_EMAIL في config.js
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function ownerEmail() { return 'salmandh02@gmail.com'; }
+    // ---------- الهوية ----------
+    function superEmail() { return 'salmandh02@gmail.com'; }
     function signedIn() { return request.auth != null && (request.auth.token.email_verified == true || request.auth.token.email.lower().matches('.*@m[.]manhalfleet[.]app$')); }
     function myEmail() { return request.auth.token.email.lower(); }
-    function isOwner() { return signedIn() && myEmail() == ownerEmail(); }
-    function accessPath() { return /databases/$(database)/documents/access/$(myEmail()); }
-    function hasAccess() { return signedIn() && exists(accessPath()); }
-    function role() { return isOwner() ? 'admin' : (hasAccess() ? get(accessPath()).data.role : 'none'); }
-    function member() { return isOwner() || hasAccess(); }
-    function isAdmin() { return role() == 'admin'; }
-    function isStaff() { return role() in ['admin', 'fleet']; }
-    function isDriver() { return role() == 'driver'; }
-    function isBranch() { return role() == 'branch'; }
-    function myBranch() { return get(accessPath()).data.branchId; }
-    function vehBranch(vid) { return get(/databases/$(database)/documents/vehicles/$(vid)).data.get('branchId', null); }
+    function isSuper() { return signedIn() && myEmail() == superEmail(); }
 
-    // البيانات التشغيلية: يقرأها كل مستخدم مضاف، ويعدلها مدير النظام ومدير الحركة، والحذف لمدير النظام
-    match /{col}/{id} {
-      allow read: if member() && !(col in ['audit', 'threads', 'ids']);
-      allow create: if isStaff() && !(col in ['settings', 'invites', 'access', 'roles', 'audit', 'seen', 'blobs', 'logins', 'threads', 'pushsubs', 'ids'])
-        && (isAdmin() || !(col == 'handovers' && 'ack' in request.resource.data))
-        && (!(col == 'handovers' && 'issuer' in request.resource.data) || request.resource.data.issuer.uid == request.auth.uid);
-      allow update: if isStaff() && !(col in ['settings', 'invites', 'access', 'roles', 'audit', 'seen', 'blobs', 'logins', 'threads', 'pushsubs', 'ids'])
-        && (isAdmin() || !(col == 'handovers' && (request.resource.data.get('ack', null) != resource.data.get('ack', null) || request.resource.data.get('issuer', null) != resource.data.get('issuer', null))))
-        && (isAdmin() || !(col == 'vehicles' && (resource.data.get('status', '') == 'sold' || request.resource.data.get('status', '') == 'sold')));
-      allow delete: if isAdmin() && !(col in ['audit', 'access']);
+    // ---------- الشركة والصلاحيات داخلها ----------
+    function coPath(cid) { return /databases/$(database)/documents/companies/$(cid); }
+    function co(cid) { return get(coPath(cid)).data; }
+    function coActive(cid) { return exists(coPath(cid)) && co(cid).status in ['trial', 'active']; }
+    function isCoOwner(cid) { return signedIn() && exists(coPath(cid)) && co(cid).ownerEmail == myEmail(); }
+    function accPath(cid) { return /databases/$(database)/documents/companies/$(cid)/access/$(myEmail()); }
+    function hasAcc(cid) { return signedIn() && exists(accPath(cid)); }
+    function acc(cid) { return get(accPath(cid)).data; }
+    // الشركة الموقوفة: لا يصل أحد من مستخدميها إلى بياناتها
+    function role(cid) { return !coActive(cid) ? 'none' : (isCoOwner(cid) ? 'admin' : (hasAcc(cid) ? acc(cid).role : 'none')); }
+    function member(cid) { return role(cid) != 'none'; }
+    function isAdmin(cid) { return role(cid) == 'admin'; }
+    function isStaff(cid) { return role(cid) in ['admin', 'fleet']; }
+    function isDriver(cid) { return role(cid) == 'driver'; }
+    function isBranch(cid) { return role(cid) == 'branch'; }
+    function myBranch(cid) { return acc(cid).branchId; }
+    function vehBranch(cid, vid) { return get(/databases/$(database)/documents/companies/$(cid)/vehicles/$(vid)).data.get('branchId', null); }
+
+    // تسجيل شركة جديدة: الشركة ووثيقة العضوية وصلاحية المدير تُكتب في دفعة واحدة
+    function memPath(e) { return /databases/$(database)/documents/members/$(e); }
+    function signupOwner(cid) {
+      return signedIn() && !exists(coPath(cid)) && existsAfter(coPath(cid))
+        && getAfter(coPath(cid)).data.ownerUid == request.auth.uid
+        && getAfter(coPath(cid)).data.ownerEmail == myEmail();
     }
 
-    // الإعدادات والمستخدمون: مدير النظام فقط
-    match /settings/{id} { allow write: if isAdmin(); }
-    match /invites/{id} { allow write: if isAdmin(); }
-    match /roles/{id}   { allow write: if isAdmin(); }
-    match /access/{email} {
-      allow read: if signedIn() && (email == myEmail() || isAdmin());
-      allow write: if isAdmin();
+    // ---------- فهرس العضوية: أي شركة ينتمي لها كل مستخدم ----------
+    match /members/{email} {
+      allow get: if signedIn() && (email == myEmail() || isSuper() || isAdmin(resource.data.companyId));
+      allow list: if isSuper();
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['companyId', 'at'])
+        && (isAdmin(request.resource.data.companyId) || (email == myEmail() && signupOwner(request.resource.data.companyId)));
+      // لا تستطيع شركة أن تسحب مستخدماً مسجلاً في شركة أخرى
+      allow update: if request.resource.data.keys().hasOnly(['companyId', 'at'])
+        && isAdmin(resource.data.companyId) && request.resource.data.companyId == resource.data.companyId;
+      allow delete: if isSuper() || isAdmin(resource.data.companyId);
     }
 
-    // أرقام الهوية: يراها مدير النظام، وكل مستخدم يرى رقمه فقط
-    match /ids/{id} {
-      allow read: if isAdmin() || (hasAccess() && get(accessPath()).data.inviteId == id);
-      allow write: if isAdmin();
-    }
-
-    // السائق: يسجل الفحص الأسبوعي، ويحدّث قراءة العداد فقط
-    // ربط رقم الجوال بالحساب: يقرأه شاشة الدخول، ويكتبه المستخدم عند التفعيل لرقمه فقط
+    // ---------- ربط رقم الجوال بالحساب (يُقرأ قبل الدخول) ----------
     match /logins/{phone} {
-      allow read: if true;
-      allow create, update: if hasAccess() && request.resource.data.email == myEmail() && get(accessPath()).data.phone == phone;
-      allow delete: if isAdmin();
+      allow get: if true;
+      allow create, update: if request.resource.data.keys().hasOnly(['email', 'phone', 'at', 'companyId'])
+        && hasAcc(request.resource.data.companyId) && member(request.resource.data.companyId)
+        && request.resource.data.email == myEmail()
+        && acc(request.resource.data.companyId).phone == phone
+        && (resource == null || resource.data.get('companyId', '') == request.resource.data.companyId);
+      allow delete: if isSuper() || isAdmin(resource.data.get('companyId', ''));
     }
 
-    // الرسائل: كل محادثة بين شخصين، ولا يقرأها غيرهما
-    function otherOf(ps) { return ps[0] == myEmail() ? ps[1] : ps[0]; }
-    function canChatWith(o) { return isStaff() || isBranch() || o == ownerEmail() || (exists(/databases/$(database)/documents/access/$(o)) && get(/databases/$(database)/documents/access/$(o)).data.role in ['admin', 'fleet']); }
-    function inThread(tid) { return myEmail() in get(/databases/$(database)/documents/threads/$(tid)).data.participants; }
-    match /threads/{tid} {
-      allow read: if member() && myEmail() in resource.data.participants;
-      allow create: if member() && request.resource.data.participants.size() == 2 && myEmail() in request.resource.data.participants && canChatWith(otherOf(request.resource.data.participants));
-      allow update: if member() && myEmail() in resource.data.participants && request.resource.data.participants == resource.data.participants;
-      allow delete: if isAdmin();
-      match /messages/{mid} {
-        allow read: if member() && inThread(tid);
-        allow create: if member() && inThread(tid) && request.resource.data.from == myEmail();
-        allow delete: if isAdmin();
+    // ---------- وثيقة الشركة ----------
+    match /companies/{cid} {
+      allow get: if isSuper() || hasAcc(cid) || isCoOwner(cid);
+      // لوحة المالك تعرض كل الشركات، وحساب التذكيرات يرى الشركات التي فعّلته فقط
+      allow list: if isSuper() || (signedIn() && resource.data.get('sysEmail', '') == myEmail());
+      allow create: if signedIn() && cid.matches('^[a-z0-9][a-z0-9-]{2,39}$')
+        && request.resource.data.keys().hasOnly(['name', 'ownerUid', 'ownerEmail', 'ownerName', 'phone', 'status', 'plan', 'createdAt', 'trialEnds'])
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerEmail == myEmail()
+        && request.resource.data.status == 'trial'
+        && request.resource.data.name is string && request.resource.data.name.size() > 1 && request.resource.data.name.size() <= 120
+        // شركة واحدة لكل مستخدم، وتُسجَّل عضويته في نفس الدفعة
+        && !exists(memPath(myEmail())) && getAfter(memPath(myEmail())).data.companyId == cid;
+      // المالك العام يغيّر الحالة والباقة، ومدير الشركة يغيّر الاسم وحساب التذكيرات فقط
+      allow update: if isSuper()
+        || (isAdmin(cid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'sysEmail', 'updatedAt']));
+      allow delete: if false;
+
+      // ---------- بيانات الشركة التشغيلية ----------
+      match /{col}/{id} {
+        allow read: if member(cid) && !(col in ['audit', 'threads', 'ids']);
+        allow create: if isStaff(cid) && !(col in ['settings', 'invites', 'access', 'roles', 'audit', 'seen', 'blobs', 'logins', 'threads', 'pushsubs', 'ids'])
+          && (isAdmin(cid) || !(col == 'handovers' && 'ack' in request.resource.data))
+          && (!(col == 'handovers' && 'issuer' in request.resource.data) || request.resource.data.issuer.uid == request.auth.uid);
+        allow update: if isStaff(cid) && !(col in ['settings', 'invites', 'access', 'roles', 'audit', 'seen', 'blobs', 'logins', 'threads', 'pushsubs', 'ids'])
+          && (isAdmin(cid) || !(col == 'handovers' && (request.resource.data.get('ack', null) != resource.data.get('ack', null) || request.resource.data.get('issuer', null) != resource.data.get('issuer', null))))
+          && (isAdmin(cid) || !(col == 'vehicles' && (resource.data.get('status', '') == 'sold' || request.resource.data.get('status', '') == 'sold')));
+        allow delete: if isAdmin(cid) && !(col in ['audit', 'access']);
       }
-    }
+      // عدد السيارات لكل شركة يظهر في لوحة المالك (للفوترة لاحقاً)
+      match /vehicles/{id} { allow list: if isSuper(); }
 
-    // اشتراكات إشعارات الجوال: كل مستخدم يسجل أجهزته فقط
-    match /pushsubs/{id} {
-      allow read, delete: if member();
-      allow create, update: if member() && request.resource.data.key == myEmail();
-    }
+      // الإعدادات والمستخدمون: مدير النظام فقط
+      match /settings/{id} { allow write: if isAdmin(cid); }
+      match /invites/{id} { allow write: if isAdmin(cid); }
+      match /roles/{id}   { allow write: if isAdmin(cid); }
+      match /access/{email} {
+        allow read: if signedIn() && (email == myEmail() || isAdmin(cid));
+        allow write: if isAdmin(cid);
+        // صلاحية المدير المؤسس عند تسجيل الشركة
+        allow create: if email == myEmail() && signupOwner(cid) && request.resource.data.role == 'admin';
+      }
 
-    match /inspections/{id} { allow create: if isDriver(); }
-    // التوقيع الإلكتروني: السائق يوقّع محاضره فقط، ولا يغيّر غير خانة التوقيع
-    match /handovers/{id} {
-      allow update: if isDriver()
-        && resource.data.driverId == get(accessPath()).data.driverId
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ack'])
-        && request.resource.data.ack.uid == request.auth.uid;
-      // مشرف الفرع: ينشئ محاضر التسليم والاستلام لسيارات فرعه فقط
-      allow create: if isBranch() && myBranch() != null && vehBranch(request.resource.data.vehicleId) == myBranch()
-        && !('ack' in request.resource.data) && request.resource.data.issuer.uid == request.auth.uid;
-    }
-    match /vehicles/{id} {
-      allow update: if isDriver() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['odometer']);
-      allow update: if isBranch() && myBranch() != null && resource.data.get('branchId', null) == myBranch() && resource.data.get('status', '') != 'sold'
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'driverId', 'odometer'])
-        && request.resource.data.status in ['assigned', 'available'];
-    }
+      // أرقام الهوية: يراها مدير النظام، وكل مستخدم يرى رقمه فقط
+      match /ids/{id} {
+        allow read: if isAdmin(cid) || (member(cid) && hasAcc(cid) && acc(cid).inviteId == id);
+        allow write: if isAdmin(cid);
+      }
 
-    // الصور والمرفقات
-    match /blobs/{id} {
-      allow create: if member() && !(role() == 'viewer');
-      allow update: if isStaff();
-    }
+      // الرسائل: كل محادثة بين شخصين، ولا يقرأها غيرهما
+      function otherOf(ps) { return ps[0] == myEmail() ? ps[1] : ps[0]; }
+      function canChatWith(o) { return isStaff(cid) || isBranch(cid) || o == co(cid).ownerEmail || (exists(/databases/$(database)/documents/companies/$(cid)/access/$(o)) && get(/databases/$(database)/documents/companies/$(cid)/access/$(o)).data.role in ['admin', 'fleet']); }
+      function inThread(tid) { return myEmail() in get(/databases/$(database)/documents/companies/$(cid)/threads/$(tid)).data.participants; }
+      match /threads/{tid} {
+        allow read: if member(cid) && myEmail() in resource.data.participants;
+        allow create: if member(cid) && request.resource.data.participants.size() == 2 && myEmail() in request.resource.data.participants && canChatWith(otherOf(request.resource.data.participants));
+        allow update: if member(cid) && myEmail() in resource.data.participants && request.resource.data.participants == resource.data.participants;
+        allow delete: if isAdmin(cid);
+        match /messages/{mid} {
+          allow read: if member(cid) && inThread(tid);
+          allow create: if member(cid) && inThread(tid) && request.resource.data.from == myEmail();
+          allow delete: if isAdmin(cid);
+        }
+      }
 
-    // آخر دخول: كل مستخدم يكتب سجله فقط
-    match /seen/{uid} { allow write: if signedIn() && request.auth.uid == uid; }
+      // اشتراكات إشعارات الجوال: كل مستخدم يسجل أجهزته فقط
+      match /pushsubs/{id} {
+        allow read, delete: if member(cid);
+        allow create, update: if member(cid) && request.resource.data.key == myEmail();
+      }
 
-    // سجل التدقيق: إضافة فقط، لا تعديل ولا حذف، والقراءة لمدير النظام
-    match /audit/{id} {
-      allow read: if isAdmin();
-      allow create: if member() && request.resource.data.uid == request.auth.uid;
+      // السائق: يسجل الفحص الأسبوعي، ويحدّث قراءة العداد فقط
+      match /inspections/{id} { allow create: if isDriver(cid); }
+      // التوقيع الإلكتروني: السائق يوقّع محاضره فقط، ولا يغيّر غير خانة التوقيع
+      match /handovers/{id} {
+        allow update: if isDriver(cid)
+          && resource.data.driverId == acc(cid).driverId
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ack'])
+          && request.resource.data.ack.uid == request.auth.uid;
+        // مشرف الفرع: ينشئ محاضر التسليم والاستلام لسيارات فرعه فقط
+        allow create: if isBranch(cid) && myBranch(cid) != null && vehBranch(cid, request.resource.data.vehicleId) == myBranch(cid)
+          && !('ack' in request.resource.data) && request.resource.data.issuer.uid == request.auth.uid;
+      }
+      match /vehicles/{id} {
+        allow update: if isDriver(cid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['odometer']);
+        allow update: if isBranch(cid) && myBranch(cid) != null && resource.data.get('branchId', null) == myBranch(cid) && resource.data.get('status', '') != 'sold'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'driverId', 'odometer'])
+          && request.resource.data.status in ['assigned', 'available'];
+      }
+
+      // الصور والمرفقات
+      match /blobs/{id} {
+        allow create: if member(cid) && role(cid) != 'viewer';
+        allow update: if isStaff(cid);
+      }
+
+      // آخر دخول: كل مستخدم يكتب سجله فقط
+      match /seen/{uid} { allow write: if member(cid) && request.auth.uid == uid; }
+
+      // سجل التدقيق: إضافة فقط، لا تعديل ولا حذف، والقراءة لمدير النظام
+      match /audit/{id} {
+        allow read: if isAdmin(cid);
+        allow create: if member(cid) && request.resource.data.uid == request.auth.uid;
+      }
     }
   }
 }

@@ -1,9 +1,13 @@
 // منطق التذكيرات التلقائية: يقرأ بيانات الأسطول من Firestore ويرسل إشعارات الجوال
 const webpush = require('web-push');
-const PROJECT = process.env.FB_PROJECT || 'manhal-49df0';
-const FS = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents`;
+const PROJECT = process.env.FB_PROJECT;
+const ROOT = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents`;
 const IDT = 'https://identitytoolkit.googleapis.com/v1/accounts';
-const OWNER = String(process.env.OWNER_EMAIL || '').toLowerCase();
+// كل القراءات داخل شركة واحدة: companies/{cid}
+let CID = null, OWNER = '';
+const okCid = c => typeof c === 'string' && /^[a-z0-9][a-z0-9-]{2,39}$/.test(c);
+function setCompany(cid, ownerEmail) { if (!okCid(cid)) throw new Error('bad company'); CID = cid; OWNER = String(ownerEmail || '').toLowerCase(); }
+const base = () => { if (!CID) throw new Error('no company'); return `${ROOT}/companies/${CID}`; };
 
 // ---------- Firestore REST ----------
 function val(v) {
@@ -22,7 +26,7 @@ const obj = f => Object.fromEntries(Object.entries(f).map(([k, v]) => [k, val(v)
 async function list(token, col) {
   const out = []; let page = '';
   for (let i = 0; i < 40; i++) {
-    const r = await fetch(`${FS}/${col}?pageSize=300${page ? '&pageToken=' + encodeURIComponent(page) : ''}`, { headers: { Authorization: 'Bearer ' + token } });
+    const r = await fetch(`${base()}/${col}?pageSize=300${page ? '&pageToken=' + encodeURIComponent(page) : ''}`, { headers: { Authorization: 'Bearer ' + token } });
     if (!r.ok) throw new Error(`read ${col} ${r.status}`);
     const j = await r.json();
     for (const d of j.documents || []) out.push({ id: d.name.split('/').pop(), ...obj(d.fields || {}) });
@@ -56,10 +60,10 @@ const ivKey = x => String(x && (x.loginEmail || x.email) || '').toLowerCase();
 // ---------- الإرسال ----------
 async function sendTo(token, keys, msg) {
   keys = [...new Set(keys.filter(Boolean))]; if (!keys.length) return 0;
-  webpush.setVapidDetails(process.env.VAPID_SUBJECT || 'https://manhalfleet.netlify.app', process.env.VAPID_PUBLIC, process.env.VAPID_PRIVATE);
+  webpush.setVapidDetails(process.env.VAPID_SUBJECT || process.env.URL, process.env.VAPID_PUBLIC, process.env.VAPID_PRIVATE);
   const subs = [];
   for (let i = 0; i < keys.length; i += 30) {
-    const r = await fetch(`${FS}:runQuery`, { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    const r = await fetch(`${base()}:runQuery`, { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'pushsubs' }], where: { fieldFilter: { field: { fieldPath: 'key' }, op: 'IN', value: { arrayValue: { values: keys.slice(i, i + 30).map(k => ({ stringValue: k })) } } } } } }) });
     if (!r.ok) throw new Error('pushsubs ' + r.status);
     for (const row of await r.json()) if (row.document) subs.push(row.document);
@@ -157,4 +161,17 @@ function dueKinds(cfg, d = ksa()) {
   return k;
 }
 
-module.exports = { systemLogin, run, dueKinds, list, load };
+// الشركات التي فعّلت التذكيرات بهذا الحساب (وثيقة الشركة فيها sysEmail)
+async function companiesFor(token, email) {
+  const r = await fetch(`${ROOT}:runQuery`, { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'companies' }], where: { fieldFilter: { field: { fieldPath: 'sysEmail' }, op: 'EQUAL', value: { stringValue: email } } } } }) });
+  if (!r.ok) throw new Error('companies ' + r.status);
+  return (await r.json()).filter(x => x.document).map(x => ({ id: x.document.name.split('/').pop(), ...obj(x.document.fields || {}) }));
+}
+async function getCompany(token, cid) {
+  if (!okCid(cid)) return null;
+  const r = await fetch(`${ROOT}/companies/${cid}`, { headers: { Authorization: 'Bearer ' + token } });
+  if (!r.ok) return null; const j = await r.json(); return { id: cid, ...obj(j.fields || {}) };
+}
+
+module.exports = { systemLogin, run, dueKinds, list, load, setCompany, companiesFor, getCompany, okCid, ROOT, base: () => base() };

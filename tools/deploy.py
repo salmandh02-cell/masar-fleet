@@ -1,12 +1,17 @@
 """ينشر الموقع والدوال (functions) على Netlify عبر الـ API.
-المفتاح من /root/.netlify_token، والدالة تُجمَّع مسبقاً في build/push.js (esbuild).
+التوكن من متغير البيئة NETLIFY_AUTH_TOKEN فقط (لا يُحفظ في ملف ولا في المستودع).
+الموقع من NETLIFY_SITE_ID. والدوال تُجمَّع مسبقاً في build/*.js (esbuild).
+الاستخدام: NETLIFY_AUTH_TOKEN=... NETLIFY_SITE_ID=... python3 tools/deploy.py build/push.js build/remind.js
 """
 import hashlib, io, json, os, sys, urllib.request, zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SITE = 'b77a682e-f03d-4456-b363-340daaab3764'
-TOKEN = open('/root/.netlify_token').read().strip()
-FILES = ['index.html', 'fb.js', 'sw.js', 'config.js', 'qr.js', 'i18n.js', 'manifest.json', 'icon.svg', 'icon-192.png', 'icon-512.png']
+SITE = os.environ.get('NETLIFY_SITE_ID', '')
+TOKEN = os.environ.get('NETLIFY_AUTH_TOKEN', '')
+if not TOKEN or not SITE: raise SystemExit('NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID are required')
+# حماية: لا يُنشر نظام SaaS فوق موقع منهل الحالي
+if SITE == 'b77a682e-f03d-4456-b363-340daaab3764': raise SystemExit('refusing to deploy over the live Manhal site')
+FILES = ['index.html', 'admin.html', 'fb.js', 'sw.js', 'config.js', 'qr.js', 'i18n.js', 'manifest.json', 'icon.svg', 'icon-192.png', 'icon-512.png', '_redirects']
 # الدوال المجمّعة: python3 tools/deploy.py build/push.js build/remind.js
 BUNDLES = sys.argv[1:]
 SCHEDULES = {'remind': '0 4,5,6 * * *'}  # 7 و8 و9 صباحاً بتوقيت الرياض

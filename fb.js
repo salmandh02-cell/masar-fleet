@@ -1,5 +1,5 @@
 // طبقة الربط بين النظام و Firebase (الدخول، قاعدة البيانات، الصور، التنزيل، سجل التدقيق)
-import { FIREBASE_CONFIG, OWNER_EMAIL } from './config.js';
+import { FIREBASE_CONFIG, SUPER_ADMIN_EMAIL, APP_NAME, TRIAL_DAYS, SUPPORT_CONTACT } from './config.js';
 const V = '10.12.2';
 const FB = `https://www.gstatic.com/firebasejs/${V}`;
 
@@ -66,7 +66,7 @@ let lastShow = null;
 function card(inner) {
   if (window.I18N) window.I18N.use(window.I18N.lang);
   const r = authRoot();
-  r.innerHTML = `<div class="card" role="dialog" aria-label="${T('تسجيل الدخول')}">${window.I18N ? window.I18N.picker() : ''}<div class="lg"><span class="mk">KSA</span><div><b>${T('نظام أسطول الشركة')}</b><small>${T('إدارة السيارات والسائقين والتكاليف')}</small></div></div>${inner}</div>`;
+  r.innerHTML = `<div class="card" role="dialog" aria-label="${T('تسجيل الدخول')}">${window.I18N ? window.I18N.picker() : ''}<div class="lg"><span class="mk">KSA</span><div><b>${esc(APP_NAME || T('نظام أسطول الشركة'))}</b><small>${T('إدارة السيارات والسائقين والتكاليف')}</small></div></div>${inner}</div>`;
   r.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { window.I18N.set(b.dataset.lang); window.I18N.use(b.dataset.lang); if (lastShow) lastShow(); });
 }
 
@@ -81,11 +81,13 @@ export async function start() {
   let fs;
   try { fs = F.initializeFirestore(app, { localCache: F.persistentLocalCache({ tabManager: F.persistentMultipleTabManager() }) }); }
   catch (e) { fs = F.getFirestore(app); }
-  const OWNER = String(OWNER_EMAIL).toLowerCase();
+  const SUPER = String(SUPER_ADMIN_EMAIL || '').toLowerCase();
+  let CID = null, COMPANY = null;
+  const P = c => `companies/${CID}/${c}`;
 
-  A.onIdTokenChanged(auth, async u => { if (u) swPost({ type: 'token', token: await u.getIdToken(), project: FIREBASE_CONFIG.projectId }); });
+  A.onIdTokenChanged(auth, async u => { if (u && CID) swPost({ type: 'token', token: await u.getIdToken(), project: FIREBASE_CONFIG.projectId, cid: CID }); });
   navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', async e => {
-    if (e.data && e.data.type === 'need-token' && auth.currentUser) swPost({ type: 'token', token: await auth.currentUser.getIdToken(), project: FIREBASE_CONFIG.projectId });
+    if (e.data && e.data.type === 'need-token' && auth.currentUser && CID) swPost({ type: 'token', token: await auth.currentUser.getIdToken(), project: FIREBASE_CONFIG.projectId, cid: CID });
   });
   window.__fbIdToken = async () => auth.currentUser ? auth.currentUser.getIdToken() : null;
   window.__fbSignOut = async () => { try { (await caches.keys()).forEach(k => caches.delete(k)); } catch (e) {} await A.signOut(auth); location.reload(); };
@@ -99,7 +101,8 @@ export async function start() {
       <label>${T('كلمة المرور')}<input id="ap" type="password" dir="ltr" autocomplete="current-password" required></label>
       <div class="err" id="aerr">${esc(msg || '')}</div>
       <button class="pri" id="ab">${T('دخول')}</button></form>
-      <div class="row"><button class="lnk" id="a-new">${T('مستخدم جديد؟ فعّل حسابك')}</button><button class="lnk" id="a-rst">${T('نسيت كلمة المرور')}</button></div>`);
+      <div class="row"><button class="lnk" id="a-new">${T('مستخدم جديد؟ فعّل حسابك')}</button><button class="lnk" id="a-rst">${T('نسيت كلمة المرور')}</button></div>
+      <div class="row" style="border-top:1px solid var(--line,#D6DDD9);padding-top:12px"><span style="font-size:14px">${T('شركة جديدة؟')}</span><button class="lnk" id="a-co">${T('سجّل شركتك وابدأ التجربة المجانية')}</button></div>`);
     const f = document.getElementById('af');
     f.onsubmit = async e => { e.preventDefault(); const b = document.getElementById('ab'); b.disabled = true;
       const id = f.ae.value.trim(); const er = document.getElementById('aerr');
@@ -115,6 +118,7 @@ export async function start() {
       } catch (err) { er.textContent = err.code === 'auth/invalid-credential' ? T('رقم الجوال أو كلمة المرور غير صحيحة') : (window.I18N && window.I18N.ui !== 'ar' ? T('تعذر الدخول، حاول مرة أخرى') : (ERR[err.code] || 'تعذر الدخول، حاول مرة أخرى')); b.disabled = false; } };
     setTimeout(() => document.getElementById('ae').focus(), 50);
     document.getElementById('a-new').onclick = () => showActivate();
+    document.getElementById('a-co').onclick = () => showCompanySignup();
     document.getElementById('a-rst').onclick = () => { const v = document.getElementById('ae').value; v.includes('@') ? showReset(v) : showForgotPhone(); };
   }
   function showForgotPhone() {
@@ -146,10 +150,12 @@ export async function start() {
       try { c = await A.createUserWithEmailAndPassword(auth, email, document.getElementById('sp').value); }
       catch (err) { er.textContent = err.code === 'auth/email-already-in-use' ? T('هذا الحساب مفعّل مسبقاً – سجّل الدخول برقم الجوال وكلمة المرور') : (window.I18N && window.I18N.ui !== 'ar' ? T('تعذر التفعيل') : (ERR[err.code] || 'تعذر التفعيل')); b.disabled = false; busyAuth = false; return; }
       try {
-        const a = await F.getDoc(F.doc(fs, 'access', email));
-        if (!a.exists()) { try { await c.user.delete(); } catch (x) {} er.textContent = T('رمز التفعيل غير صحيح أو انتهى. اطلب رمزاً جديداً من مدير النظام.'); b.disabled = false; busyAuth = false; return; }
+        const m = await F.getDoc(F.doc(fs, 'members', email)).catch(() => null);
+        const cid = m && m.exists() ? m.data().companyId : null;
+        const a = cid ? await F.getDoc(F.doc(fs, 'companies', cid, 'access', email)).catch(() => null) : null;
+        if (!a || !a.exists()) { try { await c.user.delete(); } catch (x) {} er.textContent = T('رمز التفعيل غير صحيح أو انتهى. اطلب رمزاً جديداً من مدير النظام.'); b.disabled = false; busyAuth = false; return; }
         await A.updateProfile(c.user, { displayName: document.getElementById('sn').value.trim() });
-        await F.setDoc(F.doc(fs, 'logins', ph), { email, phone: ph, at: new Date().toISOString() });
+        await F.setDoc(F.doc(fs, 'logins', ph), { email, phone: ph, companyId: cid, at: new Date().toISOString() });
         history.replaceState(null, '', location.pathname + location.hash);
         busyAuth = false; join = null; enter(auth.currentUser);
       } catch (err) { er.textContent = T('تعذر إكمال التفعيل، حاول مرة أخرى'); b.disabled = false; busyAuth = false; }
@@ -203,18 +209,119 @@ export async function start() {
     document.getElementById('n-out').onclick = window.__fbSignOut;
   }
 
+  /* ----- تسجيل شركة جديدة ----- */
+  const PENDING = 'fleet-pending-company';
+  const pend = { get() { try { return JSON.parse(localStorage.getItem(PENDING) || 'null'); } catch (e) { return null; } },
+    set(v) { try { localStorage.setItem(PENDING, JSON.stringify(v)); } catch (e) {} }, clear() { try { localStorage.removeItem(PENDING); } catch (e) {} } };
+  function showCompanySignup() {
+    lastShow = null;
+    card(`<h2>تسجيل شركة جديدة</h2><p>أنشئ حساب شركتك وحساب مدير النظام، وابدأ التجربة المجانية ${TRIAL_DAYS} يوماً.</p>
+      <form id="cf" style="display:grid;gap:12px">
+      <label>اسم الشركة<input id="cn" type="text" maxlength="120" autocomplete="organization" required></label>
+      <label>اسمك (مدير النظام)<input id="cu" type="text" autocomplete="name" required></label>
+      <label>البريد الإلكتروني<input id="ce" type="email" dir="ltr" autocomplete="username" required></label>
+      <label>رقم الجوال<input id="cph" type="text" inputmode="tel" dir="ltr" placeholder="05xxxxxxxx"></label>
+      <label>كلمة المرور (6 أحرف على الأقل)<input id="cp" type="password" dir="ltr" autocomplete="new-password" minlength="6" required></label>
+      <div class="err" id="cerr"></div><button class="pri" id="cb">إنشاء الحساب</button></form>
+      <div class="row"><button class="lnk" id="c-back">لدي حساب – تسجيل الدخول</button></div>`);
+    const f = document.getElementById('cf'); const er = document.getElementById('cerr');
+    setTimeout(() => document.getElementById('cn').focus(), 50);
+    f.onsubmit = async e => { e.preventDefault(); const b = document.getElementById('cb'); b.disabled = true; er.textContent = '';
+      const name = document.getElementById('cn').value.trim(), uname = document.getElementById('cu').value.trim();
+      const phone = document.getElementById('cph').value.trim() ? normPhone(document.getElementById('cph').value) : '';
+      if (name.length < 2) { er.textContent = 'اكتب اسم الشركة'; b.disabled = false; return; }
+      if (phone && !/^05\d{8}$/.test(phone)) { er.textContent = 'رقم الجوال يبدأ بـ 05 ويتكون من 10 أرقام'; b.disabled = false; return; }
+      busyAuth = true;
+      try {
+        const c = await A.createUserWithEmailAndPassword(auth, document.getElementById('ce').value.trim(), document.getElementById('cp').value);
+        await A.updateProfile(c.user, { displayName: uname });
+        pend.set({ name, phone, uname, email: String(c.user.email).toLowerCase() });
+        await A.sendEmailVerification(c.user);
+        busyAuth = false; showVerify(c.user);
+      } catch (err) { busyAuth = false; er.textContent = ERR[err.code] || 'تعذر إنشاء الحساب'; b.disabled = false; }
+    };
+    document.getElementById('c-back').onclick = () => showLogin();
+  }
+  const newCid = () => 'c' + Array.from(crypto.getRandomValues(new Uint8Array(6)), x => x.toString(36).padStart(2, '0')).join('').slice(0, 10);
+  async function createCompany(u, { name, phone, uname }) {
+    const email = String(u.email).toLowerCase(); const now = new Date();
+    const cid = newCid();
+    const b = F.writeBatch(fs);
+    b.set(F.doc(fs, 'companies', cid), { name, ownerUid: u.uid, ownerEmail: email, ownerName: uname || u.displayName || '', phone: phone || '', status: 'trial', plan: 'trial', createdAt: now.toISOString(), trialEnds: new Date(now.getTime() + TRIAL_DAYS * 864e5).toISOString().slice(0, 10) });
+    b.set(F.doc(fs, 'members', email), { companyId: cid, at: now.toISOString() });
+    b.set(F.doc(fs, 'companies', cid, 'access', email), { role: 'admin', name: uname || u.displayName || '', phone: phone || null, driverId: null, branchId: null, inviteId: null, owner: true, updatedAt: now.toISOString() });
+    await b.commit();
+    // بعد إنشاء الشركة صار المستخدم مديرها، فيكتب بياناتها الأساسية
+    await F.setDoc(F.doc(fs, 'companies', cid, 'settings', 'main'), { companyName: name, updatedAt: now.toISOString() });
+    pend.clear();
+    return cid;
+  }
+  function showCreateCompany(u, pre) {
+    pre = pre || {};
+    lastShow = null;
+    card(`<h2>بيانات شركتك</h2><p>حسابك <b dir="ltr">${esc(u.email)}</b> جاهز. أكمل بيانات الشركة لبدء التجربة المجانية.</p>
+      <form id="kf" style="display:grid;gap:12px">
+      <label>اسم الشركة<input id="kn" type="text" maxlength="120" value="${esc(pre.name || '')}" required></label>
+      <label>رقم الجوال<input id="kph" type="text" inputmode="tel" dir="ltr" placeholder="05xxxxxxxx" value="${esc(pre.phone || '')}"></label>
+      <div class="err" id="kerr"></div><button class="pri" id="kb">إنشاء الشركة والدخول</button></form>
+      <div class="row"><button class="lnk" id="k-out">خروج</button></div>`);
+    const f = document.getElementById('kf');
+    f.onsubmit = async e => { e.preventDefault(); const b = document.getElementById('kb'); b.disabled = true; const er = document.getElementById('kerr');
+      const name = document.getElementById('kn').value.trim(); const phone = document.getElementById('kph').value.trim() ? normPhone(document.getElementById('kph').value) : '';
+      if (name.length < 2) { er.textContent = 'اكتب اسم الشركة'; b.disabled = false; return; }
+      if (phone && !/^05\d{8}$/.test(phone)) { er.textContent = 'رقم الجوال يبدأ بـ 05 ويتكون من 10 أرقام'; b.disabled = false; return; }
+      try { await createCompany(u, { name, phone, uname: pre.uname }); entered = false; enter(u); }
+      catch (err) { console.warn(err); er.textContent = 'تعذر إنشاء الشركة. قد يكون حسابك مسجلاً في شركة أخرى.'; b.disabled = false; } };
+    document.getElementById('k-out').onclick = window.__fbSignOut;
+  }
+  function showSuspended(u) {
+    lastShow = () => showSuspended(u);
+    card(`<h2>الاشتراك موقوف</h2><p>اشتراك شركة <b>${esc(COMPANY && COMPANY.name || '')}</b> موقوف حالياً، والبيانات محفوظة كما هي. تواصل معنا لإعادة التفعيل.</p>
+      ${SUPPORT_CONTACT ? `<p dir="ltr" style="text-align:right">${esc(SUPPORT_CONTACT)}</p>` : ''}
+      <button class="pri" id="su-r">إعادة المحاولة</button><div class="row"><button class="lnk" id="su-out">خروج</button></div>`);
+    document.getElementById('su-r').onclick = () => { entered = false; enter(u); };
+    document.getElementById('su-out').onclick = window.__fbSignOut;
+  }
+  function showSuperChoice(u, hasCompany) {
+    lastShow = null;
+    card(`<h2>مرحباً ${esc(u.displayName || '')}</h2><p>أنت مالك المنصة. اختر وجهتك:</p>
+      <a class="pri" href="admin.html" style="text-align:center;text-decoration:none;display:block;padding:12px;border-radius:10px;background:var(--acc,#0E5A44);color:#fff;font-weight:600">لوحة تحكم المالك (الشركات والاشتراكات)</a>
+      ${hasCompany ? `<button class="pri" id="sc-co" style="background:#fff;color:var(--acc,#0E5A44);border:2px solid var(--acc,#0E5A44)">الدخول إلى نظام شركتي</button>` : ''}
+      <div class="row"><button class="lnk" id="sc-out">خروج</button></div>`);
+    const b = document.getElementById('sc-co'); if (b) b.onclick = () => { sessionStorage.setItem('fleet-super-co', '1'); entered = false; enter(u); };
+    document.getElementById('sc-out').onclick = window.__fbSignOut;
+  }
+
   let entered = false;
   async function enter(u) {
     if (entered) return;
     if (!u.emailVerified && !isPhoneAcct(u.email)) return showVerify(u);
     const email = String(u.email).toLowerCase();
-    const isOwner = email === OWNER;
+    const isSuper = !!SUPER && email === SUPER;
+    // أي شركة ينتمي لها المستخدم
+    let mem = null;
+    try { const m = await F.getDoc(F.doc(fs, 'members', email)); mem = m.exists() ? m.data() : null; } catch (e) { mem = null; }
+    if (!mem) {
+      if (isSuper) return showSuperChoice(u, false);
+      if (isPhoneAcct(u.email)) return showNoAccess(u);
+      const p = pend.get();
+      return showCreateCompany(u, p && p.email === email ? p : { uname: u.displayName || '' });
+    }
+    if (isSuper && !sessionStorage.getItem('fleet-super-co')) return showSuperChoice(u, true);
+    CID = mem.companyId;
+    try { const c = await F.getDoc(F.doc(fs, 'companies', CID)); COMPANY = c.exists() ? c.data() : null; } catch (e) { COMPANY = null; }
+    if (!COMPANY) return showNoAccess(u);
+    if (!['trial', 'active'].includes(COMPANY.status)) return showSuspended(u);
+    const isOwner = email === String(COMPANY.ownerEmail || '').toLowerCase();
     let access = null;
     if (!isOwner) {
-      try { const s = await F.getDoc(F.doc(fs, 'access', email)); access = s.exists() ? s.data() : null; } catch (e) { access = null; }
+      try { const s = await F.getDoc(F.doc(fs, P('access'), email)); access = s.exists() ? s.data() : null; } catch (e) { access = null; }
       if (!access) return showNoAccess(u);
     }
     entered = true;
+    window.__companyId = CID; window.__company = { id: CID, ...COMPANY }; window.OWNER_EMAIL = String(COMPANY.ownerEmail || '').toLowerCase();
+    window.__companySetSys = async sysEmail => { await F.updateDoc(F.doc(fs, 'companies', CID), { sysEmail, updatedAt: new Date().toISOString() }); };
+    swPost({ type: 'token', token: await u.getIdToken(), project: FIREBASE_CONFIG.projectId, cid: CID });
     document.getElementById('auth') && (document.getElementById('auth').hidden = true);
     window.claude = makeClaude(u, isOwner, access);
     readyResolve();
@@ -227,21 +334,27 @@ export async function start() {
     const label = d => { if (!d) return ''; const p = [d.plateLetters, d.plateNumbers].filter(Boolean).join(' '); return p || d.name || d.kind || d.title || d.ref || ''; };
     async function audit(col, id, action, data, fields) {
       if (SKIP_AUDIT.has(col) || String(col).startsWith('threads')) return;
-      try { await F.addDoc(F.collection(fs, 'audit'), { at: new Date().toISOString(), uid: me.id, name: me.name, email: me.phone || me.email, col, docId: id, action, label: label(data), vid: (data && data.vehicleId) || null, fields: fields || null }); } catch (e) {}
+      try { await F.addDoc(F.collection(fs, P('audit')), { at: new Date().toISOString(), uid: me.id, name: me.name, email: me.phone || me.email, col, docId: id, action, label: label(data), vid: (data && data.vehicleId) || null, fields: fields || null }); } catch (e) {}
     }
     const accKey = d => d && String(d.loginEmail || d.email || '').toLowerCase();
     async function mirrorAccess(id, data, prev) {
       const pe = accKey(prev), ne = accKey(data);
       try {
         if (pe && pe !== ne) {
-          await F.deleteDoc(F.doc(fs, 'access', pe));
+          await F.deleteDoc(F.doc(fs, P('access'), pe));
+          try { await F.deleteDoc(F.doc(fs, 'members', pe)); } catch (e) {}
           if (prev.phone && prev.loginEmail) { try { await F.deleteDoc(F.doc(fs, 'logins', normPhone(prev.phone))); } catch (e) {} }
         }
-        if (ne) await F.setDoc(F.doc(fs, 'access', ne), { role: data.role || 'viewer', driverId: data.driverId || null, branchId: data.branchId || null, name: data.name || '', phone: data.phone ? normPhone(data.phone) : null, inviteId: id, updatedAt: new Date().toISOString() });
-      } catch (e) { console.warn('access', e); }
+        if (ne) {
+          // فهرس العضوية: يفشل إن كان الإيميل مسجلاً في شركة أخرى
+          try { await F.setDoc(F.doc(fs, 'members', ne), { companyId: CID, at: new Date().toISOString() }); }
+          catch (e) { const x = new Error('هذا المستخدم مسجل في شركة أخرى على المنصة'); x.code = 'member-conflict'; throw x; }
+        }
+        if (ne) await F.setDoc(F.doc(fs, P('access'), ne), { role: data.role || 'viewer', driverId: data.driverId || null, branchId: data.branchId || null, name: data.name || '', phone: data.phone ? normPhone(data.phone) : null, inviteId: id, updatedAt: new Date().toISOString() });
+      } catch (e) { console.warn('access', e); if (e.code === 'member-conflict') { window.toast && window.toast(e.message); } }
     }
     const docApi = (col, id) => {
-      const ref = F.doc(fs, col, id);
+      const ref = F.doc(fs, P(col), id);
       return {
         async set(data) {
           const prev = col === 'invites' ? (await F.getDoc(ref)).data() : null;
@@ -268,8 +381,8 @@ export async function start() {
     const db = {
       collection(col) {
         return {
-          onSnapshot(cb, err) { return F.onSnapshot(F.collection(fs, col), s => cb({ docs: s.docs.map(d => ({ id: d.id, data: () => d.data() })) }), err); },
-          async add(data) { const r = await F.addDoc(F.collection(fs, col), data); if (col === 'invites') await mirrorAccess(r.id, data, null); audit(col, r.id, 'add', data); return { id: r.id }; },
+          onSnapshot(cb, err) { return F.onSnapshot(F.collection(fs, P(col)), s => cb({ docs: s.docs.map(d => ({ id: d.id, data: () => d.data() })) }), err); },
+          async add(data) { const r = await F.addDoc(F.collection(fs, P(col)), data); if (col === 'invites') await mirrorAccess(r.id, data, null); audit(col, r.id, 'add', data); return { id: r.id }; },
           doc: id => docApi(col, id)
         };
       },
@@ -277,17 +390,17 @@ export async function start() {
       // استعلام مباشر مع تحديث لحظي (للرسائل)
       watch(col, opts, cb, err) {
         const cons = []; (opts.where || []).forEach(w => cons.push(F.where(w[0], w[1], w[2]))); if (opts.orderBy) cons.push(F.orderBy(opts.orderBy[0], opts.orderBy[1] || 'asc')); if (opts.limit) cons.push(F.limit(opts.limit));
-        return F.onSnapshot(F.query(F.collection(fs, col), ...cons), s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))), err);
+        return F.onSnapshot(F.query(F.collection(fs, P(col)), ...cons), s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))), err);
       },
-      async merge(col, id, data) { await F.setDoc(F.doc(fs, col, id), data, { merge: true }); },
-      async addTo(col, data) { const r = await F.addDoc(F.collection(fs, col), data); return r.id; },
-      async getOne(col, id) { const s = await F.getDoc(F.doc(fs, col, id)); return s.exists() ? { id: s.id, ...s.data() } : null; },
-      async recent(col, n) { const s = await F.getDocs(F.query(F.collection(fs, col), F.orderBy('at', 'desc'), F.limit(n || 300))); return s.docs.map(d => ({ id: d.id, ...d.data() })); },
+      async merge(col, id, data) { await F.setDoc(F.doc(fs, P(col), id), data, { merge: true }); },
+      async addTo(col, data) { const r = await F.addDoc(F.collection(fs, P(col)), data); return r.id; },
+      async getOne(col, id) { const s = await F.getDoc(F.doc(fs, P(col), id)); return s.exists() ? { id: s.id, ...s.data() } : null; },
+      async recent(col, n) { const s = await F.getDocs(F.query(F.collection(fs, P(col)), F.orderBy('at', 'desc'), F.limit(n || 300))); return s.docs.map(d => ({ id: d.id, ...d.data() })); },
       async importAll(data, onProgress) {
         const items = []; Object.entries(data.collections || {}).forEach(([c, list]) => (list || []).forEach(d => { const { id, ...rest } = d; if (id) items.push([c, id, rest]); }));
         Object.entries(data.blobs || {}).forEach(([id, b]) => chunkBlob(id, b.type, b.data, b.size).forEach(([bid, doc]) => items.push(['blobs', bid, doc])));
         for (let i = 0; i < items.length; i += 400) {
-          const b = F.writeBatch(fs); items.slice(i, i + 400).forEach(([c, id, d]) => b.set(F.doc(fs, c, id), d)); await b.commit(); onProgress && onProgress(Math.min(items.length, i + 400), items.length);
+          const b = F.writeBatch(fs); items.slice(i, i + 400).forEach(([c, id, d]) => b.set(F.doc(fs, P(c), id), d)); await b.commit(); onProgress && onProgress(Math.min(items.length, i + 400), items.length);
         }
         for (const iv of (data.collections?.invites || [])) await mirrorAccess(iv.id, iv, null);
         audit('settings', 'import', 'import', { name: 'استيراد بيانات' });
@@ -307,7 +420,7 @@ export async function start() {
         const id = Array.from(crypto.getRandomValues(new Uint8Array(16)), x => x.toString(16).padStart(2, '0')).join('');
         const type = (opts && opts.type) || blob.type || 'application/octet-stream';
         const b64 = await toB64(blob);
-        for (const [bid, d] of chunkBlob(id, type, b64, blob.size)) await F.setDoc(F.doc(fs, 'blobs', bid), d);
+        for (const [bid, d] of chunkBlob(id, type, b64, blob.size)) await F.setDoc(F.doc(fs, P('blobs'), bid), d);
         return { id, url: '_blob/' + id, sizeBytes: blob.size, contentType: type };
       }
     };
@@ -320,7 +433,7 @@ export async function start() {
     };
     const user = {
       async me() { return me; }, async can() { return true; },
-      async profiles(ids) { const out = {}; for (const id of [].concat(ids)) { try { const s = await F.getDoc(F.doc(fs, 'seen', id)); const d = s.data() || {}; out[id] = { id, name: d.name || d.email || '', email: d.email || '' }; } catch (e) { out[id] = { id }; } } return out; },
+      async profiles(ids) { const out = {}; for (const id of [].concat(ids)) { try { const s = await F.getDoc(F.doc(fs, P('seen'), id)); const d = s.data() || {}; out[id] = { id, name: d.name || d.email || '', email: d.email || '' }; } catch (e) { out[id] = { id }; } } return out; },
       async search() { return []; }
     };
     return { use: async x => ({ db, assets, downloads, user })[x] || null, standalone: true };
@@ -330,6 +443,6 @@ export async function start() {
   A.onAuthStateChanged(auth, async u => {
     if (busyAuth) return;
     if (u && join && normPhone(join.phone) !== phoneOf(u.email)) { await A.signOut(auth); return; }
-    if (u) enter(u); else { entered = false; join ? showActivate(join) : showLogin(); } });
+    if (u) enter(u); else { entered = false; join ? showActivate(join) : qp.has('signup') ? showCompanySignup() : showLogin(); } });
 }
 start().catch(e => { console.error(e); card(`<h2>تعذر تشغيل النظام</h2><p>تأكد من اتصالك بالإنترنت ثم أعد تحميل الصفحة.</p><p class="err" dir="ltr">${esc(e && e.message)}</p>`); });

@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>لوحة تحكم المالك</title>
+<link rel="icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--acc:#0E5A44;--ink:#15201B;--muted:#5A6862;--line:#D6DDD9;--bg:#EEF1EF;--surface:#fff;--surface-2:#F6F8F7;--ok:#0E7A4F;--warn:#B54708;--bad:#B42318;--info:#175CD3}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "IBM Plex Sans Arabic",system-ui,sans-serif}
+header{background:var(--acc);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header h1{margin:0;font:600 19px "Readex Pro",sans-serif}
+header small{opacity:.8}
+header .who{display:flex;gap:10px;align-items:center;font-size:14px}
+main{max-width:1200px;margin:0 auto;padding:18px 16px 40px;display:grid;gap:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi b{display:block;font:700 26px "Readex Pro",sans-serif}
+.kpi span{color:var(--muted);font-size:13px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.bar input,.bar select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);color:inherit}
+.bar input{flex:1;min-width:180px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:860px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-weight:600;font-size:13px;color:var(--muted);background:var(--surface-2)}
+td small{display:block;color:var(--muted);font-size:12px}
+.pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.p-active{background:#DCFAE6;color:var(--ok)}.p-trial{background:#D1E9FF;color:var(--info)}.p-suspended{background:#FEE4E2;color:var(--bad)}.p-expired{background:#FEF0C7;color:var(--warn)}
+.btn{font:600 13px "IBM Plex Sans Arabic",sans-serif;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.bad{color:var(--bad);border-color:#F4C7C3}
+.btn.lt{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.btn:disabled{opacity:.5}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+#login{max-width:400px;margin:60px auto;background:var(--surface);border-radius:16px;padding:24px;display:grid;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.12)}
+#login h2{margin:0;font:600 19px "Readex Pro",sans-serif}
+#login label{display:grid;gap:5px;font-size:13px;color:var(--muted)}
+#login input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.err{color:var(--bad);font-size:14px;min-height:1em}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#15201B;color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.2s;pointer-events:none}
+#toast.on{opacity:1}
+dialog{border:0;border-radius:14px;padding:0;width:min(420px,92vw)}
+dialog form{padding:20px;display:grid;gap:12px}
+dialog h3{margin:0;font:600 17px "Readex Pro",sans-serif}
+dialog label{display:grid;gap:5px;font-size:13px;color:var(--muted)}
+dialog input,dialog select,dialog textarea{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:9px}
+dialog .acts{justify-content:flex-start}
+</style>
+</head>
+<body>
+<header><div><h1>لوحة تحكم المالك</h1><small>الشركات المشتركة وحالة الاشتراك</small></div><div class="who" id="who"></div></header>
+<div id="login" hidden>
+  <h2>دخول مالك المنصة</h2>
+  <form id="lf" style="display:grid;gap:12px">
+    <label>البريد الإلكتروني<input id="le" type="email" dir="ltr" autocomplete="username" required></label>
+    <label>كلمة المرور<input id="lp" type="password" dir="ltr" autocomplete="current-password" required></label>
+    <div class="err" id="lerr"></div>
+    <button class="btn pri" style="padding:11px">دخول</button>
+  </form>
+</div>
+<main id="app" hidden>
+  <section class="kpis" id="kpis"></section>
+  <section class="panel">
+    <div class="bar">
+      <input id="q" type="search" placeholder="بحث باسم الشركة أو الإيميل أو الجوال">
+      <select id="fs"><option value="all">كل الحالات</option><option value="active">مفعّلة</option><option value="trial">تجربة</option><option value="expired">تجربة منتهية</option><option value="suspended">موقوفة</option></select>
+      <button class="btn" id="reload">تحديث</button>
+    </div>
+    <div class="tw"><table><thead><tr><th>الشركة</th><th>المدير</th><th>الحالة</th><th>السيارات</th><th>التسجيل</th><th>نهاية التجربة / الاشتراك</th><th>إجراءات</th></tr></thead><tbody id="rows"></tbody></table></div>
+  </section>
+</main>
+<dialog id="dlg"><form method="dialog" id="df"></form></dialog>
+<div id="toast"></div>
+<script type="module">
+import { FIREBASE_CONFIG, SUPER_ADMIN_EMAIL } from './config.js';
+const FB = 'https://www.gstatic.com/firebasejs/10.12.2';
+const [{ initializeApp }, A, F] = await Promise.all([import(`${FB}/firebase-app.js`), import(`${FB}/firebase-auth.js`), import(`${FB}/firebase-firestore.js`)]);
+const app = initializeApp(FIREBASE_CONFIG); const auth = A.getAuth(app); const fs = F.getFirestore(app);
+const SUPER = String(SUPER_ADMIN_EMAIL).toLowerCase();
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2600); };
+const today = () => new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 10);
+const addDays = (d, n) => new Date(Date.parse((d && d > today() ? d : today()) + 'T00:00:00Z') + n * 864e5).toISOString().slice(0, 10);
+const fmt = s => s ? String(s).slice(0, 10) : '—';
+const ST = { active: ['مفعّلة', 'p-active'], trial: ['تجربة', 'p-trial'], suspended: ['موقوفة', 'p-suspended'], expired: ['تجربة منتهية', 'p-expired'] };
+const stOf = c => c.status === 'trial' && c.trialEnds && c.trialEnds < today() ? 'expired' : (c.status || 'trial');
+let COS = [];
+
+$('#lf').onsubmit = async e => { e.preventDefault(); $('#lerr').textContent = '';
+  try { await A.signInWithEmailAndPassword(auth, $('#le').value.trim(), $('#lp').value); }
+  catch (err) { $('#lerr').textContent = 'الإيميل أو كلمة المرور غير صحيحة'; } };
+
+A.onAuthStateChanged(auth, async u => {
+  if (!u) { $('#login').hidden = false; $('#app').hidden = true; $('#who').innerHTML = ''; return; }
+  if (String(u.email).toLowerCase() !== SUPER) { $('#login').hidden = false; $('#lerr').textContent = 'هذه الصفحة لمالك المنصة فقط'; await A.signOut(auth); return; }
+  $('#login').hidden = true; $('#app').hidden = false;
+  $('#who').innerHTML = `<span dir="ltr">${esc(u.email)}</span><a class="btn lt" href="./" style="text-decoration:none">النظام</a><button class="btn lt" id="out">خروج</button>`;
+  $('#out').onclick = () => A.signOut(auth);
+  load();
+});
+
+async function load() {
+  $('#rows').innerHTML = `<tr><td colspan="7" class="empty">جارٍ التحميل…</td></tr>`;
+  try {
+    const s = await F.getDocs(F.collection(fs, 'companies'));
+    COS = s.docs.map(d => ({ id: d.id, ...d.data(), vehicles: null })).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    render();
+    await Promise.all(COS.map(async c => { try { c.vehicles = (await F.getCountFromServer(F.collection(fs, 'companies', c.id, 'vehicles'))).data().count; } catch (e) { c.vehicles = '؟'; } }));
+    render();
+  } catch (e) { console.error(e); $('#rows').innerHTML = `<tr><td colspan="7" class="empty">تعذر تحميل الشركات: ${esc(e.code || e.message)}</td></tr>`; }
+}
+
+function render() {
+  const q = $('#q').value.trim().toLowerCase(), f = $('#fs').value;
+  const n = k => COS.filter(c => stOf(c) === k).length;
+  const veh = COS.reduce((t, c) => t + (+c.vehicles || 0), 0);
+  $('#kpis').innerHTML = [['كل الشركات', COS.length], ['مفعّلة', n('active')], ['تجربة', n('trial')], ['تجربة منتهية', n('expired')], ['موقوفة', n('suspended')], ['إجمالي السيارات', veh]]
+    .map(([l, v]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
+  const list = COS.filter(c => (f === 'all' || stOf(c) === f) && (!q || [c.name, c.ownerEmail, c.ownerName, c.phone, c.id].some(x => String(x || '').toLowerCase().includes(q))));
+  $('#rows').innerHTML = list.length ? list.map(c => { const st = stOf(c); const [lb, cl] = ST[st] || [st, '']; return `<tr>
+    <td><b>${esc(c.name)}</b><small dir="ltr" style="text-align:right;font-family:ui-monospace,monospace">${esc(c.id)}</small>${c.note ? `<small>📝 ${esc(c.note)}</small>` : ''}</td>
+    <td>${esc(c.ownerName || '')}<small dir="ltr" style="text-align:right">${esc(c.ownerEmail)}</small>${c.phone ? `<small dir="ltr" style="text-align:right">${esc(c.phone)}</small>` : ''}</td>
+    <td><span class="pill ${cl}">${lb}</span>${c.plan && c.plan !== 'trial' ? `<small>${esc(c.plan)}</small>` : ''}</td>
+    <td>${c.vehicles == null ? '…' : esc(c.vehicles)}</td>
+    <td>${fmt(c.createdAt)}</td>
+    <td>${c.status === 'active' ? fmt(c.paidUntil) : fmt(c.trialEnds)}</td>
+    <td><div class="acts">
+      ${c.status !== 'active' ? `<button class="btn pri" data-a="activate" data-id="${esc(c.id)}">تفعيل</button>` : ''}
+      ${c.status !== 'suspended' ? `<button class="btn bad" data-a="suspend" data-id="${esc(c.id)}">إيقاف</button>` : ''}
+      ${c.status !== 'active' ? `<button class="btn" data-a="extend" data-id="${esc(c.id)}">تمديد التجربة</button>` : ''}
+      <button class="btn" data-a="edit" data-id="${esc(c.id)}">تعديل</button>
+    </div></td></tr>`; }).join('') : `<tr><td colspan="7" class="empty">${COS.length ? 'لا توجد نتائج' : 'لا توجد شركات مسجلة بعد'}</td></tr>`;
+}
+$('#q').oninput = render; $('#fs').onchange = render; $('#reload').onclick = load;
+
+async function save(id, data, msg) {
+  try { await F.updateDoc(F.doc(fs, 'companies', id), { ...data, updatedAt: new Date().toISOString() }); Object.assign(COS.find(c => c.id === id), data); render(); toast(msg); }
+  catch (e) { console.error(e); toast('تعذر الحفظ: ' + (e.code || e.message)); }
+}
+function dialog(html, onOk) {
+  const d = $('#dlg'), f = $('#df'); f.innerHTML = html + `<div class="acts"><button class="btn pri" value="ok">حفظ</button><button class="btn" value="cancel" formnovalidate>إلغاء</button></div>`;
+  d.onclose = () => { if (d.returnValue === 'ok') onOk(new FormData(f)); }; d.returnValue = ''; d.showModal();
+}
+$('#rows').onclick = e => {
+  const b = e.target.closest('[data-a]'); if (!b) return; const c = COS.find(x => x.id === b.dataset.id); if (!c) return;
+  if (b.dataset.a === 'activate') dialog(`<h3>تفعيل اشتراك ${esc(c.name)}</h3>
+      <label>الباقة<input name="plan" value="${esc(c.plan && c.plan !== 'trial' ? c.plan : 'شهري')}" required></label>
+      <label>الاشتراك مدفوع حتى<input name="paidUntil" type="date" value="${esc(c.paidUntil || addDays(today(), 30))}" required></label>`,
+    fd => save(c.id, { status: 'active', plan: fd.get('plan'), paidUntil: fd.get('paidUntil') }, 'تم تفعيل الاشتراك ✓'));
+  if (b.dataset.a === 'suspend') { if (confirm(`إيقاف «${c.name}»؟\nلن يستطيع أي مستخدم في الشركة الدخول، والبيانات تبقى محفوظة ويمكن إعادة التفعيل في أي وقت.`)) save(c.id, { status: 'suspended', suspendedAt: new Date().toISOString() }, 'تم إيقاف الشركة'); }
+  if (b.dataset.a === 'extend') dialog(`<h3>تمديد التجربة – ${esc(c.name)}</h3><label>تنتهي التجربة في<input name="trialEnds" type="date" value="${esc(addDays(c.trialEnds, 14))}" required></label>`,
+    fd => save(c.id, { status: 'trial', trialEnds: fd.get('trialEnds') }, 'تم تمديد التجربة ✓'));
+  if (b.dataset.a === 'edit') dialog(`<h3>تعديل ${esc(c.name)}</h3>
+      <label>اسم الشركة<input name="name" value="${esc(c.name)}" required maxlength="120"></label>
+      <label>الباقة<input name="plan" value="${esc(c.plan || '')}"></label>
+      <label>ملاحظة داخلية<textarea name="note" rows="2">${esc(c.note || '')}</textarea></label>`,
+    fd => save(c.id, { name: fd.get('name').trim(), plan: fd.get('plan').trim(), note: fd.get('note').trim() }, 'تم الحفظ ✓'));
+};
+</script>
+</body>
+</html>
