@@ -1,0 +1,13 @@
+{
+ "name": "fleet-functions",
+ "private": true,
+ "dependencies": {
+  "web-push": "3.6.7"
+ },
+ "devDependencies": {
+  "esbuild": "0.23.1"
+ },
+ "scripts": {
+  "build": "esbuild push.js --bundle --platform=node --target=node18 --format=cjs --outfile=../build/push.js"
+ }
+}

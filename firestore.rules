@@ -1,0 +1,112 @@
+rules_version = '2';
+// قواعد أمان نظام أسطول الشركة
+// غيّر الإيميل في ownerEmail() ليطابق config.js
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function ownerEmail() { return 'salmandh02@gmail.com'; }
+    function signedIn() { return request.auth != null && (request.auth.token.email_verified == true || request.auth.token.email.lower().matches('.*@m[.]manhalfleet[.]app$')); }
+    function myEmail() { return request.auth.token.email.lower(); }
+    function isOwner() { return signedIn() && myEmail() == ownerEmail(); }
+    function accessPath() { return /databases/$(database)/documents/access/$(myEmail()); }
+    function hasAccess() { return signedIn() && exists(accessPath()); }
+    function role() { return isOwner() ? 'admin' : (hasAccess() ? get(accessPath()).data.role : 'none'); }
+    function member() { return isOwner() || hasAccess(); }
+    function isAdmin() { return role() == 'admin'; }
+    function isStaff() { return role() in ['admin', 'fleet']; }
+    function isDriver() { return role() == 'driver'; }
+    function isBranch() { return role() == 'branch'; }
+    function myBranch() { return get(accessPath()).data.branchId; }
+    function vehBranch(vid) { return get(/databases/$(database)/documents/vehicles/$(vid)).data.get('branchId', null); }
+
+    // البيانات التشغيلية: يقرأها كل مستخدم مضاف، ويعدلها مدير النظام ومدير الحركة، والحذف لمدير النظام
+    match /{col}/{id} {
+      allow read: if member() && !(col in ['audit', 'threads', 'ids']);
+      allow create: if isStaff() && !(col in ['settings', 'invites', 'access', 'roles', 'audit', 'seen', 'blobs', 'logins', 'threads', 'pushsubs', 'ids'])
+        && (isAdmin() || !(col == 'handovers' && 'ack' in request.resource.data))
+        && (!(col == 'handovers' && 'issuer' in request.resource.data) || request.resource.data.issuer.uid == request.auth.uid);
+      allow update: if isStaff() && !(col in ['settings', 'invites', 'access', 'roles', 'audit', 'seen', 'blobs', 'logins', 'threads', 'pushsubs', 'ids'])
+        && (isAdmin() || !(col == 'handovers' && (request.resource.data.get('ack', null) != resource.data.get('ack', null) || request.resource.data.get('issuer', null) != resource.data.get('issuer', null))))
+        && (isAdmin() || !(col == 'vehicles' && (resource.data.get('status', '') == 'sold' || request.resource.data.get('status', '') == 'sold')));
+      allow delete: if isAdmin() && !(col in ['audit', 'access']);
+    }
+
+    // الإعدادات والمستخدمون: مدير النظام فقط
+    match /settings/{id} { allow write: if isAdmin(); }
+    match /invites/{id} { allow write: if isAdmin(); }
+    match /roles/{id}   { allow write: if isAdmin(); }
+    match /access/{email} {
+      allow read: if signedIn() && (email == myEmail() || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // أرقام الهوية: يراها مدير النظام، وكل مستخدم يرى رقمه فقط
+    match /ids/{id} {
+      allow read: if isAdmin() || (hasAccess() && get(accessPath()).data.inviteId == id);
+      allow write: if isAdmin();
+    }
+
+    // السائق: يسجل الفحص الأسبوعي، ويحدّث قراءة العداد فقط
+    // ربط رقم الجوال بالحساب: يقرأه شاشة الدخول، ويكتبه المستخدم عند التفعيل لرقمه فقط
+    match /logins/{phone} {
+      allow read: if true;
+      allow create, update: if hasAccess() && request.resource.data.email == myEmail() && get(accessPath()).data.phone == phone;
+      allow delete: if isAdmin();
+    }
+
+    // الرسائل: كل محادثة بين شخصين، ولا يقرأها غيرهما
+    function otherOf(ps) { return ps[0] == myEmail() ? ps[1] : ps[0]; }
+    function canChatWith(o) { return isStaff() || isBranch() || o == ownerEmail() || (exists(/databases/$(database)/documents/access/$(o)) && get(/databases/$(database)/documents/access/$(o)).data.role in ['admin', 'fleet']); }
+    function inThread(tid) { return myEmail() in get(/databases/$(database)/documents/threads/$(tid)).data.participants; }
+    match /threads/{tid} {
+      allow read: if member() && myEmail() in resource.data.participants;
+      allow create: if member() && request.resource.data.participants.size() == 2 && myEmail() in request.resource.data.participants && canChatWith(otherOf(request.resource.data.participants));
+      allow update: if member() && myEmail() in resource.data.participants && request.resource.data.participants == resource.data.participants;
+      allow delete: if isAdmin();
+      match /messages/{mid} {
+        allow read: if member() && inThread(tid);
+        allow create: if member() && inThread(tid) && request.resource.data.from == myEmail();
+        allow delete: if isAdmin();
+      }
+    }
+
+    // اشتراكات إشعارات الجوال: كل مستخدم يسجل أجهزته فقط
+    match /pushsubs/{id} {
+      allow read, delete: if member();
+      allow create, update: if member() && request.resource.data.key == myEmail();
+    }
+
+    match /inspections/{id} { allow create: if isDriver(); }
+    // التوقيع الإلكتروني: السائق يوقّع محاضره فقط، ولا يغيّر غير خانة التوقيع
+    match /handovers/{id} {
+      allow update: if isDriver()
+        && resource.data.driverId == get(accessPath()).data.driverId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ack'])
+        && request.resource.data.ack.uid == request.auth.uid;
+      // مشرف الفرع: ينشئ محاضر التسليم والاستلام لسيارات فرعه فقط
+      allow create: if isBranch() && myBranch() != null && vehBranch(request.resource.data.vehicleId) == myBranch()
+        && !('ack' in request.resource.data) && request.resource.data.issuer.uid == request.auth.uid;
+    }
+    match /vehicles/{id} {
+      allow update: if isDriver() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['odometer']);
+      allow update: if isBranch() && myBranch() != null && resource.data.get('branchId', null) == myBranch() && resource.data.get('status', '') != 'sold'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'driverId', 'odometer'])
+        && request.resource.data.status in ['assigned', 'available'];
+    }
+
+    // الصور والمرفقات
+    match /blobs/{id} {
+      allow create: if member() && !(role() == 'viewer');
+      allow update: if isStaff();
+    }
+
+    // آخر دخول: كل مستخدم يكتب سجله فقط
+    match /seen/{uid} { allow write: if signedIn() && request.auth.uid == uid; }
+
+    // سجل التدقيق: إضافة فقط، لا تعديل ولا حذف، والقراءة لمدير النظام
+    match /audit/{id} {
+      allow read: if isAdmin();
+      allow create: if member() && request.resource.data.uid == request.auth.uid;
+    }
+  }
+}
