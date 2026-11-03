@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>الفاتورة والدفع</title>
+<link rel="icon" href="icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="moyasar.css">
+<style>
+:root{--acc:#0E5A44;--ink:#15201B;--muted:#5A6862;--line:#D6DDD9;--bg:#EEF1EF}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "IBM Plex Sans Arabic",system-ui,sans-serif}
+header{background:var(--acc);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+header b{font:600 17px "Readex Pro",sans-serif}header a{color:#fff;font-size:14px}
+main{max-width:860px;margin:0 auto;padding:16px;display:grid;gap:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h2{margin:0 0 8px;font:600 18px "Readex Pro",sans-serif}
+.msg{padding:12px 14px;border-radius:10px}.ok{background:#DCFAE6;color:#0E7A4F}.bad{background:#FEE4E2;color:#B42318}.info{background:#F6F8F7}
+.btn{font:600 14px "IBM Plex Sans Arabic",sans-serif;padding:9px 16px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.mysr-form{max-width:420px;margin:0 auto}
+@media print{header,.np{display:none}body{background:#fff}.card{border:0;padding:0}}
+</style>
+</head>
+<body>
+<header><b>الفاتورة والدفع</b><a href="./#billing">رجوع للنظام</a></header>
+<main>
+  <div class="card np" id="state"><div class="msg info">جارٍ التحميل…</div></div>
+  <div class="card np" id="payBox" hidden><h2>الدفع الإلكتروني</h2><p style="margin:0 0 10px;color:var(--muted);font-size:14px">مدى، فيزا، ماستركارد، Apple Pay. الدفع يتم عبر بوابة ميسر المرخّصة، ولا نحفظ بيانات بطاقتك.</p><div class="mysr-form"></div></div>
+  <div class="card" id="inv" hidden></div>
+  <div class="np" id="acts" hidden style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" onclick="print()">طباعة / حفظ PDF</button><a class="btn" href="./#billing">رجوع للاشتراك والفواتير</a></div>
+</main>
+<script src="qr.js"></script>
+<script src="moyasar.js"></script>
+<script type="module">
+import { FIREBASE_CONFIG, APP_NAME } from './config.js';
+import { invoiceBody } from './invoice.js';
+const FB = 'https://www.gstatic.com/firebasejs/10.12.2';
+const [{ initializeApp }, A, F] = await Promise.all([import(`${FB}/firebase-app.js`), import(`${FB}/firebase-auth.js`), import(`${FB}/firebase-firestore.js`)]);
+const app = initializeApp(FIREBASE_CONFIG); const auth = A.getAuth(app); const fs = F.getFirestore(app);
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const qp = new URLSearchParams(location.search); const invId = qp.get('inv');
+const state = (html, cls = 'info') => { $('#state').hidden = false; $('#state').innerHTML = `<div class="msg ${cls}">${html}</div>`; };
+
+A.onAuthStateChanged(auth, async u => {
+  if (!u) return state(`سجّل الدخول أولاً لعرض الفاتورة. <a href="./?login=1">تسجيل الدخول</a>`, 'bad');
+  if (!invId) return state('رابط غير صحيح', 'bad');
+  let inv, pub = {};
+  try { const d = await F.getDoc(F.doc(fs, 'invoices', invId)); if (!d.exists()) return state('الفاتورة غير موجودة', 'bad'); inv = { id: d.id, ...d.data() }; }
+  catch (e) { return state('لا تملك صلاحية عرض هذه الفاتورة', 'bad'); }
+  try { const p = await F.getDoc(F.doc(fs, 'platform', 'public')); pub = p.exists() ? p.data() : {}; } catch (e) {}
+  $('#inv').innerHTML = invoiceBody(inv, pub); $('#inv').hidden = false; $('#acts').hidden = false;
+
+  // العودة من بوابة الدفع: نتحقق من العملية في الخادم قبل اعتمادها
+  if (qp.get('id') && inv.status === 'unpaid') {
+    if (qp.get('status') !== 'paid') { state(`لم تكتمل عملية الدفع${qp.get('message') ? ': ' + esc(qp.get('message')) : ''}. يمكنك المحاولة مرة أخرى.`, 'bad'); }
+    else {
+      state('جارٍ التحقق من الدفع…');
+      try {
+        const r = await fetch('/.netlify/functions/plat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'pay-verify', invoiceId: invId, paymentId: qp.get('id') }) });
+        const j = await r.json();
+        if (j.ok) { state(`تم الدفع بنجاح ✓ وتفعّل اشتراكك. <a href="./">الدخول للنظام</a>`, 'ok'); const d = await F.getDoc(F.doc(fs, 'invoices', invId)); $('#inv').innerHTML = invoiceBody({ id: invId, ...d.data() }, pub); history.replaceState(null, '', `?inv=${invId}&view=1`); return; }
+        state('تعذر تأكيد الدفع: ' + esc(j.message || j.error || '') + '. إن خُصم المبلغ فتواصل معنا وسنراجعه.', 'bad');
+      } catch (e) { state('تعذر الاتصال للتحقق من الدفع. إن خُصم المبلغ فتواصل معنا وسنراجعه.', 'bad'); }
+    }
+  }
+  if (inv.status === 'paid') return state('هذه الفاتورة مدفوعة ✓', 'ok');
+  if (inv.status === 'cancelled') return state('هذه الفاتورة ملغاة', 'bad');
+  if (qp.has('view') && !qp.get('id')) { $('#state').hidden = true; return; }
+  if (!pub.moyasarPk) return state(`الدفع الإلكتروني غير مفعّل بعد. يمكنك التحويل إلى الحساب المذكور في الفاتورة ثم إرفاق الإيصال من <a href="./#billing">صفحة الفواتير</a>.`);
+  if (!qp.get('id')) $('#state').hidden = true;
+  $('#payBox').hidden = false;
+  const back = `${location.origin}${location.pathname}?inv=${encodeURIComponent(invId)}`;
+  Moyasar.init({
+    element: '.mysr-form', language: 'ar', amount: Math.round(+inv.total * 100), currency: 'SAR',
+    description: `${inv.number} – ${inv.companyName}`.slice(0, 250), publishable_api_key: pub.moyasarPk, callback_url: back,
+    supported_networks: ['mada', 'visa', 'mastercard'], methods: ['creditcard', 'applepay'],
+    apple_pay: { country: 'SA', label: pub.sellerName || APP_NAME || 'الاشتراك', validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate' },
+    metadata: { invoice_id: invId, company_id: inv.cid }
+  });
+});
+</script>
+</body>
+</html>

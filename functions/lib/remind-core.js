@@ -1,8 +1,9 @@
 // منطق التذكيرات التلقائية: يقرأ بيانات الأسطول من Firestore ويرسل إشعارات الجوال
 const webpush = require('web-push');
 const PROJECT = process.env.FB_PROJECT;
-const ROOT = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents`;
-const IDT = 'https://identitytoolkit.googleapis.com/v1/accounts';
+// FIRESTORE_EMULATOR_HOST / FIREBASE_AUTH_EMULATOR_HOST للاختبار على المحاكي فقط
+const ROOT = `${process.env.FIRESTORE_EMULATOR_HOST ? 'http://' + process.env.FIRESTORE_EMULATOR_HOST : 'https://firestore.googleapis.com'}/v1/projects/${PROJECT}/databases/(default)/documents`;
+const IDT = `${process.env.FIREBASE_AUTH_EMULATOR_HOST ? 'http://' + process.env.FIREBASE_AUTH_EMULATOR_HOST + '/' : 'https://'}identitytoolkit.googleapis.com/v1/accounts`;
 // كل القراءات داخل شركة واحدة: companies/{cid}
 let CID = null, OWNER = '';
 const okCid = c => typeof c === 'string' && /^[a-z0-9][a-z0-9-]{2,39}$/.test(c);

@@ -5,8 +5,19 @@ fs.mkdirSync(SHOTS, { recursive: true });
 const AUTH = 'http://127.0.0.1:9099', PRJ = 'demo-fleet';
 await fetch(`http://127.0.0.1:8080/emulator/v1/projects/${PRJ}/databases/(default)/documents`, { method: 'DELETE' });
 await fetch(`${AUTH}/emulator/v1/projects/${PRJ}/accounts`, { method: 'DELETE' });
+import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);
+const wp = require('/tmp/claude-0/w/fleet-saas/functions/node_modules/web-push'); const vk = wp.generateVAPIDKeys();
+Object.assign(process.env, { FB_PROJECT: PRJ, FB_API_KEY: 'fake-api-key', SYS_EMAIL: 'sys-test@m.manhalfleet.app', SYS_PASS: 'sysPass12345', FIRESTORE_EMULATOR_HOST: '127.0.0.1:8080', FIREBASE_AUTH_EMULATOR_HOST: '127.0.0.1:9099',
+  VAPID_PUBLIC: vk.publicKey, VAPID_PRIVATE: vk.privateKey, VAPID_SUBJECT: 'mailto:t@t.com', SITE_URL: 'http://127.0.0.1:8000', MOYASAR_SECRET: 'sk_test_x' });
+const plat = require('/tmp/claude-0/w/fleet-saas/functions/plat.js'); const CALLS = [];
+const realFetch = globalThis.fetch; let PAY = null;
+globalThis.fetch = (u, o) => String(u).startsWith('https://api.moyasar.com/') ? Promise.resolve(new Response(JSON.stringify(PAY || {}), { status: PAY ? 200 : 404, headers: { 'Content-Type': 'application/json' } })) : realFetch(u, o);
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png' };
-const srv = http.createServer((q, r) => { let p = decodeURIComponent(q.url.split('?')[0]); if (p.endsWith('/')) p += 'index.html'; const f = path.join(SITE, p);
+const srv = http.createServer(async (q, r) => {
+  if (q.url.startsWith('/.netlify/functions/plat')) { let body = ''; for await (const c of q) body += c;
+    const out = await plat.handler({ httpMethod: q.method, headers: q.headers, body }); let j = {}; try { j = JSON.parse(out.body); } catch (e) {} CALLS.push({ action: (JSON.parse(body || '{}')).action, code: out.statusCode, j });
+    r.writeHead(out.statusCode, { 'Content-Type': 'application/json' }); return r.end(out.body); }
+  let p = decodeURIComponent(q.url.split('?')[0]); if (p.endsWith('/')) p += 'index.html'; const f = path.join(SITE, p);
   if (!fs.existsSync(f)) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'Content-Type': types[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r); }).listen(8000);
 const B = 'http://127.0.0.1:8000/';
 let pass = 0, fail = 0; const ok = (c, m) => { c ? pass++ : fail++; console.log(c ? '  ✓' : '  ✗', m); };
@@ -15,9 +26,9 @@ async function newPage(w = 420) {
   const ctx = await browser.newContext({ locale: 'ar', viewport: { width: w, height: 900 } }); const page = await ctx.newPage();
   await ctx.route('**/*', route => { const u = route.request().url();
     if (u.startsWith('https://www.gstatic.com/firebasejs/')) return route.fulfill({ path: path.join(FBDIR, u.split('/').pop()), contentType: 'text/javascript' });
-    if (u.startsWith(B) || u.startsWith('http://127.0.0.1:9099') || u.startsWith('http://127.0.0.1:8080') || u.startsWith('blob:') || u.startsWith('data:') || u.startsWith('about:')) return route.continue();
+    if (u.startsWith('https://fonts.')) return route.abort(); if (u.startsWith(B) || u.startsWith('http://127.0.0.1:9099') || u.startsWith('http://127.0.0.1:8080') || u.startsWith('blob:') || u.startsWith('data:') || u.startsWith('about:')) return route.continue();
     return route.abort(); });
-  page.on('pageerror', e => console.log('    [pageerror]', e.message)); page.on('dialog', d => d.accept());
+  page.on('pageerror', e => console.log('    [pageerror]', page.url(), e.message, (e.stack||'').split('\n')[1])); page.on('dialog', d => d.accept());
   return page;
 }
 async function verifyAll() { const j = await (await fetch(`${AUTH}/emulator/v1/projects/${PRJ}/oobCodes`)).json(); for (const c of j.oobCodes || []) if (c.requestType === 'VERIFY_EMAIL') await fetch(c.oobLink); }
@@ -72,7 +83,7 @@ console.log('٤) الإعدادات والفريق والفواتير');
 await a.click('#sheet [data-f=close]');
 await a.click('nav [data-t=settings]'); await a.waitForSelector('#setg [name=sellerName]');
 await a.fill('#setg [name=sellerName]', 'شركة النظام للتقنية'); await a.fill('#setg [name=vatNumber]', '300000000000003'); await a.fill('#setg [name=pricePerVehicle]', '30'); await a.fill('#setg [name=iban]', 'SA0000000000000000000000');
-await a.click('#setf button'); await a.waitForTimeout(800);
+await a.click('#setf button.pri'); await a.waitForTimeout(800);
 await a.click('nav [data-t=team]'); await a.click('#addStaff');
 await a.fill('#df [name=email]', 'acc@plat.com'); await a.fill('#df [name=name]', 'سعد المحاسب'); await a.selectOption('#df [name=role]', 'accountant'); await a.click('#dlg button[value=ok]');
 await a.waitForSelector('#srows td:has-text("acc@plat.com")', { timeout: 10000 }); ok(true, 'أُضيف المحاسب');
@@ -122,6 +133,105 @@ ok((await p2.textContent('#auth')).includes('صورة السجل غير واضح
 await p2.screenshot({ path: SHOTS + '/9-rejected.png' });
 await p2.click('#pd-r'); await p2.waitForSelector('#kf'); ok(await p2.inputValue('#kf [name=crNumber]') === '1010999999', 'النموذج معبأ ببياناتها');
 await p2.setInputFiles('#kf input[data-kind=cr]', '/tmp/claude-0/e2e/cr.pdf'); await p2.click('#kb'); await p2.waitForSelector('#pd-e', { timeout: 15000 }); ok(true, 'أُعيد إرسال الطلب');
+
+console.log('٧) الحساب الآلي والإشعارات');
+const adm = (path) => realFetch(`http://127.0.0.1:8080/v1/projects/${PRJ}/databases/(default)/documents/${path}`, { headers: { Authorization: 'Bearer owner' } }).then(r => r.json());
+const sysDoc = await adm('staff/sys-test@m.manhalfleet.app'); ok(sysDoc.fields && sysDoc.fields.role.stringValue === 'system', 'أُنشئ الحساب الآلي بدور system تلقائياً');
+const sg = CALLS.filter(c => c.action === 'signup'); console.log('   signup', JSON.stringify(sg)); ok(sg.length >= 2 && sg.every(c => c.code === 200), 'إشعار الطلب الجديد: ' + sg.map(c => c.code).join(','));
+const dc = CALLS.filter(c => c.action === 'decision'); ok(dc.length >= 2 && dc.every(c => c.code === 200), 'إشعار الاعتماد/الرفض: ' + dc.map(c => c.code).join(','));
+
+console.log('٨) فواتير الشركة والإيصال');
+await a.click('nav [data-t=invoices]'); await a.click('#newInv'); await a.waitForSelector('#isum'); await a.click('#dlg button[value=ok]'); await a.waitForSelector('#irows [data-i=pay]', { timeout: 10000 });
+await p.goto(B + '#billing'); await p.waitForSelector('[data-act=bill-rcpt]', { timeout: 20000 }); ok(true, 'صفحة الاشتراك والفواتير تعرض الفاتورة غير المدفوعة');
+await p.screenshot({ path: SHOTS + '/10-billing.png', fullPage: true });
+const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.click('[data-act=bill-rcpt]')]); await fc.setFiles('/tmp/claude-0/e2e/cr.pdf');
+await p.waitForFunction(() => document.body.innerText.includes('أُرفق إيصال'), null, { timeout: 15000 }); ok(true, 'أُرفق الإيصال');
+await p.waitForTimeout(800); ok(CALLS.some(c => c.action === 'receipt' && c.code === 200), 'إشعار المحاسبة بالإيصال');
+await a.click('nav [data-t=companies]'); await a.click('#reload'); await a.waitForTimeout(1500); await a.click('nav [data-t=invoices]');
+ok(await a.locator('#irows [data-i=rcpt]').count() === 1 && (await a.textContent('#rcBadge')).trim() === '1', 'الإيصال ظاهر في لوحة المنصة مع شارة');
+
+console.log('٩) الدفع الإلكتروني');
+const invId = await a.getAttribute('#irows [data-i=pay]', 'data-id');
+await p.goto(B + 'pay.html?inv=' + invId); await p.waitForSelector('#inv .inv', { timeout: 15000 });
+ok((await p.textContent('#state')).includes('غير مفعّل'), 'بدون مفتاح ميسر: تظهر طريقة التحويل');
+await a.click('nav [data-t=settings]'); await a.fill('#setg [name=moyasarPk]', 'sk_live_x'); await a.click('#setf button.pri'); await a.waitForTimeout(500);
+ok((await a.textContent('#toast')).includes('pk_live_'), 'يرفض وضع المفتاح السري مكان العام');
+await a.fill('#setg [name=moyasarPk]', 'pk_test_abc'); await a.click('#setf button.pri'); await a.waitForTimeout(1000);
+await p.goto(B + 'pay.html?inv=' + invId); await p.waitForSelector('#payBox:not([hidden])', { timeout: 15000 }); await p.waitForTimeout(1500);
+ok(await p.locator('.mysr-form *').count() > 3, 'نموذج ميسر ظهر');
+await p.screenshot({ path: SHOTS + '/11-pay.png', fullPage: true });
+const inv = (await adm('invoices/' + invId)).fields; const amt = Math.round(+(inv.total.doubleValue ?? inv.total.integerValue) * 100);
+PAY = { id: 'pay_fake_123456', status: 'paid', amount: amt + 100, currency: 'SAR', metadata: { invoice_id: invId } };
+await p.goto(B + `pay.html?inv=${invId}&id=pay_fake_123456&status=paid`); await p.waitForFunction(() => /تعذر|تم الدفع/.test(document.querySelector('#state').innerText), null, { timeout: 15000 });
+ok((await p.textContent('#state')).includes('تعذر'), 'مبلغ مختلف: يُرفض');
+PAY.amount = amt;
+await p.goto(B + `pay.html?inv=${invId}&id=pay_fake_123456&status=paid`); await p.waitForFunction(() => /تعذر|تم الدفع/.test(document.querySelector('#state').innerText), null, { timeout: 15000 });
+ok((await p.textContent('#state')).includes('تم الدفع'), 'الدفع الإلكتروني سُجّل'); console.log('   pay calls', JSON.stringify(CALLS.filter(c => c.action === 'pay-verify')));
+const inv2 = (await adm('invoices/' + invId)).fields; ok(inv2.status.stringValue === 'paid' && inv2.ref.stringValue === 'pay_fake_123456', 'الفاتورة مدفوعة برقم العملية');
+
+console.log('١٠) الدعم الفني');
+await p.goto(B + '#support'); await p.waitForSelector('[data-act=tk-new]', { timeout: 20000 }); await p.click('[data-act=tk-new]');
+await p.fill('#f-subject', 'لا أستطيع إضافة سائق'); await p.fill('#f-body', 'تظهر رسالة خطأ عند الحفظ'); await p.click('#frm [type=submit]');
+await p.waitForSelector('tr[data-act=tk-open]', { timeout: 15000 }); ok(true, 'فتحت الشركة تذكرة');
+await p.waitForTimeout(800); ok(CALLS.some(c => c.action === 'ticket' && c.code === 200), 'إشعار الدعم بالتذكرة');
+await a.click('nav [data-t=support]'); await a.click('#tkReload'); await a.waitForSelector('#tkrows tr[data-tk]', { timeout: 10000 });
+ok((await a.textContent('#tkBadge')).trim() === '1', 'شارة التذاكر الجديدة');
+await a.click('#tkrows tr[data-tk]'); await a.fill('#df [name=text]', 'جرّب تحديث الصفحة ثم أعد المحاولة'); await a.click('#dlg button[value=ok]'); await a.waitForTimeout(1200);
+await p.reload(); await p.waitForSelector('tr[data-act=tk-open]', { timeout: 20000 }); ok((await p.textContent('#main')).includes('رد جديد'), 'الشركة ترى «رد جديد»');
+await p.click('tr[data-act=tk-open]'); await p.waitForSelector('#tk-r'); ok((await p.textContent('.modal, #modal-root, body')).includes('جرّب تحديث الصفحة'), 'الرد ظاهر في التذكرة');
+await p.screenshot({ path: SHOTS + '/12-ticket.png' });
+
+console.log('١١) التقارير والسجل');
+await a.click('nav [data-t=reports]'); await a.waitForTimeout(500); ok(!(await a.textContent('#t-reports .kpi b')).startsWith('0.00'), 'الإيراد الشهري المتكرر: ' + await a.textContent('#t-reports .kpi b'));
+await a.screenshot({ path: SHOTS + '/13-reports.png', fullPage: true });
+await a.click('nav [data-t=log]'); await a.waitForSelector('#logrows tr td b', { timeout: 10000 }); const logTxt = await a.textContent('#logrows');
+ok(logTxt.includes('اعتماد') && logTxt.includes('إصدار فاتورة') && logTxt.includes('رد على تذكرة'), 'سجل النشاط يوثّق الاعتماد والفوترة والدعم');
+await a.screenshot({ path: SHOTS + '/14-log.png' });
+
+console.log('١٢) الإيقاف التلقائي والتنبيه');
+const daily = require('/tmp/claude-0/w/fleet-saas/functions/lib/plat-daily.js'); const core = require('/tmp/claude-0/w/fleet-saas/functions/lib/remind-core.js');
+const put = (id, f) => realFetch(`http://127.0.0.1:8080/v1/projects/${PRJ}/databases/(default)/documents/companies/${id}`, { method: 'PATCH', headers: { Authorization: 'Bearer owner', 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: f }) });
+const S_ = v => ({ stringValue: v });
+await put('cexp-old', { name: S_('منتهية'), ownerEmail: S_('x@old.sa'), ownerUid: S_('u'), status: S_('trial'), trialEnds: S_('2026-01-01') });
+await put('cexp-soon', { name: S_('قريبة'), ownerEmail: S_('y@soon.sa'), ownerUid: S_('u'), status: S_('active'), paidUntil: S_(new Date(Date.now() + 3 * 3600e3 + 3 * 864e5).toISOString().slice(0, 10)) });
+const { token: stok } = await core.systemLogin(false); const res = await daily.run(stok);
+ok(res.suspended.includes('cexp-old'), 'أُوقفت الشركة المنتهية تلقائياً'); ok(res.notices >= 1, 'أُرسل تنبيه قبل الانتهاء بـ 3 أيام');
+const res2 = await daily.run(stok); ok(res2.notices === 0, 'لا يتكرر التنبيه في نفس اليوم');
+
+console.log('١٣) الصفحة التعريفية');
+const v = await newPage(1280); await v.goto(B); await v.waitForURL(/welcome\.html/, { timeout: 15000 }); ok(true, 'الزائر يُحوَّل للصفحة التعريفية');
+await v.waitForTimeout(1500); ok((await v.textContent('#plans')).includes('30'), 'السعر من إعدادات المنصة');
+await v.screenshot({ path: SHOTS + '/15-welcome.png', fullPage: true });
+await v.goto(B + 'privacy.html'); await v.waitForTimeout(800); ok((await v.textContent('main')).includes('شركة النظام للتقنية'), 'الخصوصية تعرض اسم المشغّل');
+const vm = await newPage(390); await vm.goto(B + 'welcome.html'); await vm.waitForTimeout(1200); await vm.screenshot({ path: SHOTS + '/16-welcome-mobile.png', fullPage: false });
+ok(await vm.evaluate(() => document.documentElement.scrollWidth <= 392), 'لا تمرير أفقي على الجوال');
+
+console.log('١٤) الباقات والخصم السنوي');
+await a.click('nav [data-t=settings]'); await a.waitForSelector('#addPlan'); await a.click('#addPlan');
+ok(await a.locator('#plrows tr').count() === 3, 'اقتراح ثلاث باقات');
+await a.fill('#plrows [data-pl="0"][data-k=maxVehicles]', '1'); await a.fill('#setf [name=yearlyDiscount]', '15');
+await a.click('#setf button.pri'); await a.waitForTimeout(1200);
+const pubDoc = (await adm('platform/public')).fields; ok(pubDoc.plans && pubDoc.plans.arrayValue.values.length === 3 && +pubDoc.yearlyDiscount.integerValue === 15, 'الباقات والخصم محفوظة في الصفحة العامة');
+await a.click('nav [data-t=companies]'); await a.click('#reload'); await a.waitForTimeout(1200);
+await a.click('#rows tr[data-id]:has-text("1010123456")'); await a.waitForSelector('#sheet [data-f=edit]'); await a.click('#sheet [data-f=edit]');
+await a.selectOption('#df [name=planId]', 'basic'); await a.selectOption('#df [name=cycle]', 'yearly'); console.log('   fd', await a.evaluate(() => JSON.stringify([...new FormData(document.querySelector('#df'))].filter(([k]) => !k.startsWith('p_'))))); await a.click('#dlg button[value=ok]'); await a.waitForTimeout(1500); console.log('   log', await a.evaluate(() => JSON.stringify(document.querySelector('#df').innerHTML.length))); console.log('   toast', await a.textContent('#toast'));
+const cdocs = (await adm('companies')).documents || []; const nk = cdocs.find(d => d.fields.name.stringValue.includes('النخبة')).fields; console.log('   nk', JSON.stringify(nk).slice(0,600));
+ok(nk.planId.stringValue === 'basic' && nk.billingCycle.stringValue === 'yearly' && +nk.maxVehicles.integerValue === 1, 'الشركة على الباقة الأساسية السنوية بحد سيارة واحدة');
+ok((await a.textContent('#sheet')).includes('الأساسية'), 'الباقة ظاهرة في ملف الشركة');
+await a.click('#sheet [data-f=close]').catch(() => {});
+await a.click('nav [data-t=invoices]'); await a.click('#newInv'); await a.waitForSelector('#isum');
+await a.selectOption('#df [name=planId]', 'basic'); await a.selectOption('#df [name=cycle]', 'yearly'); await a.waitForTimeout(300);
+console.log('   inv', await a.inputValue('#df [name=months]'), await a.inputValue('#df [name=price]'), await a.inputValue('#df [name=disc]'), (await a.textContent('#isum')).replace(/\s+/g, ' '));
+ok(await a.inputValue('#df [name=months]') === '12' && await a.inputValue('#df [name=price]') === '25', 'السنوي: 12 شهراً بسعر الباقة');
+ok(+await a.inputValue('#df [name=disc]') === 450, 'خصم سنوي 15% = 450');
+await a.screenshot({ path: SHOTS + '/17-yearly-inv.png' });
+await a.click('#dlg button[value=cancel]');
+await v.goto(B + 'welcome.html'); await v.waitForTimeout(1500); ok((await v.textContent('#plans')).includes('الاحترافية') && await v.locator('#cycle:not([hidden])').count() === 1, 'الصفحة التعريفية تعرض الباقات مع شهري/سنوي');
+await v.click('#cycle [data-c=y]'); await v.waitForTimeout(300); await v.screenshot({ path: SHOTS + '/18-welcome-plans.png', fullPage: true });
+await p.goto(B + '#billing'); await p.reload(); await p.waitForSelector('[data-act=plan-req]', { timeout: 20000 }); ok((await p.textContent('#main')).includes('من 1'), 'صفحة الاشتراك تعرض حد الباقة');
+await p.screenshot({ path: SHOTS + '/19-billing-plan.png', fullPage: true });
+await p.goto(B + '#vehicles'); await p.waitForSelector('[data-act=v-new]', { timeout: 20000 }); await p.click('[data-act=v-new]'); await p.waitForTimeout(500);
+ok((await p.textContent('body')).includes('حد باقتك'), 'منع إضافة سيارة فوق حد الباقة');
 
 console.log(`\n${pass} نجح، ${fail} فشل`);
 await browser.close(); srv.close(); process.exit(fail ? 1 : 0);

@@ -24,6 +24,10 @@ exports.handler = async () => {
         }
       } catch (e) { o.error = e.message; }
     }
+    // مهمة المنصة: مرة يومياً الساعة 8 صباحاً بتوقيت الرياض
+    if (new Date(Date.now() + 3 * 3600e3).getUTCHours() === 8) {
+      try { out._platform = await require('./lib/plat-daily').run(token); } catch (e) { out._platform = { error: e.message }; }
+    }
     console.log('scheduled', JSON.stringify(out));
     return { statusCode: 200, body: JSON.stringify(out) };
   } catch (e) { console.error('scheduled failed', e.message); return { statusCode: 500, body: e.message }; }

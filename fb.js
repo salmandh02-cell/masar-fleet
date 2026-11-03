@@ -209,6 +209,26 @@ export async function start() {
     document.getElementById('n-out').onclick = window.__fbSignOut;
   }
 
+  /* ----- دالة المنصة (إشعارات، دفع) ----- */
+  async function platCall(body) {
+    const t = auth.currentUser && await auth.currentUser.getIdToken();
+    const r = await fetch('/.netlify/functions/plat', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(t ? { Authorization: 'Bearer ' + t } : {}) }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || r.status); return j;
+  }
+  const platNotify = body => platCall(body).catch(e => console.warn('notify', e.message));
+  /* فواتير الشركة: عرض، دفع إلكتروني، وإرفاق إيصال التحويل */
+  async function coInvoices(cid) {
+    const s = await F.getDocs(F.query(F.collection(fs, 'invoices'), F.where('cid', '==', cid)));
+    return s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.seq || 0) - (a.seq || 0));
+  }
+  async function attachReceipt(u, cid, inv, file, note) {
+    const d = await prepFile(file); const ref = F.doc(F.collection(fs, 'kyc'));
+    await F.setDoc(ref, { cid, kind: 'receipt', invoiceId: inv.id, ...d, at: new Date().toISOString(), by: String(u.email).toLowerCase() });
+    await F.updateDoc(F.doc(fs, 'invoices', inv.id), { receiptId: ref.id, receiptAt: new Date().toISOString(), receiptNote: String(note || '').slice(0, 300), receiptBy: String(u.email).toLowerCase(), updatedAt: new Date().toISOString() });
+    platNotify({ action: 'receipt', invoiceId: inv.id });
+  }
+  function pickFile() { return new Promise(res => { const i = document.createElement('input'); i.type = 'file'; i.accept = 'application/pdf,image/*'; i.onchange = () => res(i.files[0] || null); i.click(); }); }
+
   /* ----- تسجيل شركة جديدة ----- */
   const PENDING = 'fleet-pending-company';
   const pend = { get() { try { return JSON.parse(localStorage.getItem(PENDING) || 'null'); } catch (e) { return null; } },
@@ -322,6 +342,7 @@ export async function start() {
           await F.updateDoc(F.doc(fs, 'companies', cid), { name, profile, phone: profile.contactMobile || '', status: 'pending', submittedAt: new Date().toISOString(), updatedAt: new Date().toISOString() }); }
         else cid = await createCompany(u, { name, phone: profile.contactMobile || pre.phone || '', uname: pre.uname || profile.contactName, profile });
         try { await uploadDocs(u, cid, files); } catch (x) { console.warn(x); alert('سُجّل الطلب، لكن تعذر رفع بعض المستندات. يمكنك رفعها لاحقاً من «تعديل بيانات الطلب».'); }
+        platNotify({ action: 'signup', cid });
         entered = false; enter(u);
       } catch (err) { console.warn(err); fail(existing ? 'تعذر الحفظ، حاول مرة أخرى' : 'تعذر إرسال الطلب. قد يكون حسابك مسجلاً في شركة أخرى.'); } };
     const bk = document.getElementById('k-back'); if (bk) bk.onclick = () => { entered = false; enter(u); };
@@ -345,11 +366,21 @@ export async function start() {
   }
   function showSuspended(u) {
     lastShow = () => showSuspended(u);
-    card(`<h2>الاشتراك موقوف</h2><p>اشتراك شركة <b>${esc(COMPANY && COMPANY.name || '')}</b> موقوف حالياً، والبيانات محفوظة كما هي. تواصل معنا لإعادة التفعيل.</p>
+    const why = COMPANY && COMPANY.suspendReason ? `(${esc(COMPANY.suspendReason)}) ` : '';
+    card(`<h2>الاشتراك موقوف</h2><p>اشتراك شركة <b>${esc(COMPANY && COMPANY.name || '')}</b> موقوف حالياً ${why}والبيانات محفوظة كما هي. ادفع الفاتورة المستحقة أو تواصل معنا لإعادة التفعيل.</p>
+      <div id="su-inv" style="display:grid;gap:8px"></div>
       ${SUPPORT_CONTACT ? `<p dir="ltr" style="text-align:right">${esc(SUPPORT_CONTACT)}</p>` : ''}
       <button class="pri" id="su-r">إعادة المحاولة</button><div class="row"><button class="lnk" id="su-out">خروج</button></div>`);
     document.getElementById('su-r').onclick = () => { entered = false; enter(u); };
     document.getElementById('su-out').onclick = window.__fbSignOut;
+    const own = String(u.email).toLowerCase() === String(COMPANY && COMPANY.ownerEmail || '').toLowerCase();
+    if (!own) return;
+    coInvoices(CID).then(list => { const un = list.filter(i => i.status === 'unpaid'); const box = document.getElementById('su-inv'); if (!box || !un.length) return;
+      box.innerHTML = un.map(i => `<div style="border:1px solid var(--line,#D6DDD9);border-radius:10px;padding:10px 12px;display:grid;gap:6px"><div><b dir="ltr">${esc(i.number)}</b> · ${esc(i.total)} ريال${i.receiptId ? ' · <span style="color:#0E5A44">أُرفق إيصال، بانتظار المراجعة</span>' : ''}</div>
+        <div class="row" style="justify-content:flex-start;gap:12px"><a class="lnk" href="pay.html?inv=${esc(i.id)}">ادفع الآن</a><button class="lnk" data-rc="${esc(i.id)}">إرفاق إيصال تحويل</button></div></div>`).join('');
+      box.onclick = async e => { const b = e.target.closest('[data-rc]'); if (!b) return; const f = await pickFile(); if (!f) return;
+        try { await attachReceipt(u, CID, un.find(x => x.id === b.dataset.rc), f); b.textContent = 'أُرفق الإيصال ✓'; b.disabled = true; } catch (x) { alert(x.message === 'size' ? 'حجم الملف أكبر من 700 كيلوبايت' : 'تعذر رفع الإيصال'); } };
+    }).catch(() => {});
   }
   function showSuperChoice(u, hasCompany) {
     lastShow = null;
@@ -393,7 +424,27 @@ export async function start() {
     // أول دخول بعد الاعتماد: تُكتب بيانات الشركة الأساسية في إعدادات النظام
     if (isOwner) { try { const sm = await F.getDoc(F.doc(fs, P('settings'), 'main')); if (!sm.exists()) await F.setDoc(F.doc(fs, P('settings'), 'main'), { companyName: COMPANY.name, updatedAt: new Date().toISOString() }); } catch (e) { console.warn(e); } }
     entered = true;
-    window.__companyId = CID; window.__company = { id: CID, ...COMPANY }; window.OWNER_EMAIL = String(COMPANY.ownerEmail || '').toLowerCase();
+    window.__plat = {
+      company: () => ({ id: CID, ...COMPANY }), isOwner, email,
+      invoices: () => coInvoices(CID),
+      receipts: async () => { const s = await F.getDocs(F.query(F.collection(fs, 'kyc'), F.where('cid', '==', CID), F.where('kind', '==', 'receipt'))); return s.docs.map(d => ({ id: d.id, ...d.data() })); },
+      attachReceipt: (inv, note) => pickFile().then(f => f ? attachReceipt(u, CID, inv, f, note).then(() => true) : false),
+      tickets: async () => { const q = isOwner || (await F.getDoc(F.doc(fs, P('access'), email)).then(d => d.data() && d.data().role === 'admin').catch(() => false))
+          ? F.query(F.collection(fs, 'tickets'), F.where('cid', '==', CID)) : F.query(F.collection(fs, 'tickets'), F.where('cid', '==', CID), F.where('by', '==', email));
+        const s = await F.getDocs(q); return s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(b.lastAt).localeCompare(String(a.lastAt))); },
+      openTicket: async ({ subject, body, category }) => { const now = new Date().toISOString();
+        const ref = await F.addDoc(F.collection(fs, 'tickets'), { cid: CID, companyName: COMPANY.name, subject, body, category: category || 'tech', status: 'open', by: email, byName: u.displayName || '', createdAt: now, lastAt: now, lastBy: email, unreadPlat: true, unreadCo: false });
+        platNotify({ action: 'ticket', ticketId: ref.id, text: body }); return ref.id; },
+      ticketMsgs: async id => { const s = await F.getDocs(F.collection(fs, 'tickets', id, 'msgs')); return s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(a.at).localeCompare(String(b.at))); },
+      reply: async (id, text) => { const now = new Date().toISOString();
+        await F.addDoc(F.collection(fs, 'tickets', id, 'msgs'), { by: email, byName: u.displayName || '', text, at: now, side: 'co' });
+        await F.updateDoc(F.doc(fs, 'tickets', id), { status: 'open', lastAt: now, lastBy: email, unreadPlat: true, unreadCo: false });
+        platNotify({ action: 'ticket', ticketId: id, reply: true, text }); },
+      seen: id => F.updateDoc(F.doc(fs, 'tickets', id), { unreadCo: false }).catch(() => {}),
+      closeTicket: id => F.updateDoc(F.doc(fs, 'tickets', id), { status: 'closed', lastAt: new Date().toISOString(), lastBy: email }),
+      pub: () => F.getDoc(F.doc(fs, 'platform', 'public')).then(d => d.exists() ? d.data() : {}).catch(() => ({}))
+    };
+    window.__companyId = CID; try { localStorage.setItem('fleet-was-in', '1'); } catch (e) {} window.__company = { id: CID, ...COMPANY }; window.OWNER_EMAIL = String(COMPANY.ownerEmail || '').toLowerCase();
     window.__companySetSys = async sysEmail => { await F.updateDoc(F.doc(fs, 'companies', CID), { sysEmail, updatedAt: new Date().toISOString() }); };
     swPost({ type: 'token', token: await u.getIdToken(), project: FIREBASE_CONFIG.projectId, cid: CID });
     document.getElementById('auth') && (document.getElementById('auth').hidden = true);
@@ -517,6 +568,10 @@ export async function start() {
   A.onAuthStateChanged(auth, async u => {
     if (busyAuth) return;
     if (u && join && normPhone(join.phone) !== phoneOf(u.email)) { await A.signOut(auth); return; }
-    if (u) enter(u); else { entered = false; join ? showActivate(join) : qp.has('signup') ? showCompanySignup() : showLogin(); } });
+    if (u) enter(u); else { entered = false;
+      // الزائر الجديد يرى الصفحة التعريفية، ومن ضغط «دخول» أو فتح التطبيق المثبّت يرى شاشة الدخول
+      const app = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+      if (!join && !qp.has('signup') && !qp.has('login') && !app && !localStorage.getItem('fleet-was-in')) { location.replace('welcome.html'); return; }
+      join ? showActivate(join) : qp.has('signup') ? showCompanySignup() : showLogin(); } });
 }
 start().catch(e => { console.error(e); card(`<h2>تعذر تشغيل النظام</h2><p>تأكد من اتصالك بالإنترنت ثم أعد تحميل الصفحة.</p><p class="err" dir="ltr">${esc(e && e.message)}</p>`); });

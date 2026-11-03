@@ -20,3 +20,6 @@ export const TRIAL_DAYS = 14;
 
 // وسيلة التواصل التي تظهر للشركة عند إيقاف اشتراكها
 export const SUPPORT_CONTACT = "salmandh02@gmail.com";
+
+// مفتاح إشعارات الجوال العام (VAPID) – يطابق VAPID_PUBLIC في Netlify و PUSH_PUBLIC في index.html
+export const PUSH_PUBLIC = "BOrIcCMkeIBxvAz1HnPQD6FFVpMyBH7EVi7frgi61TBDguAHLH3uKxn1cEfOSfC6FcpCh7yXIqh9Pj6qZNyHE1c";

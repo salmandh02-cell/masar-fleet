@@ -16,12 +16,14 @@ service cloud.firestore {
     function stfPath() { return /databases/$(database)/documents/staff/$(myEmail()); }
     function isPlat() { return isSuper() || (signedIn() && exists(stfPath()) && get(stfPath()).data.active == true); }
     function platPerms() { return {
-      'manager':    ['view', 'data', 'approve', 'status', 'trial', 'edit', 'note', 'invoices'],
+      'manager':    ['view', 'data', 'approve', 'status', 'trial', 'edit', 'note', 'invoices', 'log'],
       'accounts':   ['view', 'approve', 'status', 'trial', 'edit', 'note', 'invoices'],
       'accountant': ['view', 'note', 'invoices'],
       'sales':      ['view', 'approve', 'trial', 'edit', 'note'],
       'support':    ['view', 'data', 'note'],
-      'viewer':     ['view']
+      'viewer':     ['view'],
+      // الحساب الآلي: إشعارات، إيقاف تلقائي عند الانتهاء، وتسجيل الدفع الإلكتروني
+      'system':     ['view', 'status', 'invoices', 'notify']
     }; }
     function platCan(p) { return isSuper() || (signedIn() && exists(stfPath()) && get(stfPath()).data.active == true && p in platPerms().get(get(stfPath()).data.get('role', ''), [])); }
 
@@ -59,10 +61,10 @@ service cloud.firestore {
         // صاحب الطلب: يعدّل بياناته ويعيد الإرسال ما دام الطلب لم يُعتمد
         || (open && nw == 'pending' && k.hasOnly(['name', 'phone', 'ownerName', 'profile', 'status', 'submittedAt', 'updatedAt']) && isCoOwner(cid))
         // فريق المنصة حسب الصلاحية
-        || (open && nw in ['trial', 'active', 'rejected'] && k.hasOnly(['status', 'trialEnds', 'plan', 'paidUntil', 'approvedAt', 'approvedBy', 'rejectReason', 'updatedAt']) && platCan('approve'))
-        || (!open && nw in ['trial', 'active', 'suspended'] && k.hasOnly(['status', 'plan', 'paidUntil', 'suspendedAt', 'updatedAt']) && platCan('status'))
+        || (open && nw in ['trial', 'active', 'rejected'] && k.hasOnly(['status', 'trialEnds', 'plan', 'paidUntil', 'approvedAt', 'approvedBy', 'rejectReason', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'updatedAt']) && platCan('approve'))
+        || (!open && nw in ['trial', 'active', 'suspended'] && k.hasOnly(['status', 'plan', 'paidUntil', 'suspendedAt', 'suspendReason', 'lastNotice', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'updatedAt']) && platCan('status'))
         || (!open && nw == 'trial' && k.hasOnly(['status', 'trialEnds', 'updatedAt']) && platCan('trial'))
-        || (k.hasOnly(['name', 'phone', 'ownerName', 'profile', 'plan', 'note', 'updatedAt']) && platCan('edit'))
+        || (k.hasOnly(['name', 'phone', 'ownerName', 'profile', 'plan', 'note', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'updatedAt']) && platCan('edit'))
         || (k.hasOnly(['note', 'updatedAt']) && platCan('note'));
     }
 
@@ -121,7 +123,7 @@ service cloud.firestore {
         allow delete: if isAdmin(cid) && !(col in ['audit', 'access']);
       }
       // عدد السيارات لكل شركة يظهر في لوحة المالك (للفوترة لاحقاً)
-      match /vehicles/{id} { allow list: if platCan('view'); }
+      match /vehicles/{id} { allow list: if platCan('data') || platCan('invoices'); }
 
       // الإعدادات والمستخدمون: مدير النظام فقط
       match /settings/{id} { allow write: if isAdmin(cid); }
@@ -158,7 +160,7 @@ service cloud.firestore {
 
       // اشتراكات إشعارات الجوال: كل مستخدم يسجل أجهزته فقط
       match /pushsubs/{id} {
-        allow read, delete: if member(cid);
+        allow read, delete: if member(cid) || platCan('notify');
         allow create, update: if member(cid) && request.resource.data.key == myEmail();
       }
 
@@ -206,22 +208,28 @@ service cloud.firestore {
     }
     // إعدادات المنصة (بيانات البائع للفواتير والأسعار) وعدّاد أرقام الفواتير
     match /platform/{id} {
-      allow read: if isPlat();
+      // public: الأسعار وبيانات التواصل للصفحة التعريفية ومفتاح الدفع العام
+      allow read: if isPlat() || id == 'public';
       allow write: if isSuper() || (id == 'counters' && platCan('invoices'));
     }
     // مستندات الشركة (السجل التجاري، شهادة الضريبة، العنوان الوطني)
     match /kyc/{id} {
-      allow read: if platCan('view') || isCoOwner(resource.data.cid);
-      allow create: if (isCoOwner(request.resource.data.cid) || platCan('edit'))
-        && request.resource.data.keys().hasOnly(['cid', 'kind', 'name', 'type', 'size', 'data', 'at', 'by'])
+      allow read: if platCan('view') || isCoOwner(resource.data.cid) || isAdmin(resource.data.cid);
+      allow create: if (isCoOwner(request.resource.data.cid) || isAdmin(request.resource.data.cid) || platCan('edit'))
+        && request.resource.data.keys().hasOnly(['cid', 'kind', 'name', 'type', 'size', 'data', 'at', 'by', 'invoiceId'])
         && request.resource.data.data is string && request.resource.data.data.size() < 1000000
         && request.resource.data.by == myEmail();
       allow delete: if platCan('edit') || (isCoOwner(resource.data.cid) && co(resource.data.cid).status in ['pending', 'rejected']);
     }
     // الفواتير: يصدرها فريق المنصة، وتراها الشركة صاحبة الفاتورة
+    function coBoss(cid) { return isCoOwner(cid) || isAdmin(cid); }
     match /invoices/{id} {
-      allow read: if platCan('view') || isCoOwner(resource.data.cid);
+      allow read: if platCan('view') || coBoss(resource.data.cid);
       allow create, update: if platCan('invoices');
+      // الشركة ترفق إيصال التحويل على فاتورتها غير المدفوعة
+      allow update: if resource.data.status == 'unpaid' && coBoss(resource.data.cid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiptId', 'receiptAt', 'receiptNote', 'receiptBy', 'updatedAt'])
+        && request.resource.data.receiptBy == myEmail();
       allow delete: if isSuper();
     }
     // سجل المتابعة (مكالمات وملاحظات) لكل شركة: داخلي لفريق المنصة
@@ -229,6 +237,32 @@ service cloud.firestore {
       allow read: if platCan('view');
       allow create: if platCan('note') && request.resource.data.by == myEmail();
       allow delete: if isSuper();
+    }
+    // اشتراكات إشعارات الجوال لفريق المنصة
+    match /platpush/{id} {
+      allow read: if platCan('notify') || (isPlat() && resource.data.key == myEmail());
+      allow create, update: if isPlat() && request.resource.data.key == myEmail();
+      allow delete: if platCan('notify') || (signedIn() && resource.data.key == myEmail());
+    }
+    // سجل نشاط فريق المنصة: إضافة فقط
+    match /platlog/{id} {
+      allow read: if platCan('log');
+      allow create: if isPlat() && request.resource.data.by == myEmail();
+    }
+    // تذاكر الدعم الفني بين الشركات وفريق المنصة
+    function tkCo(cid) { return isCoOwner(cid) || member(cid); }
+    function tkRead(t) { return platCan('view') || coBoss(t.cid) || (signedIn() && t.by == myEmail() && tkCo(t.cid)); }
+    match /tickets/{tid} {
+      allow read: if tkRead(resource.data);
+      allow create: if signedIn() && tkCo(request.resource.data.cid) && request.resource.data.by == myEmail() && request.resource.data.status == 'open'
+        && request.resource.data.keys().hasOnly(['cid', 'companyName', 'subject', 'body', 'category', 'status', 'by', 'byName', 'createdAt', 'lastAt', 'lastBy', 'unreadPlat', 'unreadCo']);
+      allow update: if (platCan('note') || (tkRead(resource.data) && tkCo(resource.data.cid)))
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'lastAt', 'lastBy', 'unreadPlat', 'unreadCo', 'assignee', 'updatedAt']);
+      match /msgs/{mid} {
+        function tk() { return get(/databases/$(database)/documents/tickets/$(tid)).data; }
+        allow read: if tkRead(tk());
+        allow create: if request.resource.data.by == myEmail() && (platCan('note') || (tkRead(tk()) && tkCo(tk().cid)));
+      }
     }
   }
 }

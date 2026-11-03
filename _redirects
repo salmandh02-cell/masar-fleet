@@ -1,1 +1,5 @@
-/signup  /?signup=1  302
+/signup   /?signup=1   302
+/login    /?login=1    302
+/pricing  /welcome.html#pricing  302
+/privacy  /privacy.html  200
+/terms    /terms.html    200
