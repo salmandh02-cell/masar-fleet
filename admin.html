@@ -239,14 +239,23 @@ function showVerify(u) {
   $('#v-re').onclick = async () => { try { await A.sendEmailVerification(u); $('#verr').className = 'ok'; $('#verr').textContent = 'أُعيد الإرسال'; } catch (e) { $('#verr').textContent = 'انتظر قليلاً ثم أعد المحاولة'; } };
   $('#v-out').onclick = () => A.signOut(auth);
 }
-A.onAuthStateChanged(auth, u => { if (!u) { $('#who').innerHTML = ''; return showLogin(); } boot(u); });
+let AUTH_UID = null;
+A.onAuthStateChanged(auth, u => {
+  // تغيّر الحساب من تبويب آخر بعد فتح اللوحة: نعيد التحميل حتى لا تعمل اللوحة بحساب غير الظاهر
+  if (AUTH_UID && u && u.uid !== AUTH_UID) return location.reload();
+  AUTH_UID = u ? u.uid : null;
+  if (!u) { $('#who').innerHTML = ''; $('#app').hidden = true; $('#authBox').hidden = false; return showLogin(); } boot(u); });
 async function boot(u) {
   const email = String(u.email).toLowerCase();
   if (!u.emailVerified) return showVerify(u);
   ME = { email, super: email === SUPER, role: email === SUPER ? 'owner' : '', name: u.displayName || '' };
   if (!ME.super) {
     let st = null; try { const s = await F.getDoc(F.doc(fs, 'staff', email)); st = s.exists() ? s.data() : null; } catch (e) {}
-    if (!st || !st.active) { await A.signOut(auth); return showLogin('هذا الحساب ليس ضمن فريق المنصة، أو أُوقف.'); }
+    // لا نُخرج الحساب: الدخول مشترك بين صفحات الموقع، والخروج هنا يُخرج الشركة من نظامها في التبويب الآخر
+    if (!st || !st.active) { $('#app').hidden = true; $('#authBox').hidden = false; $('#who').innerHTML = '';
+      authCard(`<h2>هذا الحساب ليس من فريق المنصة</h2><p style="margin:0;font-size:14px">أنت داخل بحساب <b dir="ltr">${esc(email)}</b>، وهو ليس ضمن فريق إدارة المنصة أو أُوقف.</p>
+        <a class="btn pri" href="./" style="padding:11px;text-align:center;text-decoration:none">الذهاب إلى نظام الشركة</a><div class="row"><button class="lnk" id="nx-out">الدخول بحساب آخر</button></div>`);
+      $('#nx-out').onclick = () => A.signOut(auth); return; }
     ME.role = st.role; ME.name = st.name || ME.name;
   }
   $('#authBox').hidden = true; $('#app').hidden = false;

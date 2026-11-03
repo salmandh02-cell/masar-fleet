@@ -79,6 +79,8 @@ await p.waitForTimeout(2000);
 await p.evaluate(async () => { const db = await window.claude.use('db'); await db.collection('vehicles').doc('v1').set({ plateLetters: 'أ ب ج', plateNumbers: '1234', make: 'تويوتا', model: 'هايلكس', status: 'available' }); });
 ok(true, 'أضافت سيارة');
 
+const pa = await p.context().newPage(); await pa.goto(B + 'admin.html'); await pa.waitForTimeout(4000);
+ok(await p.evaluate(() => document.getElementById('auth').hidden && !!window.__companyId) && (await pa.textContent('#authBox')).includes('ليس من فريق المنصة'), 'فتح لوحة المنصة في نفس المتصفح لا يُخرج الشركة'); await pa.close();
 console.log('٤) الإعدادات والفريق والفواتير');
 await a.click('#sheet [data-f=close]');
 await a.click('nav [data-t=settings]'); await a.waitForSelector('#setg [name=sellerName]');

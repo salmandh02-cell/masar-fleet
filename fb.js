@@ -392,7 +392,7 @@ export async function start() {
     document.getElementById('sc-out').onclick = window.__fbSignOut;
   }
 
-  let entered = false;
+  let entered = false, ENTERED_UID = null;
   async function enter(u) {
     if (entered) return;
     if (!u.emailVerified && !isPhoneAcct(u.email)) return showVerify(u);
@@ -423,7 +423,7 @@ export async function start() {
     }
     // أول دخول بعد الاعتماد: تُكتب بيانات الشركة الأساسية في إعدادات النظام
     if (isOwner) { try { const sm = await F.getDoc(F.doc(fs, P('settings'), 'main')); if (!sm.exists()) await F.setDoc(F.doc(fs, P('settings'), 'main'), { companyName: COMPANY.name, updatedAt: new Date().toISOString() }); } catch (e) { console.warn(e); } }
-    entered = true;
+    entered = true; ENTERED_UID = u.uid;
     window.__plat = {
       company: () => ({ id: CID, ...COMPANY }), isOwner, email,
       invoices: () => coInvoices(CID),
@@ -568,6 +568,8 @@ export async function start() {
   A.onAuthStateChanged(auth, async u => {
     if (busyAuth) return;
     if (u && join && normPhone(join.phone) !== phoneOf(u.email)) { await A.signOut(auth); return; }
+    // تغيّر الحساب من تبويب آخر (مثل دخول المالك للوحة المنصة): نعيد التحميل بالحساب الجديد
+    if (entered && (!u || u.uid !== ENTERED_UID)) { location.reload(); return; }
     if (u) enter(u); else { entered = false;
       // الزائر الجديد يرى الصفحة التعريفية، ومن ضغط «دخول» أو فتح التطبيق المثبّت يرى شاشة الدخول
       const app = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
