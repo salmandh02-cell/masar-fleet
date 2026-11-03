@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>لوحة تحكم المالك</title>
+<title>لوحة تحكم المنصة</title>
 <link rel="icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap" rel="stylesheet">
@@ -13,158 +13,525 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "IBM Plex Sans Arabic",system-ui,sans-serif}
-header{background:var(--acc);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header{background:var(--acc);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 header h1{margin:0;font:600 19px "Readex Pro",sans-serif}
 header small{opacity:.8}
-header .who{display:flex;gap:10px;align-items:center;font-size:14px}
-main{max-width:1200px;margin:0 auto;padding:18px 16px 40px;display:grid;gap:16px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-.kpi b{display:block;font:700 26px "Readex Pro",sans-serif}
+header .who{display:flex;gap:10px;align-items:center;font-size:14px;flex-wrap:wrap}
+nav{background:var(--surface);border-bottom:1px solid var(--line);display:flex;gap:4px;padding:0 12px;overflow-x:auto}
+nav button{font:600 14px "IBM Plex Sans Arabic",sans-serif;background:none;border:0;border-bottom:3px solid transparent;padding:12px 14px;color:var(--muted);cursor:pointer;white-space:nowrap}
+nav button.on{color:var(--acc);border-bottom-color:var(--acc)}
+nav .badge{background:var(--bad);color:#fff;border-radius:10px;padding:0 7px;font-size:12px;margin-inline-start:4px}
+main{max-width:1240px;margin:0 auto;padding:18px 16px 40px;display:grid;gap:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.kpi b{display:block;font:700 24px "Readex Pro",sans-serif}
 .kpi span{color:var(--muted);font-size:13px}
+.kpi.hot{border-color:#F4C7C3;background:#FFFBFA}.kpi.hot b{color:var(--bad)}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.panel h3{margin:0;font:600 16px "Readex Pro",sans-serif}
 .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
 .bar input,.bar select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);color:inherit}
-.bar input{flex:1;min-width:180px}
+.bar input[type=search]{flex:1;min-width:200px}
 .tw{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:860px}
+table{width:100%;border-collapse:collapse;min-width:820px}
 th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:middle}
 th{font-weight:600;font-size:13px;color:var(--muted);background:var(--surface-2)}
 td small{display:block;color:var(--muted);font-size:12px}
-.pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600}
-.p-active{background:#DCFAE6;color:var(--ok)}.p-trial{background:#D1E9FF;color:var(--info)}.p-suspended{background:#FEE4E2;color:var(--bad)}.p-expired{background:#FEF0C7;color:var(--warn)}
-.btn{font:600 13px "IBM Plex Sans Arabic",sans-serif;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap}
+tr.click{cursor:pointer}tr.click:hover td{background:#F8FBF9}
+.pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+.p-active,.p-paid{background:#DCFAE6;color:var(--ok)}.p-trial{background:#D1E9FF;color:var(--info)}.p-suspended,.p-rejected,.p-cancelled{background:#FEE4E2;color:var(--bad)}.p-expired,.p-unpaid{background:#FEF0C7;color:var(--warn)}.p-pending{background:#F4EBFF;color:#6941C6}.p-off{background:#EAECF0;color:#475467}
+.btn{font:600 13px "IBM Plex Sans Arabic",sans-serif;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-block}
 .btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
 .btn.bad{color:var(--bad);border-color:#F4C7C3}
 .btn.lt{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
 .btn:disabled{opacity:.5}
 .acts{display:flex;gap:6px;flex-wrap:wrap}
 .empty{padding:30px;text-align:center;color:var(--muted)}
-#login{max-width:400px;margin:60px auto;background:var(--surface);border-radius:16px;padding:24px;display:grid;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.12)}
-#login h2{margin:0;font:600 19px "Readex Pro",sans-serif}
-#login label{display:grid;gap:5px;font-size:13px;color:var(--muted)}
-#login input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
-.err{color:var(--bad);font-size:14px;min-height:1em}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#15201B;color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.2s;pointer-events:none}
+.auth{max-width:400px;margin:60px auto;background:var(--surface);border-radius:16px;padding:24px;display:grid;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.12)}
+.auth h2{margin:0;font:600 19px "Readex Pro",sans-serif}
+.auth label{display:grid;gap:5px;font-size:13px;color:var(--muted)}
+.auth input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.auth .row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.lnk{background:none;border:0;color:var(--acc);font:inherit;font-size:14px;cursor:pointer;padding:2px}
+.err{color:var(--bad);font-size:14px;min-height:1em}.ok{color:var(--ok);font-size:14px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#15201B;color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.2s;pointer-events:none;z-index:100}
 #toast.on{opacity:1}
-dialog{border:0;border-radius:14px;padding:0;width:min(420px,92vw)}
+dialog{border:0;border-radius:14px;padding:0;width:min(480px,94vw)}
+dialog::backdrop{background:rgba(16,24,20,.45)}
 dialog form{padding:20px;display:grid;gap:12px}
 dialog h3{margin:0;font:600 17px "Readex Pro",sans-serif}
 dialog label{display:grid;gap:5px;font-size:13px;color:var(--muted)}
-dialog input,dialog select,dialog textarea{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:9px}
+dialog input,dialog select,dialog textarea{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:inherit}
 dialog .acts{justify-content:flex-start}
+dialog .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+dialog .sum{background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:14px;display:grid;gap:2px}
+#file{position:fixed;inset:0;background:rgba(16,24,20,.45);z-index:40;display:flex;justify-content:flex-start}
+#file .sheet{background:var(--bg);width:min(980px,100%);height:100%;overflow:auto;box-shadow:0 0 40px rgba(0,0,0,.25)}
+#file .top{position:sticky;top:0;z-index:2;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+#file .top h2{margin:0;font:600 19px "Readex Pro",sans-serif}
+#file .body{padding:16px 18px 40px;display:grid;gap:14px}
+.sec{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.sec h4{margin:0 0 10px;font:600 15px "Readex Pro",sans-serif;display:flex;justify-content:space-between;align-items:center;gap:8px}
+dl.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px 18px;margin:0}
+dl.kv div{border-bottom:1px dashed var(--line);padding-bottom:6px}
+dl.kv dt{font-size:12px;color:var(--muted)}dl.kv dd{margin:0;font-weight:500;word-break:break-word}
+.mini{min-width:0}.mini th,.mini td{padding:7px 9px;font-size:14px}
+.note{border-inline-start:3px solid var(--acc);padding:4px 10px;margin:6px 0}
+.note small{color:var(--muted);display:block;font-size:12px}
+.tabs2{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.tabs2 button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:4px 12px;cursor:pointer}
+.tabs2 button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.roles{display:grid;gap:6px;font-size:13px;color:var(--muted);padding:12px 14px}
+.roles b{color:var(--ink)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;padding:14px}
+.form-grid label{display:grid;gap:5px;font-size:13px;color:var(--muted)}
+.form-grid input,.form-grid textarea{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:9px}
+@media (max-width:640px){header{padding:10px 14px}main{padding:14px 12px 30px}dialog .g2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header><div><h1>لوحة تحكم المالك</h1><small>الشركات المشتركة وحالة الاشتراك</small></div><div class="who" id="who"></div></header>
-<div id="login" hidden>
-  <h2>دخول مالك المنصة</h2>
-  <form id="lf" style="display:grid;gap:12px">
-    <label>البريد الإلكتروني<input id="le" type="email" dir="ltr" autocomplete="username" required></label>
-    <label>كلمة المرور<input id="lp" type="password" dir="ltr" autocomplete="current-password" required></label>
-    <div class="err" id="lerr"></div>
-    <button class="btn pri" style="padding:11px">دخول</button>
-  </form>
+<header><div><h1>لوحة تحكم المنصة</h1><small>الشركات المشتركة والاشتراكات والفواتير</small></div><div class="who" id="who"></div></header>
+<div id="authBox" class="auth" hidden></div>
+<div id="app" hidden>
+  <nav id="nav"></nav>
+  <main>
+    <section class="kpis" id="kpis"></section>
+    <section class="panel" id="t-companies" hidden>
+      <div class="bar">
+        <input id="q" type="search" placeholder="بحث: اسم الشركة، السجل، الرقم الضريبي، المدينة، الإيميل، الجوال">
+        <select id="fs"><option value="reqs" hidden>الطلبات</option><option value="all">كل الحالات</option><option value="pending">بانتظار الاعتماد</option><option value="rejected">مرفوضة</option><option value="active">مفعّلة</option><option value="trial">تجربة</option><option value="expired">منتهية</option><option value="suspended">موقوفة</option></select>
+        <button class="btn" id="reload">تحديث</button>
+      </div>
+      <div class="tw"><table><thead><tr><th>الشركة</th><th>السجل / الضريبي</th><th>المدير والتواصل</th><th>المدينة</th><th>الحالة</th><th>السيارات</th><th>التسجيل</th><th>نهاية التجربة / الاشتراك</th></tr></thead><tbody id="rows"></tbody></table></div>
+    </section>
+    <section class="panel" id="t-invoices" hidden>
+      <div class="bar">
+        <input id="iq" type="search" placeholder="بحث: رقم الفاتورة أو اسم الشركة">
+        <select id="ifs"><option value="all">كل الفواتير</option><option value="unpaid">غير مدفوعة</option><option value="overdue">متأخرة</option><option value="paid">مدفوعة</option><option value="cancelled">ملغاة</option></select>
+        <button class="btn pri" id="newInv" hidden>فاتورة جديدة</button>
+      </div>
+      <div class="tw"><table><thead><tr><th>رقم الفاتورة</th><th>الشركة</th><th>التاريخ</th><th>الفترة</th><th>الإجمالي</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="irows"></tbody></table></div>
+    </section>
+    <section class="panel" id="t-team" hidden>
+      <div class="bar"><h3 style="flex:1">فريق المنصة</h3><button class="btn pri" id="addStaff">إضافة مستخدم</button></div>
+      <div class="tw"><table><thead><tr><th>الاسم</th><th>الإيميل</th><th>الدور</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="srows"></tbody></table></div>
+      <div class="roles" id="roleHelp"></div>
+    </section>
+    <section class="panel" id="t-settings" hidden>
+      <div class="bar"><h3 style="flex:1">بيانات شركة النظام (تظهر في الفواتير) والأسعار</h3></div>
+      <form id="setf"><div class="form-grid" id="setg"></div><div style="padding:0 14px 14px"><button class="btn pri">حفظ الإعدادات</button></div></form>
+    </section>
+  </main>
 </div>
-<main id="app" hidden>
-  <section class="kpis" id="kpis"></section>
-  <section class="panel">
-    <div class="bar">
-      <input id="q" type="search" placeholder="بحث باسم الشركة أو الإيميل أو الجوال">
-      <select id="fs"><option value="all">كل الحالات</option><option value="active">مفعّلة</option><option value="trial">تجربة</option><option value="expired">تجربة منتهية</option><option value="suspended">موقوفة</option></select>
-      <button class="btn" id="reload">تحديث</button>
-    </div>
-    <div class="tw"><table><thead><tr><th>الشركة</th><th>المدير</th><th>الحالة</th><th>السيارات</th><th>التسجيل</th><th>نهاية التجربة / الاشتراك</th><th>إجراءات</th></tr></thead><tbody id="rows"></tbody></table></div>
-  </section>
-</main>
+<div id="file" hidden><div class="sheet" id="sheet"></div></div>
 <dialog id="dlg"><form method="dialog" id="df"></form></dialog>
 <div id="toast"></div>
+<script src="qr.js"></script>
 <script type="module">
-import { FIREBASE_CONFIG, SUPER_ADMIN_EMAIL } from './config.js';
+import { FIREBASE_CONFIG, SUPER_ADMIN_EMAIL, TRIAL_DAYS } from './config.js';
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2';
 const [{ initializeApp }, A, F] = await Promise.all([import(`${FB}/firebase-app.js`), import(`${FB}/firebase-auth.js`), import(`${FB}/firebase-firestore.js`)]);
 const app = initializeApp(FIREBASE_CONFIG); const auth = A.getAuth(app); const fs = F.getFirestore(app);
 const SUPER = String(SUPER_ADMIN_EMAIL).toLowerCase();
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2600); };
+const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2800); };
 const today = () => new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 10);
 const addDays = (d, n) => new Date(Date.parse((d && d > today() ? d : today()) + 'T00:00:00Z') + n * 864e5).toISOString().slice(0, 10);
+const addMonths = (d, n) => { const x = new Date(Date.parse(d + 'T00:00:00Z')); x.setUTCMonth(x.getUTCMonth() + n); x.setUTCDate(x.getUTCDate() - 1); return x.toISOString().slice(0, 10); };
 const fmt = s => s ? String(s).slice(0, 10) : '—';
-const ST = { active: ['مفعّلة', 'p-active'], trial: ['تجربة', 'p-trial'], suspended: ['موقوفة', 'p-suspended'], expired: ['تجربة منتهية', 'p-expired'] };
-const stOf = c => c.status === 'trial' && c.trialEnds && c.trialEnds < today() ? 'expired' : (c.status || 'trial');
-let COS = [];
+const money = n => (Math.round((+n || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const nowIso = () => new Date().toISOString();
 
-$('#lf').onsubmit = async e => { e.preventDefault(); $('#lerr').textContent = '';
-  try { await A.signInWithEmailAndPassword(auth, $('#le').value.trim(), $('#lp').value); }
-  catch (err) { $('#lerr').textContent = 'الإيميل أو كلمة المرور غير صحيحة'; } };
+/* ---------- الأدوار (تطابق platPerms في firestore.rules) ---------- */
+const ROLES = {
+  manager: ['مدير عام', 'كل شيء: اعتماد الشركات، الاشتراكات، الفواتير، تعديل البيانات، والاطلاع على بيانات الشركات التشغيلية'],
+  accounts: ['مدير الحسابات', 'اعتماد الشركات، تفعيل وإيقاف الاشتراكات، الفواتير والتحصيل، تعديل البيانات'],
+  accountant: ['محاسب', 'إصدار الفواتير وتسجيل الدفعات، والاطلاع على ملفات الشركات'],
+  sales: ['مدير مبيعات', 'مراجعة طلبات التسجيل واعتمادها أو رفضها، تمديد التجربة، تعديل البيانات وسجل المتابعة'],
+  support: ['دعم فني', 'الاطلاع على ملف الشركة وبياناتها التشغيلية (قراءة فقط) وتسجيل المتابعة'],
+  viewer: ['مطّلع', 'عرض الشركات والفواتير فقط دون أي تعديل']
+};
+const PERMS = { manager: ['view', 'data', 'approve', 'status', 'trial', 'edit', 'note', 'invoices'], accounts: ['view', 'approve', 'status', 'trial', 'edit', 'note', 'invoices'],
+  accountant: ['view', 'note', 'invoices'], sales: ['view', 'approve', 'trial', 'edit', 'note'], support: ['view', 'data', 'note'], viewer: ['view'] };
+let ME = { email: '', super: false, role: '', name: '' };
+const can = p => ME.super || (PERMS[ME.role] || []).includes(p);
 
-A.onAuthStateChanged(auth, async u => {
-  if (!u) { $('#login').hidden = false; $('#app').hidden = true; $('#who').innerHTML = ''; return; }
-  if (String(u.email).toLowerCase() !== SUPER) { $('#login').hidden = false; $('#lerr').textContent = 'هذه الصفحة لمالك المنصة فقط'; await A.signOut(auth); return; }
-  $('#login').hidden = true; $('#app').hidden = false;
-  $('#who').innerHTML = `<span dir="ltr">${esc(u.email)}</span><a class="btn lt" href="./" style="text-decoration:none">النظام</a><button class="btn lt" id="out">خروج</button>`;
+/* ---------- الحقول ---------- */
+const PF = [
+  ['بيانات المنشأة', [['legalName', 'الاسم التجاري حسب السجل'], ['crNumber', 'رقم السجل التجاري'], ['unifiedNumber', 'الرقم الوطني الموحد'], ['vatNumber', 'الرقم الضريبي'], ['activity', 'النشاط'], ['fleetSize', 'عدد السيارات (تقديري)']]],
+  ['العنوان الوطني', [['city', 'المدينة'], ['district', 'الحي'], ['street', 'الشارع'], ['buildingNo', 'رقم المبنى'], ['postalCode', 'الرمز البريدي'], ['additionalNo', 'الرقم الإضافي'], ['shortAddress', 'العنوان المختصر']]],
+  ['التواصل', [['officialEmail', 'البريد الرسمي'], ['companyPhone', 'هاتف الشركة'], ['contactName', 'اسم المسؤول'], ['contactTitle', 'المسمى الوظيفي'], ['contactMobile', 'جوال المسؤول'], ['website', 'الموقع الإلكتروني']]]];
+const LTR = new Set(['crNumber', 'unifiedNumber', 'vatNumber', 'buildingNo', 'postalCode', 'additionalNo', 'shortAddress', 'officialEmail', 'companyPhone', 'contactMobile', 'website', 'fleetSize']);
+const DOCK = { cr: 'السجل التجاري', vat: 'شهادة ضريبة القيمة المضافة', address: 'شهادة العنوان الوطني', other: 'مستند آخر' };
+const SET_F = [['sellerName', 'اسم شركة النظام (البائع)'], ['sellerNameEn', 'الاسم بالإنجليزية'], ['vatNumber', 'الرقم الضريبي'], ['crNumber', 'السجل التجاري'], ['address', 'العنوان'], ['phone', 'الهاتف'], ['email', 'البريد'],
+  ['bankName', 'البنك'], ['iban', 'رقم الآيبان (IBAN)'], ['pricePerVehicle', 'سعر السيارة شهرياً (ريال، قبل الضريبة)'], ['minMonthly', 'الحد الأدنى الشهري (ريال)'], ['vatRate', 'نسبة الضريبة %'], ['invoiceNote', 'ملاحظة أسفل الفاتورة']];
+
+/* ---------- الحالة ---------- */
+const ST = { active: ['مفعّلة', 'p-active'], trial: ['تجربة', 'p-trial'], suspended: ['موقوفة', 'p-suspended'], expired: ['منتهية', 'p-expired'], pending: ['بانتظار الاعتماد', 'p-pending'], rejected: ['مرفوضة', 'p-rejected'] };
+const IST = { unpaid: ['غير مدفوعة', 'p-unpaid'], paid: ['مدفوعة', 'p-paid'], cancelled: ['ملغاة', 'p-cancelled'], overdue: ['متأخرة', 'p-suspended'] };
+const stOf = c => c.status === 'trial' && c.trialEnds && c.trialEnds < today() ? 'expired' : c.status === 'active' && c.paidUntil && c.paidUntil < today() ? 'expired' : (c.status || 'trial');
+const istOf = i => i.status === 'unpaid' && i.dueDate && i.dueDate < today() ? 'overdue' : i.status;
+const pill = (m, k) => { const [l, c] = m[k] || [k, '']; return `<span class="pill ${c}">${esc(l)}</span>`; };
+const isOpen = c => ['pending', 'rejected'].includes(c.status);
+let COS = [], INVS = [], STAFF = [], SET = {}, TAB = 'requests';
+
+/* ---------- الدخول ---------- */
+function authCard(html) { const b = $('#authBox'); b.innerHTML = html; b.hidden = false; $('#app').hidden = true; }
+function showLogin(msg) {
+  authCard(`<h2>دخول فريق المنصة</h2><form id="lf" style="display:grid;gap:12px">
+    <label>البريد الإلكتروني<input id="le" type="email" dir="ltr" autocomplete="username" required></label>
+    <label>كلمة المرور<input id="lp" type="password" dir="ltr" autocomplete="current-password" required></label>
+    <div class="err" id="lerr">${esc(msg || '')}</div><button class="btn pri" style="padding:11px">دخول</button></form>
+    <div class="row"><button class="lnk" id="l-new">أول مرة؟ أنشئ كلمة مرور</button><button class="lnk" id="l-rst">نسيت كلمة المرور</button></div>`);
+  $('#lf').onsubmit = async e => { e.preventDefault(); $('#lerr').textContent = '';
+    try { await A.signInWithEmailAndPassword(auth, $('#le').value.trim(), $('#lp').value); }
+    catch (err) { $('#lerr').textContent = err.code === 'auth/too-many-requests' ? 'محاولات كثيرة، انتظر قليلاً' : 'الإيميل أو كلمة المرور غير صحيحة. إن كانت أول مرة فاختر «أنشئ كلمة مرور».'; } };
+  $('#l-new').onclick = showCreate; $('#l-rst').onclick = showReset;
+}
+function showCreate() {
+  authCard(`<h2>إنشاء كلمة مرور</h2><p style="margin:0;font-size:14px">استخدم الإيميل الذي أضافك به مالك المنصة.</p><form id="cf" style="display:grid;gap:12px">
+    <label>البريد الإلكتروني<input id="ce" type="email" dir="ltr" required></label>
+    <label>كلمة المرور (6 أحرف على الأقل)<input id="cp" type="password" dir="ltr" minlength="6" autocomplete="new-password" required></label>
+    <div class="err" id="cerr"></div><button class="btn pri" style="padding:11px">إنشاء</button></form><div class="row"><button class="lnk" id="c-back">رجوع</button></div>`);
+  $('#cf').onsubmit = async e => { e.preventDefault();
+    try { const c = await A.createUserWithEmailAndPassword(auth, $('#ce').value.trim(), $('#cp').value); await A.sendEmailVerification(c.user); }
+    catch (err) { $('#cerr').textContent = err.code === 'auth/email-already-in-use' ? 'يوجد حساب بهذا الإيميل، سجّل الدخول أو استعد كلمة المرور' : err.code === 'auth/weak-password' ? 'كلمة المرور قصيرة' : 'تعذر الإنشاء'; } };
+  $('#c-back').onclick = () => showLogin();
+}
+function showReset() {
+  authCard(`<h2>استعادة كلمة المرور</h2><form id="rf" style="display:grid;gap:12px"><label>البريد الإلكتروني<input id="re" type="email" dir="ltr" required></label>
+    <div class="err" id="rerr"></div><button class="btn pri" style="padding:11px">إرسال رابط الاستعادة</button></form><div class="row"><button class="lnk" id="r-back">رجوع</button></div>`);
+  $('#rf').onsubmit = async e => { e.preventDefault(); try { await A.sendPasswordResetEmail(auth, $('#re').value.trim()); $('#rerr').className = 'ok'; $('#rerr').textContent = 'أرسلنا الرابط إلى بريدك (افحص غير المرغوب أيضاً).'; } catch (err) { $('#rerr').textContent = 'تعذر الإرسال'; } };
+  $('#r-back').onclick = () => showLogin();
+}
+function showVerify(u) {
+  authCard(`<h2>تأكيد البريد</h2><p style="margin:0;font-size:14px">أرسلنا رسالة تأكيد إلى <b dir="ltr">${esc(u.email)}</b>. اضغط الرابط في الرسالة ثم «تم التأكيد».</p>
+    <div class="err" id="verr"></div><button class="btn pri" style="padding:11px" id="vb">تم التأكيد</button>
+    <div class="row"><button class="lnk" id="v-re">إعادة الإرسال</button><button class="lnk" id="v-out">خروج</button></div>`);
+  $('#vb').onclick = async () => { await u.reload(); if (auth.currentUser.emailVerified) { await auth.currentUser.getIdToken(true); boot(auth.currentUser); } else $('#verr').textContent = 'لم يتم التأكيد بعد'; };
+  $('#v-re').onclick = async () => { try { await A.sendEmailVerification(u); $('#verr').className = 'ok'; $('#verr').textContent = 'أُعيد الإرسال'; } catch (e) { $('#verr').textContent = 'انتظر قليلاً ثم أعد المحاولة'; } };
+  $('#v-out').onclick = () => A.signOut(auth);
+}
+A.onAuthStateChanged(auth, u => { if (!u) { $('#who').innerHTML = ''; return showLogin(); } boot(u); });
+async function boot(u) {
+  const email = String(u.email).toLowerCase();
+  if (!u.emailVerified) return showVerify(u);
+  ME = { email, super: email === SUPER, role: email === SUPER ? 'owner' : '', name: u.displayName || '' };
+  if (!ME.super) {
+    let st = null; try { const s = await F.getDoc(F.doc(fs, 'staff', email)); st = s.exists() ? s.data() : null; } catch (e) {}
+    if (!st || !st.active) { await A.signOut(auth); return showLogin('هذا الحساب ليس ضمن فريق المنصة، أو أُوقف.'); }
+    ME.role = st.role; ME.name = st.name || ME.name;
+  }
+  $('#authBox').hidden = true; $('#app').hidden = false;
+  $('#who').innerHTML = `<span>${ME.name ? esc(ME.name) + ' · ' : ''}${ME.super ? 'مالك المنصة' : esc((ROLES[ME.role] || [ME.role])[0])}</span><span dir="ltr" style="opacity:.8">${esc(email)}</span><a class="btn lt" href="./">النظام</a><button class="btn lt" id="out">خروج</button>`;
   $('#out').onclick = () => A.signOut(auth);
-  load();
-});
+  $('#newInv').hidden = !can('invoices');
+  buildNav(); loadAll();
+}
 
-async function load() {
-  $('#rows').innerHTML = `<tr><td colspan="7" class="empty">جارٍ التحميل…</td></tr>`;
+/* ---------- التنقل ---------- */
+function buildNav() {
+  const tabs = [['requests', 'طلبات التسجيل'], ['companies', 'الشركات'], ['invoices', 'الفواتير']];
+  if (ME.super) tabs.push(['team', 'فريق المنصة'], ['settings', 'الإعدادات']);
+  $('#nav').innerHTML = tabs.map(([k, l]) => `<button data-t="${k}">${l}${k === 'requests' ? '<span class="badge" id="reqBadge" hidden></span>' : ''}</button>`).join('');
+  $('#nav').onclick = e => { const b = e.target.closest('[data-t]'); if (b) show(b.dataset.t); };
+  show(TAB);
+}
+function show(t) {
+  TAB = t; document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  $('#t-companies').hidden = !['requests', 'companies'].includes(t); $('#t-invoices').hidden = t !== 'invoices'; $('#t-team').hidden = t !== 'team'; $('#t-settings').hidden = t !== 'settings';
+  if (t === 'requests') $('#fs').value = 'reqs'; else if (t === 'companies' && $('#fs').value === 'reqs') $('#fs').value = 'all';
+  if (t === 'team') loadStaff(); if (t === 'settings') renderSettings();
+  render(); renderInv();
+}
+
+/* ---------- التحميل ---------- */
+async function loadAll() {
+  $('#rows').innerHTML = `<tr><td colspan="8" class="empty">جارٍ التحميل…</td></tr>`;
+  try { const s = await F.getDoc(F.doc(fs, 'platform', 'settings')); SET = s.exists() ? s.data() : {}; } catch (e) { SET = {}; }
   try {
     const s = await F.getDocs(F.collection(fs, 'companies'));
-    COS = s.docs.map(d => ({ id: d.id, ...d.data(), vehicles: null })).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
-    render();
-    await Promise.all(COS.map(async c => { try { c.vehicles = (await F.getCountFromServer(F.collection(fs, 'companies', c.id, 'vehicles'))).data().count; } catch (e) { c.vehicles = '؟'; } }));
-    render();
-  } catch (e) { console.error(e); $('#rows').innerHTML = `<tr><td colspan="7" class="empty">تعذر تحميل الشركات: ${esc(e.code || e.message)}</td></tr>`; }
+    COS = s.docs.map(d => ({ id: d.id, ...d.data(), vehicles: null })).sort((a, b) => String(b.submittedAt || b.createdAt).localeCompare(String(a.submittedAt || a.createdAt)));
+  } catch (e) { console.error(e); $('#rows').innerHTML = `<tr><td colspan="8" class="empty">تعذر تحميل الشركات: ${esc(e.code || e.message)}</td></tr>`; return; }
+  try { const s = await F.getDocs(F.collection(fs, 'invoices')); INVS = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.seq || 0) - (a.seq || 0)); } catch (e) { INVS = []; }
+  render(); renderInv();
+  await Promise.all(COS.filter(c => !isOpen(c)).map(async c => { try { c.vehicles = (await F.getCountFromServer(F.collection(fs, 'companies', c.id, 'vehicles'))).data().count; } catch (e) { c.vehicles = '؟'; } }));
+  render();
 }
 
-function render() {
-  const q = $('#q').value.trim().toLowerCase(), f = $('#fs').value;
+/* ---------- الشركات ---------- */
+function kpis() {
   const n = k => COS.filter(c => stOf(c) === k).length;
   const veh = COS.reduce((t, c) => t + (+c.vehicles || 0), 0);
-  $('#kpis').innerHTML = [['كل الشركات', COS.length], ['مفعّلة', n('active')], ['تجربة', n('trial')], ['تجربة منتهية', n('expired')], ['موقوفة', n('suspended')], ['إجمالي السيارات', veh]]
-    .map(([l, v]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
-  const list = COS.filter(c => (f === 'all' || stOf(c) === f) && (!q || [c.name, c.ownerEmail, c.ownerName, c.phone, c.id].some(x => String(x || '').toLowerCase().includes(q))));
-  $('#rows').innerHTML = list.length ? list.map(c => { const st = stOf(c); const [lb, cl] = ST[st] || [st, '']; return `<tr>
-    <td><b>${esc(c.name)}</b><small dir="ltr" style="text-align:right;font-family:ui-monospace,monospace">${esc(c.id)}</small>${c.note ? `<small>📝 ${esc(c.note)}</small>` : ''}</td>
+  const unpaid = INVS.filter(i => i.status === 'unpaid').reduce((t, i) => t + (+i.total || 0), 0);
+  const m = today().slice(0, 7); const got = INVS.filter(i => i.status === 'paid' && String(i.paidAt || '').slice(0, 7) === m).reduce((t, i) => t + (+i.total || 0), 0);
+  const req = n('pending');
+  const b = $('#reqBadge'); if (b) { b.textContent = req; b.hidden = !req; }
+  $('#kpis').innerHTML = [['بانتظار الاعتماد', req, req ? 'hot' : ''], ['مفعّلة', n('active')], ['تجربة', n('trial')], ['منتهية', n('expired')], ['موقوفة', n('suspended')], ['إجمالي السيارات', veh],
+    ['فواتير غير مدفوعة (ريال)', money(unpaid)], ['المحصّل هذا الشهر', money(got)]].map(([l, v, c]) => `<div class="kpi ${c || ''}"><b>${v}</b><span>${l}</span></div>`).join('');
+}
+const hay = c => [c.name, c.id, c.ownerEmail, c.ownerName, c.phone, c.note, ...Object.values(c.profile || {})].map(x => String(x || '').toLowerCase()).join(' ');
+function render() {
+  kpis();
+  const q = $('#q').value.trim().toLowerCase(), f = $('#fs').value;
+  const list = COS.filter(c => { const s = stOf(c); return (f === 'all' || (f === 'reqs' ? isOpen(c) : s === f)) && (!q || hay(c).includes(q)); })
+    .sort((a, b) => (TAB === 'requests' ? (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1) : 0));
+  $('#rows').innerHTML = list.length ? list.map(c => { const p = c.profile || {}; return `<tr class="click" data-id="${esc(c.id)}">
+    <td><b>${esc(c.name)}</b>${p.legalName && p.legalName !== c.name ? `<small>${esc(p.legalName)}</small>` : ''}${c.note ? `<small>📝 ${esc(c.note)}</small>` : ''}</td>
+    <td dir="ltr" style="text-align:right">${esc(p.crNumber || '—')}<small>${esc(p.vatNumber || '')}</small></td>
     <td>${esc(c.ownerName || '')}<small dir="ltr" style="text-align:right">${esc(c.ownerEmail)}</small>${c.phone ? `<small dir="ltr" style="text-align:right">${esc(c.phone)}</small>` : ''}</td>
-    <td><span class="pill ${cl}">${lb}</span>${c.plan && c.plan !== 'trial' ? `<small>${esc(c.plan)}</small>` : ''}</td>
-    <td>${c.vehicles == null ? '…' : esc(c.vehicles)}</td>
-    <td>${fmt(c.createdAt)}</td>
-    <td>${c.status === 'active' ? fmt(c.paidUntil) : fmt(c.trialEnds)}</td>
-    <td><div class="acts">
-      ${c.status !== 'active' ? `<button class="btn pri" data-a="activate" data-id="${esc(c.id)}">تفعيل</button>` : ''}
-      ${c.status !== 'suspended' ? `<button class="btn bad" data-a="suspend" data-id="${esc(c.id)}">إيقاف</button>` : ''}
-      ${c.status !== 'active' ? `<button class="btn" data-a="extend" data-id="${esc(c.id)}">تمديد التجربة</button>` : ''}
-      <button class="btn" data-a="edit" data-id="${esc(c.id)}">تعديل</button>
-    </div></td></tr>`; }).join('') : `<tr><td colspan="7" class="empty">${COS.length ? 'لا توجد نتائج' : 'لا توجد شركات مسجلة بعد'}</td></tr>`;
+    <td>${esc(p.city || '—')}</td>
+    <td>${pill(ST, stOf(c))}${c.plan && c.plan !== 'trial' ? `<small>${esc(c.plan)}</small>` : ''}</td>
+    <td>${isOpen(c) ? (p.fleetSize ? `<small>~${esc(p.fleetSize)}</small>` : '—') : c.vehicles == null ? '…' : esc(c.vehicles)}</td>
+    <td>${fmt(c.submittedAt || c.createdAt)}</td>
+    <td>${c.status === 'active' ? fmt(c.paidUntil) : fmt(c.trialEnds)}</td></tr>`; }).join('')
+    : `<tr><td colspan="8" class="empty">${TAB === 'requests' && !q ? 'لا توجد طلبات تسجيل جديدة' : COS.length ? 'لا توجد نتائج' : 'لا توجد شركات مسجلة بعد'}</td></tr>`;
 }
-$('#q').oninput = render; $('#fs').onchange = render; $('#reload').onclick = load;
+$('#q').oninput = render; $('#fs').onchange = render; $('#reload').onclick = loadAll;
+$('#rows').onclick = e => { const r = e.target.closest('tr[data-id]'); if (r) openFile(r.dataset.id); };
 
-async function save(id, data, msg) {
-  try { await F.updateDoc(F.doc(fs, 'companies', id), { ...data, updatedAt: new Date().toISOString() }); Object.assign(COS.find(c => c.id === id), data); render(); toast(msg); }
-  catch (e) { console.error(e); toast('تعذر الحفظ: ' + (e.code || e.message)); }
+async function saveCo(id, data, msg) {
+  try { await F.updateDoc(F.doc(fs, 'companies', id), { ...data, updatedAt: nowIso() }); Object.assign(COS.find(c => c.id === id), data); render(); toast(msg); if (FILE_ID === id) openFile(id, true); return true; }
+  catch (e) { console.error(e); toast('تعذر الحفظ: ' + (e.code === 'permission-denied' ? 'ليست لديك صلاحية' : e.code || e.message)); return false; }
 }
-function dialog(html, onOk) {
-  const d = $('#dlg'), f = $('#df'); f.innerHTML = html + `<div class="acts"><button class="btn pri" value="ok">حفظ</button><button class="btn" value="cancel" formnovalidate>إلغاء</button></div>`;
-  d.onclose = () => { if (d.returnValue === 'ok') onOk(new FormData(f)); }; d.returnValue = ''; d.showModal();
+function dialog(html, onOk, okLabel = 'حفظ') {
+  const d = $('#dlg'), f = $('#df'); d.style.width = ''; f.innerHTML = html + `<div class="acts"><button class="btn pri" value="ok">${okLabel}</button><button class="btn" value="cancel" formnovalidate>إلغاء</button></div>`;
+  d.onclose = () => { if (d.returnValue === 'ok') onOk(new FormData(f), f); }; d.returnValue = ''; d.showModal(); return f;
 }
-$('#rows').onclick = e => {
-  const b = e.target.closest('[data-a]'); if (!b) return; const c = COS.find(x => x.id === b.dataset.id); if (!c) return;
-  if (b.dataset.a === 'activate') dialog(`<h3>تفعيل اشتراك ${esc(c.name)}</h3>
+
+/* ---------- ملف الشركة ---------- */
+let FILE_ID = null, FILE_TAB = 'vehicles';
+function openFile(id, keep) {
+  const c = COS.find(x => x.id === id); if (!c) return; FILE_ID = id;
+  const p = c.profile || {}; const st = stOf(c); const open = isOpen(c);
+  const kv = arr => `<dl class="kv">${arr.map(([k, l]) => `<div><dt>${l}</dt><dd ${LTR.has(k) ? 'dir="ltr" style="text-align:right"' : ''}>${esc(p[k] || '—')}</dd></div>`).join('')}</dl>`;
+  const act = [];
+  if (open && can('approve')) { act.push(`<button class="btn pri" data-f="approve">اعتماد</button>`); if (c.status === 'pending') act.push(`<button class="btn bad" data-f="reject">رفض</button>`); }
+  if (!open && can('status')) { if (c.status !== 'active') act.push(`<button class="btn pri" data-f="activate">تفعيل اشتراك</button>`); if (c.status !== 'suspended') act.push(`<button class="btn bad" data-f="suspend">إيقاف</button>`); }
+  if (!open && can('trial') && c.status !== 'active') act.push(`<button class="btn" data-f="extend">تمديد التجربة</button>`);
+  if (!open && can('invoices')) act.push(`<button class="btn" data-f="invoice">إصدار فاتورة</button>`);
+  if (can('edit')) act.push(`<button class="btn" data-f="edit">تعديل البيانات</button>`);
+  act.push(`<button class="btn" data-f="close">إغلاق ✕</button>`);
+  const myInv = INVS.filter(i => i.cid === id);
+  $('#sheet').innerHTML = `<div class="top"><div><h2>${esc(c.name)} ${pill(ST, st)}</h2><small style="color:var(--muted)" dir="ltr">${esc(c.id)}</small></div><div class="acts">${act.join('')}</div></div>
+  <div class="body">
+    ${c.status === 'rejected' && c.rejectReason ? `<div class="sec" style="border-color:#F4C7C3"><b>سبب الرفض:</b> ${esc(c.rejectReason)}</div>` : ''}
+    ${PF.map(([t, fl]) => `<div class="sec"><h4>${t}</h4>${kv(fl)}</div>`).join('')}
+    <div class="sec"><h4>الحساب والاشتراك</h4><dl class="kv">
+      <div><dt>مدير النظام</dt><dd>${esc(c.ownerName || '—')}</dd></div><div><dt>إيميل الدخول</dt><dd dir="ltr" style="text-align:right">${esc(c.ownerEmail)}</dd></div>
+      <div><dt>تاريخ الطلب</dt><dd>${fmt(c.submittedAt || c.createdAt)}</dd></div><div><dt>الاعتماد</dt><dd>${c.approvedAt ? fmt(c.approvedAt) + ' · ' + esc(c.approvedBy || '') : '—'}</dd></div>
+      <div><dt>الباقة</dt><dd>${esc(c.plan && c.plan !== 'trial' ? c.plan : '—')}</dd></div><div><dt>نهاية التجربة</dt><dd>${fmt(c.trialEnds)}</dd></div>
+      <div><dt>مدفوع حتى</dt><dd>${fmt(c.paidUntil)}</dd></div><div><dt>عدد السيارات الفعلي</dt><dd>${c.vehicles ?? '—'}</dd></div>
+      <div style="grid-column:1/-1"><dt>ملاحظة داخلية</dt><dd>${esc(c.note || '—')}</dd></div></dl></div>
+    <div class="sec"><h4>المستندات</h4><div id="fDocs" class="empty" style="padding:8px">جارٍ التحميل…</div></div>
+    <div class="sec"><h4>الفواتير <span>${can('invoices') && !open ? '<button class="btn" data-f="invoice">فاتورة جديدة</button>' : ''}</span></h4>
+      ${myInv.length ? `<div class="tw"><table class="mini"><thead><tr><th>الرقم</th><th>التاريخ</th><th>الفترة</th><th>الإجمالي</th><th>الحالة</th><th></th></tr></thead><tbody>${myInv.map(i => `<tr><td dir="ltr" style="text-align:right">${esc(i.number)}</td><td>${fmt(i.issueDate)}</td><td>${fmt(i.periodFrom)} ← ${fmt(i.periodTo)}</td><td>${money(i.total)}</td><td>${pill(IST, istOf(i))}</td><td><button class="btn" data-print="${esc(i.id)}">طباعة</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty" style="padding:8px">لا توجد فواتير</div>'}</div>
+    ${can('data') && !open ? `<div class="sec"><h4>بيانات الشركة في النظام <small style="color:var(--muted);font-weight:400">اطلاع فقط</small></h4><div class="tabs2" id="fTabs">${[['vehicles', 'السيارات'], ['drivers', 'السائقون'], ['access', 'المستخدمون'], ['maintenance', 'الصيانة'], ['violations', 'المخالفات']].map(([k, l]) => `<button data-ft="${k}">${l}</button>`).join('')}</div><div id="fData" class="empty" style="padding:8px">…</div></div>` : ''}
+    <div class="sec"><h4>سجل المتابعة <small style="color:var(--muted);font-weight:400">داخلي، لا تراه الشركة</small></h4>
+      ${can('note') ? `<form id="noteF" style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap"><select name="kind" style="font:inherit;border:1px solid var(--line);border-radius:9px;padding:6px"><option>اتصال</option><option>بريد</option><option>اجتماع</option><option>تحقق</option><option>ملاحظة</option></select><input name="text" required placeholder="ماذا تم؟" style="flex:1;min-width:160px;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:9px"><button class="btn pri">إضافة</button></form>` : ''}
+      <div id="fNotes">…</div></div>
+  </div>`;
+  $('#file').hidden = false; if (!keep) $('#sheet').scrollTop = 0;
+  loadDocs(id); loadNotes(id); if (can('data') && !open) loadData(id, FILE_TAB);
+  const nf = $('#noteF'); if (nf) nf.onsubmit = async e => { e.preventDefault(); const fd = new FormData(nf);
+    try { await F.addDoc(F.collection(fs, 'crm'), { cid: id, kind: fd.get('kind'), text: fd.get('text').trim(), by: ME.email, byName: ME.name || '', at: nowIso() }); nf.reset(); loadNotes(id); } catch (x) { toast('تعذر الحفظ'); } };
+}
+async function loadDocs(id) {
+  const box = $('#fDocs');
+  try { const s = await F.getDocs(F.query(F.collection(fs, 'kyc'), F.where('cid', '==', id))); const d = s.docs.map(x => ({ id: x.id, ...x.data() }));
+    box.className = ''; box.innerHTML = d.length ? `<div class="acts">${d.map(x => `<button class="btn" data-doc="${esc(x.id)}">📄 ${esc(DOCK[x.kind] || x.kind)} <small style="display:inline;color:var(--muted)">${Math.max(1, Math.round((x.size || 0) / 1024))} ك.ب</small></button>`).join('')}</div>` : '<div class="empty" style="padding:8px">لم تُرفع مستندات</div>';
+    box.onclick = e => { const b = e.target.closest('[data-doc]'); if (!b) return; const x = d.find(y => y.id === b.dataset.doc);
+      const bin = atob(x.data); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([u8], { type: x.type })); const w = window.open(url, '_blank'); if (!w) { const a = document.createElement('a'); a.href = url; a.download = x.name; a.click(); } };
+  } catch (e) { box.textContent = 'تعذر تحميل المستندات'; }
+}
+async function loadNotes(id) {
+  try { const s = await F.getDocs(F.query(F.collection(fs, 'crm'), F.where('cid', '==', id))); const n = s.docs.map(x => x.data()).sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    $('#fNotes').innerHTML = n.length ? n.map(x => `<div class="note"><b>${esc(x.kind || '')}</b> ${esc(x.text)}<small>${esc(x.byName || x.by)} · ${esc(String(x.at).slice(0, 16).replace('T', ' '))}</small></div>`).join('') : '<div class="empty" style="padding:8px">لا يوجد</div>';
+  } catch (e) { $('#fNotes').textContent = 'تعذر التحميل'; }
+}
+const DCOLS = {
+  vehicles: [['اللوحة', v => `${v.plateNumbers || ''} ${v.plateLetters || ''}`], ['السيارة', v => [v.make, v.model, v.year].filter(Boolean).join(' ')], ['النوع', v => v.type], ['الحالة', v => v.status]],
+  drivers: [['الاسم', d => d.name], ['الجوال', d => d.phone], ['الفرع', d => d.branchId]],
+  access: [['المستخدم', a => a.name], ['الإيميل', a => a._id], ['الدور', a => ({ admin: 'مدير النظام', fleet: 'مدير الحركة', branch: 'مشرف فرع', driver: 'مستخدم مركبة', viewer: 'اطلاع' })[a.role] || a.role]],
+  maintenance: [['التاريخ', m => m.date], ['السيارة', m => m.vehicleId], ['النوع', m => m.type || m.kind], ['التكلفة', m => m.cost]],
+  violations: [['التاريخ', m => m.date], ['السيارة', m => m.vehicleId], ['النوع', m => m.type || m.kind], ['المبلغ', m => m.amount]]
+};
+async function loadData(id, col) {
+  FILE_TAB = col; document.querySelectorAll('#fTabs button').forEach(b => b.classList.toggle('on', b.dataset.ft === col));
+  const box = $('#fData'); box.className = 'empty'; box.textContent = 'جارٍ التحميل…';
+  try { const s = await F.getDocs(F.query(F.collection(fs, 'companies', id, col), F.limit(300))); const rows = s.docs.map(d => ({ _id: d.id, ...d.data() })); const cols = DCOLS[col];
+    box.className = ''; box.innerHTML = rows.length ? `<small style="color:var(--muted)">${rows.length}${rows.length === 300 ? '+' : ''} سجل</small><div class="tw"><table class="mini"><thead><tr>${cols.map(c => `<th>${c[0]}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${cols.map(c => `<td>${esc(c[1](r) ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : '<div class="empty" style="padding:8px">لا يوجد</div>';
+  } catch (e) { box.textContent = 'تعذر التحميل: ' + (e.code || e.message); }
+}
+$('#file').onclick = e => {
+  if (e.target.id === 'file') return closeFile();
+  const t = e.target.closest('[data-ft]'); if (t) return loadData(FILE_ID, t.dataset.ft);
+  const pr = e.target.closest('[data-print]'); if (pr) return printInv(INVS.find(i => i.id === pr.dataset.print));
+  const b = e.target.closest('[data-f]'); if (!b) return; const c = COS.find(x => x.id === FILE_ID); const a = b.dataset.f;
+  if (a === 'close') return closeFile();
+  if (a === 'approve') dialog(`<h3>اعتماد ${esc(c.name)}</h3><p style="margin:0;font-size:14px">تأكد من التحقق من السجل التجاري والبيانات قبل الاعتماد. بعد الاعتماد يستطيع مدير الشركة الدخول للنظام.</p>
+      <label>نوع الاعتماد<select name="mode"><option value="trial">بدء تجربة مجانية</option><option value="active">اشتراك مدفوع مباشرة</option></select></label>
+      <label>نهاية التجربة / الاشتراك<input name="until" type="date" value="${addDays(today(), TRIAL_DAYS)}" required></label>`,
+    fd => saveCo(c.id, fd.get('mode') === 'active' ? { status: 'active', plan: 'شهري', paidUntil: fd.get('until'), approvedAt: nowIso(), approvedBy: ME.email, rejectReason: '' } : { status: 'trial', trialEnds: fd.get('until'), approvedAt: nowIso(), approvedBy: ME.email, rejectReason: '' }, 'تم اعتماد الشركة ✓'), 'اعتماد');
+  if (a === 'reject') dialog(`<h3>رفض طلب ${esc(c.name)}</h3><label>السبب (يظهر للشركة لتعدّل بياناتها)<textarea name="r" rows="3" required></textarea></label>`,
+    fd => saveCo(c.id, { status: 'rejected', rejectReason: fd.get('r').trim() }, 'تم رفض الطلب'), 'رفض');
+  if (a === 'activate') dialog(`<h3>تفعيل اشتراك ${esc(c.name)}</h3>
       <label>الباقة<input name="plan" value="${esc(c.plan && c.plan !== 'trial' ? c.plan : 'شهري')}" required></label>
-      <label>الاشتراك مدفوع حتى<input name="paidUntil" type="date" value="${esc(c.paidUntil || addDays(today(), 30))}" required></label>`,
-    fd => save(c.id, { status: 'active', plan: fd.get('plan'), paidUntil: fd.get('paidUntil') }, 'تم تفعيل الاشتراك ✓'));
-  if (b.dataset.a === 'suspend') { if (confirm(`إيقاف «${c.name}»؟\nلن يستطيع أي مستخدم في الشركة الدخول، والبيانات تبقى محفوظة ويمكن إعادة التفعيل في أي وقت.`)) save(c.id, { status: 'suspended', suspendedAt: new Date().toISOString() }, 'تم إيقاف الشركة'); }
-  if (b.dataset.a === 'extend') dialog(`<h3>تمديد التجربة – ${esc(c.name)}</h3><label>تنتهي التجربة في<input name="trialEnds" type="date" value="${esc(addDays(c.trialEnds, 14))}" required></label>`,
-    fd => save(c.id, { status: 'trial', trialEnds: fd.get('trialEnds') }, 'تم تمديد التجربة ✓'));
-  if (b.dataset.a === 'edit') dialog(`<h3>تعديل ${esc(c.name)}</h3>
-      <label>اسم الشركة<input name="name" value="${esc(c.name)}" required maxlength="120"></label>
+      <label>الاشتراك مدفوع حتى<input name="paidUntil" type="date" value="${esc(c.paidUntil && c.paidUntil > today() ? c.paidUntil : addDays(today(), 30))}" required></label>`,
+    fd => saveCo(c.id, { status: 'active', plan: fd.get('plan'), paidUntil: fd.get('paidUntil') }, 'تم تفعيل الاشتراك ✓'));
+  if (a === 'suspend' && confirm(`إيقاف «${c.name}»؟\nلن يستطيع أي مستخدم في الشركة الدخول، والبيانات تبقى محفوظة ويمكن إعادة التفعيل في أي وقت.`)) saveCo(c.id, { status: 'suspended', suspendedAt: nowIso() }, 'تم إيقاف الشركة');
+  if (a === 'extend') dialog(`<h3>تمديد التجربة – ${esc(c.name)}</h3><label>تنتهي التجربة في<input name="trialEnds" type="date" value="${esc(addDays(c.trialEnds, 14))}" required></label>`,
+    fd => saveCo(c.id, { status: 'trial', trialEnds: fd.get('trialEnds') }, 'تم تمديد التجربة ✓'));
+  if (a === 'invoice') newInvoice(c);
+  if (a === 'edit') { const p = c.profile || {}; dialog(`<h3>تعديل بيانات ${esc(c.name)}</h3>
+      <label>اسم الشركة في النظام<input name="name" value="${esc(c.name)}" required maxlength="120"></label>
+      ${PF.map(([t, fl]) => `<b style="font-size:14px">${t}</b><div class="g2">${fl.map(([k, l]) => `<label>${l}<input name="p_${k}" value="${esc(p[k] || '')}" ${LTR.has(k) ? 'dir="ltr"' : ''}></label>`).join('')}</div>`).join('')}
       <label>الباقة<input name="plan" value="${esc(c.plan || '')}"></label>
       <label>ملاحظة داخلية<textarea name="note" rows="2">${esc(c.note || '')}</textarea></label>`,
-    fd => save(c.id, { name: fd.get('name').trim(), plan: fd.get('plan').trim(), note: fd.get('note').trim() }, 'تم الحفظ ✓'));
+    fd => { const prof = { ...p }; PF.forEach(([, fl]) => fl.forEach(([k]) => prof[k] = String(fd.get('p_' + k) || '').trim()));
+      saveCo(c.id, { name: fd.get('name').trim(), plan: fd.get('plan').trim(), note: fd.get('note').trim(), profile: prof }, 'تم الحفظ ✓'); });
+    $('#dlg').style.width = 'min(720px,94vw)'; }
 };
+function closeFile() { $('#file').hidden = true; FILE_ID = null; }
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#file').hidden && !$('#dlg').open) closeFile(); });
+
+/* ---------- الفواتير ---------- */
+const vatRate = () => (SET.vatRate === '' || SET.vatRate == null ? 15 : +SET.vatRate);
+function renderInv() {
+  const q = $('#iq').value.trim().toLowerCase(), f = $('#ifs').value;
+  const list = INVS.filter(i => (f === 'all' || istOf(i) === f) && (!q || [i.number, i.companyName, i.buyer && i.buyer.vatNumber].some(x => String(x || '').toLowerCase().includes(q))));
+  $('#irows').innerHTML = list.length ? list.map(i => `<tr>
+    <td dir="ltr" style="text-align:right"><b>${esc(i.number)}</b></td><td>${esc(i.companyName)}</td><td>${fmt(i.issueDate)}<small>الاستحقاق ${fmt(i.dueDate)}</small></td>
+    <td>${fmt(i.periodFrom)} ← ${fmt(i.periodTo)}<small>${esc(i.qty)} سيارة × ${money(i.unitPrice)}</small></td><td><b>${money(i.total)}</b><small>منها ضريبة ${money(i.vat)}</small></td>
+    <td>${pill(IST, istOf(i))}${i.status === 'paid' ? `<small>${fmt(i.paidAt)} · ${esc(i.method || '')}</small>` : ''}</td>
+    <td><div class="acts"><button class="btn" data-i="print" data-id="${esc(i.id)}">طباعة</button>
+      ${can('invoices') && i.status === 'unpaid' ? `<button class="btn pri" data-i="pay" data-id="${esc(i.id)}">تسجيل الدفع</button><button class="btn bad" data-i="cancel" data-id="${esc(i.id)}">إلغاء</button>` : ''}
+      <button class="btn" data-i="open" data-id="${esc(i.cid)}">الشركة</button></div></td></tr>`).join('')
+    : `<tr><td colspan="7" class="empty">${INVS.length ? 'لا توجد نتائج' : 'لا توجد فواتير بعد'}</td></tr>`;
+}
+$('#iq').oninput = renderInv; $('#ifs').onchange = renderInv;
+$('#newInv').onclick = () => newInvoice(null);
+$('#irows').onclick = e => {
+  const b = e.target.closest('[data-i]'); if (!b) return; const a = b.dataset.i;
+  if (a === 'open') return openFile(b.dataset.id);
+  const i = INVS.find(x => x.id === b.dataset.id); if (!i) return;
+  if (a === 'print') printInv(i);
+  if (a === 'cancel' && confirm(`إلغاء الفاتورة ${i.number}؟`)) saveInv(i, { status: 'cancelled', cancelledAt: nowIso(), cancelledBy: ME.email }, 'أُلغيت الفاتورة');
+  if (a === 'pay') { const c = COS.find(x => x.id === i.cid); dialog(`<h3>تسجيل دفع ${esc(i.number)}</h3><div class="sum">المبلغ: <b>${money(i.total)} ريال</b></div>
+      <div class="g2"><label>تاريخ الدفع<input name="d" type="date" value="${today()}" required></label>
+      <label>طريقة الدفع<select name="m"><option>تحويل بنكي</option><option>مدى</option><option>بطاقة ائتمانية</option><option>سداد</option><option>نقدي</option></select></label></div>
+      <label>رقم المرجع / الحوالة<input name="ref" dir="ltr"></label>
+      ${can('status') && c ? `<label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input type="checkbox" name="ext" checked style="width:auto"> تفعيل اشتراك الشركة حتى ${fmt(i.periodTo)}</label>` : ''}`,
+    async fd => { if (await saveInv(i, { status: 'paid', paidAt: fd.get('d'), method: fd.get('m'), ref: fd.get('ref').trim(), paidBy: ME.email }, 'تم تسجيل الدفع ✓') && fd.get('ext') && c)
+      await saveCo(c.id, { status: 'active', plan: c.plan && c.plan !== 'trial' ? c.plan : 'شهري', paidUntil: i.periodTo > (c.paidUntil || '') ? i.periodTo : c.paidUntil }, 'تم تحديث الاشتراك ✓'); }); }
+};
+async function saveInv(i, data, msg) {
+  try { await F.updateDoc(F.doc(fs, 'invoices', i.id), { ...data, updatedAt: nowIso() }); Object.assign(i, data); renderInv(); kpis(); toast(msg); return true; }
+  catch (e) { toast('تعذر الحفظ: ' + (e.code === 'permission-denied' ? 'ليست لديك صلاحية' : e.code || e.message)); return false; }
+}
+function newInvoice(c0) {
+  const cos = COS.filter(c => !isOpen(c));
+  if (!cos.length) return toast('لا توجد شركات معتمدة');
+  const c = c0 || cos[0]; const from = c.paidUntil && c.paidUntil >= today() ? addDays(c.paidUntil, 1) : today();
+  const calc = fd => { const qty = +fd.get('qty') || 0, price = +fd.get('price') || 0, months = +fd.get('months') || 1, disc = +fd.get('disc') || 0, rate = vatRate();
+    let sub = qty * price * months; const min = (+SET.minMonthly || 0) * months; if (sub < min) sub = min; sub = Math.max(0, sub - disc);
+    sub = Math.round(sub * 100) / 100; const vat = Math.round(sub * rate) / 100; return { qty, price, months, disc, rate, sub, vat, total: Math.round((sub + vat) * 100) / 100, min }; };
+  const f = dialog(`<h3>فاتورة جديدة</h3>
+    <label>الشركة<select name="cid">${cos.map(x => `<option value="${esc(x.id)}" ${x.id === c.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>
+    <div class="g2"><label>من<input name="from" type="date" value="${from}" required></label><label>عدد الأشهر<input name="months" type="number" min="1" max="36" value="1" required></label></div>
+    <div class="g2"><label>إلى<input name="to" type="date" value="${addMonths(from, 1)}" required></label><label>تاريخ الاستحقاق<input name="due" type="date" value="${addDays(today(), 7)}" required></label></div>
+    <div class="g2"><label>عدد السيارات<input name="qty" type="number" min="1" value="${+c.vehicles || +(c.profile || {}).fleetSize || 1}" required></label><label>سعر السيارة شهرياً<input name="price" type="number" min="0" step="0.01" value="${esc(SET.pricePerVehicle || 0)}" required></label></div>
+    <div class="g2"><label>خصم (ريال)<input name="disc" type="number" min="0" step="0.01" value="0"></label><label>الوصف<input name="desc" value="اشتراك نظام إدارة الأسطول"></label></div>
+    <div class="sum" id="isum"></div>`, async fd => {
+      const x = COS.find(y => y.id === fd.get('cid')); const t = calc(fd);
+      try {
+        const seq = await F.runTransaction(fs, async tr => { const r = F.doc(fs, 'platform', 'counters'); const s = await tr.get(r); const n = ((s.exists() && s.data().invoice) || 0) + 1; tr.set(r, { invoice: n }, { merge: true }); return n; });
+        const p = x.profile || {};
+        const inv = { number: `INV-${today().slice(0, 4)}-${String(seq).padStart(4, '0')}`, seq, cid: x.id, companyName: x.name, issueDate: today(), issuedAt: nowIso(), dueDate: fd.get('due'),
+          periodFrom: fd.get('from'), periodTo: fd.get('to'), months: t.months, qty: t.qty, unitPrice: t.price, discount: t.disc, desc: fd.get('desc').trim(),
+          subtotal: t.sub, vatRate: t.rate, vat: t.vat, total: t.total, status: 'unpaid', createdBy: ME.email,
+          buyer: { name: p.legalName || x.name, vatNumber: p.vatNumber || '', crNumber: p.crNumber || '', address: [p.buildingNo, p.street, p.district, p.city, p.postalCode].filter(Boolean).join('، ') } };
+        const ref = await F.addDoc(F.collection(fs, 'invoices'), inv); INVS.unshift({ id: ref.id, ...inv }); renderInv(); kpis(); toast(`صدرت الفاتورة ${inv.number} ✓`);
+        if (FILE_ID) openFile(FILE_ID, true);
+      } catch (e) { console.error(e); toast('تعذر إصدار الفاتورة: ' + (e.code || e.message)); }
+    }, 'إصدار');
+  const upd = () => { const t = calc(new FormData(f));
+    $('#isum').innerHTML = `<div>${t.qty} سيارة × ${money(t.price)} × ${t.months} شهر${t.disc ? ` − خصم ${money(t.disc)}` : ''}${t.min && t.qty * t.price * t.months < t.min ? ` <small>(طُبّق الحد الأدنى ${money(t.min)})</small>` : ''}</div><div>قبل الضريبة: <b>${money(t.sub)}</b> · الضريبة ${t.rate}%: <b>${money(t.vat)}</b></div><div style="font-size:16px">الإجمالي: <b>${money(t.total)} ريال</b></div>`; };
+  f.oninput = e => { if (['from', 'months'].includes(e.target.name)) f.to.value = addMonths(f.from.value, +f.months.value || 1);
+    if (e.target.name === 'cid') { const x = COS.find(y => y.id === f.cid.value); f.qty.value = +x.vehicles || +(x.profile || {}).fleetSize || 1; f.from.value = x.paidUntil && x.paidUntil >= today() ? addDays(x.paidUntil, 1) : today(); f.to.value = addMonths(f.from.value, +f.months.value || 1); }
+    upd(); };
+  f.onchange = f.oninput; upd();
+}
+// رمز QR للفاتورة الضريبية المبسطة (المرحلة الأولى من الفوترة الإلكترونية – زاتكا)
+function zatcaQR(seller, vatNo, ts, total, vat) {
+  const enc = new TextEncoder(); const bytes = [];
+  [seller, vatNo, ts, String(total), String(vat)].forEach((v, i) => { const b = enc.encode(v); bytes.push(i + 1, b.length, ...b); });
+  let bin = ''; bytes.forEach(x => bin += String.fromCharCode(x));
+  const q = window.qrcode(0, 'M'); q.addData(btoa(bin)); q.make(); return q.createDataURL(4, 0);
+}
+function printInv(i) {
+  if (!i) return; const s = SET; const b = i.buyer || {};
+  const qr = s.vatNumber ? zatcaQR(s.sellerName || '', s.vatNumber, (i.issuedAt || i.issueDate).replace(/\.\d+Z$/, 'Z'), (+i.total).toFixed(2), (+i.vat).toFixed(2)) : '';
+  const w = window.open('', '_blank'); if (!w) return toast('اسمح بالنوافذ المنبثقة للطباعة');
+  w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>${esc(i.number)}</title><style>
+    body{font:14px/1.6 "IBM Plex Sans Arabic",Tahoma,sans-serif;color:#15201B;margin:0;padding:28px;background:#fff}.wrap{max-width:820px;margin:0 auto}
+    h1{font-size:22px;margin:0;color:#0E5A44}.hd{display:flex;justify-content:space-between;gap:20px;border-bottom:3px solid #0E5A44;padding-bottom:14px;margin-bottom:16px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}.box{border:1px solid #D6DDD9;border-radius:10px;padding:10px 14px}.box b{color:#0E5A44}
+    table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #D6DDD9;padding:8px 10px;text-align:right}th{background:#F6F8F7}
+    .tot td{font-weight:600}.tot tr:last-child td{background:#0E5A44;color:#fff;font-size:16px}.muted{color:#5A6862;font-size:12px}
+    .st{display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;background:${i.status === 'paid' ? '#DCFAE6;color:#0E7A4F' : i.status === 'cancelled' ? '#FEE4E2;color:#B42318' : '#FEF0C7;color:#B54708'}}
+    @media print{body{padding:0}.np{display:none}}@media (max-width:600px){.grid{grid-template-columns:1fr}body{padding:14px}}</style></head><body><div class="wrap">
+    <div class="hd"><div><h1>فاتورة ضريبية مبسطة</h1><div class="muted">Simplified Tax Invoice</div><div style="margin-top:8px">رقم الفاتورة: <b dir="ltr">${esc(i.number)}</b></div><div>تاريخ الإصدار: ${fmt(i.issueDate)} · الاستحقاق: ${fmt(i.dueDate)}</div><div>الحالة: <span class="st">${esc((IST[i.status] || [i.status])[0])}</span></div></div>
+      ${qr ? `<img src="${qr}" alt="QR" style="width:130px;height:130px">` : ''}</div>
+    <div class="grid"><div class="box"><b>البائع</b><div>${esc(s.sellerName || '—')}</div>${s.sellerNameEn ? `<div dir="ltr" style="text-align:right">${esc(s.sellerNameEn)}</div>` : ''}<div>الرقم الضريبي: <span dir="ltr">${esc(s.vatNumber || '—')}</span></div>${s.crNumber ? `<div>السجل التجاري: ${esc(s.crNumber)}</div>` : ''}${s.address ? `<div>${esc(s.address)}</div>` : ''}${s.phone || s.email ? `<div dir="ltr" style="text-align:right">${esc([s.phone, s.email].filter(Boolean).join(' · '))}</div>` : ''}</div>
+      <div class="box"><b>العميل</b><div>${esc(b.name || i.companyName)}</div><div>الرقم الضريبي: <span dir="ltr">${esc(b.vatNumber || '—')}</span></div>${b.crNumber ? `<div>السجل التجاري: ${esc(b.crNumber)}</div>` : ''}${b.address ? `<div>${esc(b.address)}</div>` : ''}</div></div>
+    <table><thead><tr><th>البيان</th><th>الفترة</th><th>الكمية</th><th>سعر الوحدة شهرياً</th><th>الأشهر</th><th>المبلغ</th></tr></thead><tbody>
+      <tr><td>${esc(i.desc || 'اشتراك')}</td><td>${fmt(i.periodFrom)} إلى ${fmt(i.periodTo)}</td><td>${esc(i.qty)} سيارة</td><td>${money(i.unitPrice)}</td><td>${esc(i.months || 1)}</td><td>${money((+i.qty) * (+i.unitPrice) * (+i.months || 1))}</td></tr></tbody></table>
+    <table class="tot" style="width:min(380px,100%);margin-inline-start:auto"><tbody>${+i.discount ? `<tr><td>الخصم</td><td>${money(i.discount)}</td></tr>` : ''}<tr><td>الإجمالي قبل الضريبة</td><td>${money(i.subtotal)}</td></tr><tr><td>ضريبة القيمة المضافة ${esc(i.vatRate)}%</td><td>${money(i.vat)}</td></tr><tr><td>الإجمالي شامل الضريبة (ريال)</td><td>${money(i.total)}</td></tr></tbody></table>
+    ${s.iban ? `<div class="box" style="margin-top:10px"><b>بيانات التحويل</b><div>${s.bankName ? esc(s.bankName) + ' · ' : ''}<span dir="ltr">${esc(s.iban)}</span></div></div>` : ''}
+    ${s.invoiceNote ? `<p class="muted">${esc(s.invoiceNote)}</p>` : ''}
+    <div class="np" style="margin-top:20px"><button onclick="print()" style="font:inherit;padding:8px 18px;background:#0E5A44;color:#fff;border:0;border-radius:8px;cursor:pointer">طباعة / حفظ PDF</button></div></div></body></html>`);
+  w.document.close();
+}
+
+/* ---------- فريق المنصة ---------- */
+async function loadStaff() {
+  $('#roleHelp').innerHTML = '<b>صلاحيات الأدوار</b>' + Object.values(ROLES).map(([l, d]) => `<div><b>${l}:</b> ${d}</div>`).join('');
+  try { const s = await F.getDocs(F.collection(fs, 'staff')); STAFF = s.docs.map(d => ({ id: d.id, ...d.data() })); } catch (e) { STAFF = []; }
+  $('#srows').innerHTML = STAFF.length ? STAFF.map(x => `<tr><td>${esc(x.name || '')}${x.phone ? `<small dir="ltr" style="text-align:right">${esc(x.phone)}</small>` : ''}</td><td dir="ltr" style="text-align:right">${esc(x.id)}</td><td>${esc((ROLES[x.role] || [x.role])[0])}</td>
+    <td>${x.active ? '<span class="pill p-active">فعّال</span>' : '<span class="pill p-off">موقوف</span>'}</td>
+    <td><div class="acts"><button class="btn" data-s="edit" data-id="${esc(x.id)}">تعديل</button><button class="btn ${x.active ? 'bad' : ''}" data-s="toggle" data-id="${esc(x.id)}">${x.active ? 'إيقاف' : 'تفعيل'}</button><button class="btn bad" data-s="del" data-id="${esc(x.id)}">حذف</button></div></td></tr>`).join('')
+    : `<tr><td colspan="5" class="empty">لم تُضف مستخدمين بعد. أضف موظفيك (محاسب، مبيعات، دعم فني…) ثم يدخلون من هذه الصفحة باختيار «أنشئ كلمة مرور».</td></tr>`;
+}
+function staffDialog(x) {
+  const f = dialog(`<h3>${x ? 'تعديل مستخدم' : 'إضافة مستخدم للفريق'}</h3>
+    <label>الإيميل<input name="email" type="email" dir="ltr" value="${esc(x ? x.id : '')}" ${x ? 'readonly' : ''} required></label>
+    <label>الاسم<input name="name" value="${esc(x ? x.name || '' : '')}" required></label>
+    <label>الجوال<input name="phone" dir="ltr" value="${esc(x ? x.phone || '' : '')}"></label>
+    <label>الدور<select name="role">${Object.entries(ROLES).map(([k, [l]]) => `<option value="${k}" ${x && x.role === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+    <small style="color:var(--muted)" id="rdesc"></small>`, async fd => {
+      const email = fd.get('email').trim().toLowerCase(); if (email === SUPER) return toast('هذا إيميل مالك المنصة');
+      try { await F.setDoc(F.doc(fs, 'staff', email), { name: fd.get('name').trim(), phone: fd.get('phone').trim(), role: fd.get('role'), active: x ? !!x.active : true, ...(x ? { updatedAt: nowIso() } : { addedAt: nowIso(), addedBy: ME.email }) }, { merge: true }); toast('تم الحفظ ✓'); loadStaff(); }
+      catch (e) { toast('تعذر الحفظ: ' + (e.code || e.message)); } });
+  const d = () => $('#rdesc').textContent = ROLES[f.role.value][1]; f.role.onchange = d; d();
+}
+$('#addStaff').onclick = () => staffDialog(null);
+$('#srows').onclick = async e => { const b = e.target.closest('[data-s]'); if (!b) return; const x = STAFF.find(y => y.id === b.dataset.id);
+  try {
+    if (b.dataset.s === 'edit') staffDialog(x);
+    if (b.dataset.s === 'toggle') { await F.updateDoc(F.doc(fs, 'staff', x.id), { active: !x.active, updatedAt: nowIso() }); loadStaff(); }
+    if (b.dataset.s === 'del' && confirm(`حذف ${x.name || x.id} من فريق المنصة؟`)) { await F.deleteDoc(F.doc(fs, 'staff', x.id)); loadStaff(); }
+  } catch (err) { toast('تعذر التنفيذ'); } };
+
+/* ---------- الإعدادات ---------- */
+function renderSettings() {
+  $('#setg').innerHTML = SET_F.map(([k, l]) => `<label>${l}${k === 'invoiceNote' || k === 'address' ? `<textarea name="${k}" rows="2">${esc(SET[k] || '')}</textarea>` : `<input name="${k}" value="${esc(SET[k] ?? (k === 'vatRate' ? 15 : ''))}" ${['vatNumber', 'crNumber', 'phone', 'email', 'iban', 'sellerNameEn', 'pricePerVehicle', 'minMonthly', 'vatRate'].includes(k) ? 'dir="ltr"' : ''}>`}</label>`).join('');
+}
+$('#setf').onsubmit = async e => { e.preventDefault(); const fd = new FormData(e.target); const d = {}; SET_F.forEach(([k]) => d[k] = String(fd.get(k) || '').trim());
+  if (d.vatNumber && !/^3\d{13}3$/.test(d.vatNumber)) return toast('الرقم الضريبي 15 رقماً يبدأ وينتهي بـ 3');
+  try { await F.setDoc(F.doc(fs, 'platform', 'settings'), { ...d, updatedAt: nowIso() }, { merge: true }); SET = { ...SET, ...d }; toast('تم حفظ الإعدادات ✓'); } catch (x) { toast('تعذر الحفظ: ' + (x.code || x.message)); } };
 </script>
 </body>
 </html>

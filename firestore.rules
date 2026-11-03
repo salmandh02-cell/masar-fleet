@@ -11,6 +11,20 @@ service cloud.firestore {
     function myEmail() { return request.auth.token.email.lower(); }
     function isSuper() { return signedIn() && myEmail() == superEmail(); }
 
+    // ---------- فريق المنصة (موظفو شركة النظام) ----------
+    // كل دور له صلاحيات محددة. إدارة الفريق والإعدادات لمالك المنصة فقط
+    function stfPath() { return /databases/$(database)/documents/staff/$(myEmail()); }
+    function isPlat() { return isSuper() || (signedIn() && exists(stfPath()) && get(stfPath()).data.active == true); }
+    function platPerms() { return {
+      'manager':    ['view', 'data', 'approve', 'status', 'trial', 'edit', 'note', 'invoices'],
+      'accounts':   ['view', 'approve', 'status', 'trial', 'edit', 'note', 'invoices'],
+      'accountant': ['view', 'note', 'invoices'],
+      'sales':      ['view', 'approve', 'trial', 'edit', 'note'],
+      'support':    ['view', 'data', 'note'],
+      'viewer':     ['view']
+    }; }
+    function platCan(p) { return isSuper() || (signedIn() && exists(stfPath()) && get(stfPath()).data.active == true && p in platPerms().get(get(stfPath()).data.get('role', ''), [])); }
+
     // ---------- الشركة والصلاحيات داخلها ----------
     function coPath(cid) { return /databases/$(database)/documents/companies/$(cid); }
     function co(cid) { return get(coPath(cid)).data; }
@@ -35,6 +49,21 @@ service cloud.firestore {
       return signedIn() && !exists(coPath(cid)) && existsAfter(coPath(cid))
         && getAfter(coPath(cid)).data.ownerUid == request.auth.uid
         && getAfter(coPath(cid)).data.ownerEmail == myEmail();
+    }
+
+    // تعديل وثيقة الشركة: تُفحص المفاتيح المتغيّرة أولاً (أرخص) ثم الصلاحية
+    function coUpd(cid, k, old, nw) {
+      let open = old in ['pending', 'rejected'];
+      // مدير الشركة المعتمدة: الاسم وحساب التذكيرات فقط
+      return (k.hasOnly(['name', 'sysEmail', 'updatedAt']) && isAdmin(cid))
+        // صاحب الطلب: يعدّل بياناته ويعيد الإرسال ما دام الطلب لم يُعتمد
+        || (open && nw == 'pending' && k.hasOnly(['name', 'phone', 'ownerName', 'profile', 'status', 'submittedAt', 'updatedAt']) && isCoOwner(cid))
+        // فريق المنصة حسب الصلاحية
+        || (open && nw in ['trial', 'active', 'rejected'] && k.hasOnly(['status', 'trialEnds', 'plan', 'paidUntil', 'approvedAt', 'approvedBy', 'rejectReason', 'updatedAt']) && platCan('approve'))
+        || (!open && nw in ['trial', 'active', 'suspended'] && k.hasOnly(['status', 'plan', 'paidUntil', 'suspendedAt', 'updatedAt']) && platCan('status'))
+        || (!open && nw == 'trial' && k.hasOnly(['status', 'trialEnds', 'updatedAt']) && platCan('trial'))
+        || (k.hasOnly(['name', 'phone', 'ownerName', 'profile', 'plan', 'note', 'updatedAt']) && platCan('edit'))
+        || (k.hasOnly(['note', 'updatedAt']) && platCan('note'));
     }
 
     // ---------- فهرس العضوية: أي شركة ينتمي لها كل مستخدم ----------
@@ -62,25 +91,27 @@ service cloud.firestore {
 
     // ---------- وثيقة الشركة ----------
     match /companies/{cid} {
-      allow get: if isSuper() || hasAcc(cid) || isCoOwner(cid);
+      allow get: if platCan('view') || hasAcc(cid) || isCoOwner(cid);
       // لوحة المالك تعرض كل الشركات، وحساب التذكيرات يرى الشركات التي فعّلته فقط
-      allow list: if isSuper() || (signedIn() && resource.data.get('sysEmail', '') == myEmail());
+      allow list: if platCan('view') || (signedIn() && resource.data.get('sysEmail', '') == myEmail());
+      // الشركة الجديدة تُسجَّل «بانتظار الاعتماد» ولا تدخل النظام حتى تعتمدها شركة النظام
       allow create: if signedIn() && cid.matches('^[a-z0-9][a-z0-9-]{2,39}$')
-        && request.resource.data.keys().hasOnly(['name', 'ownerUid', 'ownerEmail', 'ownerName', 'phone', 'status', 'plan', 'createdAt', 'trialEnds'])
+        && request.resource.data.keys().hasOnly(['name', 'ownerUid', 'ownerEmail', 'ownerName', 'phone', 'status', 'plan', 'createdAt', 'submittedAt', 'profile'])
         && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.ownerEmail == myEmail()
-        && request.resource.data.status == 'trial'
+        && request.resource.data.status == 'pending'
         && request.resource.data.name is string && request.resource.data.name.size() > 1 && request.resource.data.name.size() <= 120
+        && (!('profile' in request.resource.data) || request.resource.data.profile is map)
         // شركة واحدة لكل مستخدم، وتُسجَّل عضويته في نفس الدفعة
         && !exists(memPath(myEmail())) && getAfter(memPath(myEmail())).data.companyId == cid;
-      // المالك العام يغيّر الحالة والباقة، ومدير الشركة يغيّر الاسم وحساب التذكيرات فقط
-      allow update: if isSuper()
-        || (isAdmin(cid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'sysEmail', 'updatedAt']));
+      allow update: if isSuper() || coUpd(cid, request.resource.data.diff(resource.data).affectedKeys(), resource.data.status, request.resource.data.get('status', ''));
       allow delete: if false;
 
       // ---------- بيانات الشركة التشغيلية ----------
       match /{col}/{id} {
-        allow read: if member(cid) && !(col in ['audit', 'threads', 'ids']);
+        allow read: if (member(cid) && !(col in ['audit', 'threads', 'ids']))
+          // اطلاع فريق المنصة (للدعم الفني): قراءة فقط، دون الهويات والرسائل والسجل
+          || (platCan('data') && col in ['vehicles', 'drivers', 'access', 'maintenance', 'fuel', 'violations', 'handovers', 'inspections', 'branches', 'settings']);
         allow create: if isStaff(cid) && !(col in ['settings', 'invites', 'access', 'roles', 'audit', 'seen', 'blobs', 'logins', 'threads', 'pushsubs', 'ids'])
           && (isAdmin(cid) || !(col == 'handovers' && 'ack' in request.resource.data))
           && (!(col == 'handovers' && 'issuer' in request.resource.data) || request.resource.data.issuer.uid == request.auth.uid);
@@ -90,7 +121,7 @@ service cloud.firestore {
         allow delete: if isAdmin(cid) && !(col in ['audit', 'access']);
       }
       // عدد السيارات لكل شركة يظهر في لوحة المالك (للفوترة لاحقاً)
-      match /vehicles/{id} { allow list: if isSuper(); }
+      match /vehicles/{id} { allow list: if platCan('view'); }
 
       // الإعدادات والمستخدمون: مدير النظام فقط
       match /settings/{id} { allow write: if isAdmin(cid); }
@@ -164,6 +195,40 @@ service cloud.firestore {
         allow read: if isAdmin(cid);
         allow create: if member(cid) && request.resource.data.uid == request.auth.uid;
       }
+    }
+
+    // ================= منصة الاشتراكات (لشركة النظام) =================
+    // فريق المنصة: يديره مالك المنصة فقط، وكل موظف يقرأ وثيقته
+    match /staff/{email} {
+      allow get: if signedIn() && (email == myEmail() || isPlat());
+      allow list: if isPlat();
+      allow write: if isSuper() && email != superEmail();
+    }
+    // إعدادات المنصة (بيانات البائع للفواتير والأسعار) وعدّاد أرقام الفواتير
+    match /platform/{id} {
+      allow read: if isPlat();
+      allow write: if isSuper() || (id == 'counters' && platCan('invoices'));
+    }
+    // مستندات الشركة (السجل التجاري، شهادة الضريبة، العنوان الوطني)
+    match /kyc/{id} {
+      allow read: if platCan('view') || isCoOwner(resource.data.cid);
+      allow create: if (isCoOwner(request.resource.data.cid) || platCan('edit'))
+        && request.resource.data.keys().hasOnly(['cid', 'kind', 'name', 'type', 'size', 'data', 'at', 'by'])
+        && request.resource.data.data is string && request.resource.data.data.size() < 1000000
+        && request.resource.data.by == myEmail();
+      allow delete: if platCan('edit') || (isCoOwner(resource.data.cid) && co(resource.data.cid).status in ['pending', 'rejected']);
+    }
+    // الفواتير: يصدرها فريق المنصة، وتراها الشركة صاحبة الفاتورة
+    match /invoices/{id} {
+      allow read: if platCan('view') || isCoOwner(resource.data.cid);
+      allow create, update: if platCan('invoices');
+      allow delete: if isSuper();
+    }
+    // سجل المتابعة (مكالمات وملاحظات) لكل شركة: داخلي لفريق المنصة
+    match /crm/{id} {
+      allow read: if platCan('view');
+      allow create: if platCan('note') && request.resource.data.by == myEmail();
+      allow delete: if isSuper();
     }
   }
 }

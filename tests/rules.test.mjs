@@ -1,6 +1,6 @@
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing';
 import fs from 'node:fs';
-const env = await initializeTestEnvironment({ projectId: 'demo-fleet', firestore: { rules: fs.readFileSync('/home/claude/fleet-saas/firestore.rules', 'utf8'), host: '127.0.0.1', port: 8080 } });
+const env = await initializeTestEnvironment({ projectId: 'demo-fleet', firestore: { rules: fs.readFileSync(process.env.RULES || '/home/claude/fleet-saas/firestore.rules', 'utf8'), host: '127.0.0.1', port: 8080 } });
 await env.clearFirestore();
 const U = (uid, email, v = true) => env.authenticatedContext(uid, { email, email_verified: v }).firestore();
 const alice = U('ua', 'alice@a.com'), bob = U('ub', 'bob@b.com'), sup = U('us', 'salmandh02@gmail.com');
@@ -11,10 +11,11 @@ let pass = 0, fail = 0;
 async function t(name, p, ok = true) { try { await (ok ? assertSucceeds(p) : assertFails(p)); pass++; console.log('  ✓', name); } catch (e) { fail++; console.log('  ✗', name, '-', e.message.split('\n')[0]); } }
 function signup(db, cid, uid, email, extra = {}) {
   const b = db.batch(); const now = new Date().toISOString();
-  b.set(db.doc(`companies/${cid}`), { name: 'Co ' + cid, ownerUid: uid, ownerEmail: email, ownerName: 'n', phone: '', status: 'trial', plan: 'trial', createdAt: now, trialEnds: '2030-01-01', ...extra });
+  b.set(db.doc(`companies/${cid}`), { name: 'Co ' + cid, ownerUid: uid, ownerEmail: email, ownerName: 'n', phone: '', status: 'pending', plan: 'trial', createdAt: now, ...extra });
   b.set(db.doc(`members/${email}`), { companyId: cid, at: now });
   b.set(db.doc(`companies/${cid}/access/${email}`), { role: 'admin', name: 'n', phone: null, driverId: null, branchId: null, inviteId: null, owner: true, updatedAt: now });
-  return b.commit();
+  // الشركة الجديدة بانتظار الاعتماد، ثم يعتمدها مالك المنصة (للاختبارات التي تليها)
+  return b.commit().then(() => extra.status ? null : sup.doc(`companies/${cid}`).update({ status: 'trial', trialEnds: '2030-01-01', approvedAt: now, approvedBy: 'salmandh02@gmail.com' }));
 }
 console.log('تسجيل الشركات');
 await t('unverified email cannot create company', signup(unver, 'cx-unver', 'ux', 'x@x.com'), false);
@@ -70,7 +71,9 @@ await t('alice cannot extend own trial', alice.doc('companies/ca-111').update({ 
 await t('alice renames company', alice.doc('companies/ca-111').update({ name: 'A2', updatedAt: 'x' }));
 await t('super lists companies', sup.collection('companies').get());
 await t('super counts A vehicles', sup.collection('companies/ca-111/vehicles').get());
-await t('super cannot read A drivers', sup.collection('companies/ca-111/drivers').get(), false);
+await t('platform owner reads A drivers (read-only view)', sup.collection('companies/ca-111/drivers').get());
+await t('platform owner cannot write A drivers', sup.doc('companies/ca-111/drivers/zz').set({ n: 1 }), false);
+await t('platform owner cannot read A ids', sup.collection('companies/ca-111/ids').get(), false);
 await t('super suspends A', sup.doc('companies/ca-111').update({ status: 'suspended' }));
 await t('suspended: alice cannot read vehicles', alice.collection('companies/ca-111/vehicles').get(), false);
 await t('suspended: driver cannot read vehicles', drv.collection('companies/ca-111/vehicles').get(), false);
@@ -88,6 +91,72 @@ await t('sys cannot list all companies', sys.collection('companies').get(), fals
 await t('sys reads A vehicles', sys.collection('companies/ca-111/vehicles').get());
 await t('sys cannot read B', sys.collection('companies/cb-111/vehicles').get(), false);
 await t('sys cannot write A', sys.doc('companies/ca-111/vehicles/v1').update({ odometer: 1 }), false);
+
+console.log('الاعتماد قبل الدخول');
+const carol = U('uc', 'carol@c.com');
+const pnow = new Date().toISOString();
+await t('carol registers company C as pending with profile', (() => { const b = carol.batch();
+  b.set(carol.doc('companies/cc-111'), { name: 'Carol Co', ownerUid: 'uc', ownerEmail: 'carol@c.com', ownerName: 'c', phone: '', status: 'pending', plan: 'trial', createdAt: pnow, submittedAt: pnow, profile: { crNumber: '1010', vatNumber: '300000000000003', city: 'Riyadh' } });
+  b.set(carol.doc('members/carol@c.com'), { companyId: 'cc-111', at: pnow });
+  b.set(carol.doc('companies/cc-111/access/carol@c.com'), { role: 'admin', name: 'c', phone: null, driverId: null, branchId: null, inviteId: null, owner: true, updatedAt: pnow });
+  return b.commit(); })());
+await t('pending: carol reads her company doc', carol.doc('companies/cc-111').get());
+await t('pending: carol cannot read company data', carol.collection('companies/cc-111/vehicles').get(), false);
+await t('pending: carol cannot write company data', carol.doc('companies/cc-111/vehicles/v1').set({ plate: 'x' }), false);
+await t('pending: carol cannot approve herself', carol.doc('companies/cc-111').update({ status: 'trial', trialEnds: '2030-01-01' }), false);
+await t('pending: carol edits her profile', carol.doc('companies/cc-111').update({ profile: { crNumber: '1011' }, status: 'pending', updatedAt: pnow }));
+await t('pending: carol uploads CR document', carol.doc('kyc/k1').set({ cid: 'cc-111', kind: 'cr', name: 'cr.pdf', type: 'application/pdf', size: 3, data: 'AAA', at: pnow, by: 'carol@c.com' }));
+await t('carol cannot upload a document for company A', carol.doc('kyc/k2').set({ cid: 'ca-111', kind: 'cr', name: 'x', type: 'x', size: 1, data: 'A', at: pnow, by: 'carol@c.com' }), false);
+await t('alice cannot read carol document', alice.doc('kyc/k1').get(), false);
+await t('carol reads her document', carol.doc('kyc/k1').get());
+
+console.log('فريق المنصة');
+const acct = U('s1', 'acc@plat.com'), sales = U('s2', 'sales@plat.com'), supp = U('s3', 'sup@plat.com'), old = U('s4', 'old@plat.com');
+await t('alice cannot add herself to platform staff', alice.doc('staff/alice@a.com').set({ role: 'manager', active: true }), false);
+await t('owner adds accountant', sup.doc('staff/acc@plat.com').set({ role: 'accountant', active: true, name: 'A' }));
+await t('owner adds sales manager', sup.doc('staff/sales@plat.com').set({ role: 'sales', active: true, name: 'S' }));
+await t('owner adds support', sup.doc('staff/sup@plat.com').set({ role: 'support', active: true, name: 'T' }));
+await t('owner adds disabled staff', sup.doc('staff/old@plat.com').set({ role: 'manager', active: false, name: 'O' }));
+await t('staff cannot add staff', sales.doc('staff/x@plat.com').set({ role: 'manager', active: true }), false);
+await t('staff cannot promote self', sales.doc('staff/sales@plat.com').update({ role: 'manager' }), false);
+await t('sales lists companies', sales.collection('companies').get());
+await t('disabled staff cannot list companies', old.collection('companies').get(), false);
+await t('accountant cannot approve', acct.doc('companies/cc-111').update({ status: 'trial', trialEnds: '2030-01-01', updatedAt: pnow }), false);
+await t('support cannot approve', supp.doc('companies/cc-111').update({ status: 'trial', trialEnds: '2030-01-01', updatedAt: pnow }), false);
+await t('sales rejects with reason', sales.doc('companies/cc-111').update({ status: 'rejected', rejectReason: 'السجل منتهي', updatedAt: pnow }));
+await t('rejected: carol still cannot read data', carol.collection('companies/cc-111/vehicles').get(), false);
+await t('rejected: carol fixes data and resubmits', carol.doc('companies/cc-111').update({ profile: { crNumber: '1012' }, status: 'pending', submittedAt: pnow, updatedAt: pnow }));
+await t('sales approves (trial)', sales.doc('companies/cc-111').update({ status: 'trial', trialEnds: '2030-01-01', approvedAt: pnow, approvedBy: 'sales@plat.com', updatedAt: pnow }));
+await t('approved: carol reads data', carol.collection('companies/cc-111/vehicles').get());
+await t('approved: carol cannot edit verified profile', carol.doc('companies/cc-111').update({ profile: { crNumber: '9' }, updatedAt: pnow }), false);
+await t('sales cannot activate paid subscription', sales.doc('companies/cc-111').update({ status: 'active', paidUntil: '2030-01-01', updatedAt: pnow }), false);
+await t('sales cannot suspend', sales.doc('companies/cc-111').update({ status: 'suspended', updatedAt: pnow }), false);
+await t('sales extends trial', sales.doc('companies/cc-111').update({ status: 'trial', trialEnds: '2031-01-01', updatedAt: pnow }));
+await t('support adds note', supp.doc('companies/cc-111').update({ note: 'اتصل', updatedAt: pnow }));
+await t('support cannot edit profile', supp.doc('companies/cc-111').update({ profile: {}, updatedAt: pnow }), false);
+await t('support views company data', supp.collection('companies/cc-111/vehicles').get());
+await t('support cannot read national ids', supp.collection('companies/cc-111/ids').get(), false);
+await t('support cannot read messages', supp.collection('companies/cc-111/threads').get(), false);
+await t('sales cannot view company operational data', sales.collection('companies/cc-111/drivers').get(), false);
+await t('sales reads company documents', sales.doc('kyc/k1').get());
+await t('approved: carol cannot delete her document', carol.doc('kyc/k1').delete(), false);
+
+console.log('الفواتير والمتابعة');
+const inv = { cid: 'cc-111', number: 'INV-1', total: 115, status: 'unpaid' };
+await t('sales cannot issue invoice', sales.doc('invoices/i1').set(inv), false);
+await t('accountant issues invoice', acct.doc('invoices/i1').set(inv));
+await t('accountant marks paid', acct.doc('invoices/i1').update({ status: 'paid' }));
+await t('accountant updates invoice counter', acct.doc('platform/counters').set({ invoice: 1 }));
+await t('accountant cannot change platform settings', acct.doc('platform/settings').set({ sellerName: 'x' }), false);
+await t('owner sets platform settings', sup.doc('platform/settings').set({ sellerName: 'شركة النظام', vatNumber: '300000000000003' }));
+await t('carol reads her invoice', carol.doc('invoices/i1').get());
+await t('alice cannot read carol invoice', alice.doc('invoices/i1').get(), false);
+await t('accountant cannot delete invoice', acct.doc('invoices/i1').delete(), false);
+await t('support logs a call', supp.doc('crm/n1').set({ cid: 'cc-111', text: 'اتصال', by: 'sup@plat.com', at: pnow }));
+await t('support cannot log as someone else', supp.doc('crm/n2').set({ cid: 'cc-111', text: 'x', by: 'sales@plat.com', at: pnow }), false);
+await t('company cannot read internal notes', carol.doc('crm/n1').get(), false);
+await t('accountant activates paid subscription? (no status perm)', acct.doc('companies/cc-111').update({ status: 'active', paidUntil: '2030-01-01', updatedAt: pnow }), false);
+await t('owner activates paid subscription', sup.doc('companies/cc-111').update({ status: 'active', plan: 'شهري', paidUntil: '2030-01-01', updatedAt: pnow }));
 
 console.log(`\n${pass} نجح، ${fail} فشل`);
 await env.cleanup();

@@ -102,7 +102,7 @@ export async function start() {
       <div class="err" id="aerr">${esc(msg || '')}</div>
       <button class="pri" id="ab">${T('دخول')}</button></form>
       <div class="row"><button class="lnk" id="a-new">${T('مستخدم جديد؟ فعّل حسابك')}</button><button class="lnk" id="a-rst">${T('نسيت كلمة المرور')}</button></div>
-      <div class="row" style="border-top:1px solid var(--line,#D6DDD9);padding-top:12px"><span style="font-size:14px">${T('شركة جديدة؟')}</span><button class="lnk" id="a-co">${T('سجّل شركتك وابدأ التجربة المجانية')}</button></div>`);
+      <div class="row" style="border-top:1px solid var(--line,#D6DDD9);padding-top:12px"><span style="font-size:14px">${T('شركة جديدة؟')}</span><button class="lnk" id="a-co">${T('سجّل شركتك')}</button></div>`);
     const f = document.getElementById('af');
     f.onsubmit = async e => { e.preventDefault(); const b = document.getElementById('ab'); b.disabled = true;
       const id = f.ae.value.trim(); const er = document.getElementById('aerr');
@@ -215,7 +215,7 @@ export async function start() {
     set(v) { try { localStorage.setItem(PENDING, JSON.stringify(v)); } catch (e) {} }, clear() { try { localStorage.removeItem(PENDING); } catch (e) {} } };
   function showCompanySignup() {
     lastShow = null;
-    card(`<h2>تسجيل شركة جديدة</h2><p>أنشئ حساب شركتك وحساب مدير النظام، وابدأ التجربة المجانية ${TRIAL_DAYS} يوماً.</p>
+    card(`<h2>تسجيل شركة جديدة</h2><p>أنشئ حساب مدير النظام، ثم أكمل بيانات الشركة الرسمية. نراجع الطلب ونتواصل معك، وبعد الاعتماد تبدأ التجربة المجانية ${TRIAL_DAYS} يوماً.</p>
       <form id="cf" style="display:grid;gap:12px">
       <label>اسم الشركة<input id="cn" type="text" maxlength="120" autocomplete="organization" required></label>
       <label>اسمك (مدير النظام)<input id="cu" type="text" autocomplete="name" required></label>
@@ -243,36 +243,105 @@ export async function start() {
     document.getElementById('c-back').onclick = () => showLogin();
   }
   const newCid = () => 'c' + Array.from(crypto.getRandomValues(new Uint8Array(6)), x => x.toString(36).padStart(2, '0')).join('').slice(0, 10);
-  async function createCompany(u, { name, phone, uname }) {
-    const email = String(u.email).toLowerCase(); const now = new Date();
+  /* بيانات الشركة الرسمية: تُراجَع من شركة النظام قبل الاعتماد */
+  const PF = [
+    ['بيانات المنشأة', [
+      ['legalName', 'الاسم التجاري حسب السجل', 'text', 1], ['crNumber', 'رقم السجل التجاري', 'num', 1], ['unifiedNumber', 'الرقم الوطني الموحد (700)', 'num'],
+      ['vatNumber', 'الرقم الضريبي (15 رقماً)', 'num'], ['activity', 'النشاط', 'text'], ['fleetSize', 'عدد السيارات تقريباً', 'num']]],
+    ['العنوان الوطني', [
+      ['city', 'المدينة', 'text', 1], ['district', 'الحي', 'text', 1], ['street', 'الشارع', 'text', 1], ['buildingNo', 'رقم المبنى', 'num', 1],
+      ['postalCode', 'الرمز البريدي', 'num', 1], ['additionalNo', 'الرقم الإضافي', 'num'], ['shortAddress', 'العنوان المختصر', 'text']]],
+    ['التواصل', [
+      ['officialEmail', 'البريد الرسمي للشركة', 'email', 1], ['companyPhone', 'هاتف الشركة', 'tel', 1], ['contactName', 'اسم المسؤول', 'text', 1],
+      ['contactTitle', 'المسمى الوظيفي', 'text'], ['contactMobile', 'جوال المسؤول', 'tel', 1], ['website', 'الموقع الإلكتروني', 'text']]]];
+  const DOCS = [['cr', 'السجل التجاري', 1], ['vat', 'شهادة التسجيل في ضريبة القيمة المضافة'], ['address', 'شهادة العنوان الوطني'], ['other', 'مستند آخر']];
+  const FORM_CSS = `#auth{overflow:auto;place-items:start center}#auth .card.wide{width:min(720px,100%);margin:12px 0}
+#auth fieldset{border:1px solid var(--line,#D6DDD9);border-radius:12px;padding:12px;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+#auth legend{font-weight:600;padding:0 6px;font-size:14px}#auth .rq{color:#B42318}
+#auth input[type=file]{padding:8px;font-size:13px}#auth .fl{font-size:12px;color:var(--muted,#5A6862)}`;
+  const toB64 = blob => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(blob); });
+  // الصور تُصغَّر، وملف PDF يُرفع كما هو (حتى 700 كيلوبايت)
+  async function prepFile(f) {
+    if (/^image\//.test(f.type)) {
+      const img = await createImageBitmap(f); const k = Math.min(1, 1800 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      let q = .85, out; do { out = await new Promise(r => c.toBlob(r, 'image/jpeg', q)); q -= .15; } while (out.size > 700e3 && q > .2);
+      f = new File([out], f.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' });
+    }
+    if (f.size > 700e3) throw new Error('size');
+    return { name: f.name, type: f.type || 'application/octet-stream', size: f.size, data: await toB64(f) };
+  }
+  async function uploadDocs(u, cid, files) {
+    for (const [kind, f] of files) { const d = await prepFile(f);
+      await F.setDoc(F.doc(F.collection(fs, 'kyc')), { cid, kind, ...d, at: new Date().toISOString(), by: String(u.email).toLowerCase() }); }
+  }
+  async function createCompany(u, { name, phone, uname, profile }) {
+    const email = String(u.email).toLowerCase(); const now = new Date().toISOString();
     const cid = newCid();
     const b = F.writeBatch(fs);
-    b.set(F.doc(fs, 'companies', cid), { name, ownerUid: u.uid, ownerEmail: email, ownerName: uname || u.displayName || '', phone: phone || '', status: 'trial', plan: 'trial', createdAt: now.toISOString(), trialEnds: new Date(now.getTime() + TRIAL_DAYS * 864e5).toISOString().slice(0, 10) });
-    b.set(F.doc(fs, 'members', email), { companyId: cid, at: now.toISOString() });
-    b.set(F.doc(fs, 'companies', cid, 'access', email), { role: 'admin', name: uname || u.displayName || '', phone: phone || null, driverId: null, branchId: null, inviteId: null, owner: true, updatedAt: now.toISOString() });
+    b.set(F.doc(fs, 'companies', cid), { name, ownerUid: u.uid, ownerEmail: email, ownerName: uname || u.displayName || '', phone: phone || '', status: 'pending', plan: 'trial', createdAt: now, submittedAt: now, profile });
+    b.set(F.doc(fs, 'members', email), { companyId: cid, at: now });
+    b.set(F.doc(fs, 'companies', cid, 'access', email), { role: 'admin', name: uname || u.displayName || '', phone: phone || null, driverId: null, branchId: null, inviteId: null, owner: true, updatedAt: now });
     await b.commit();
-    // بعد إنشاء الشركة صار المستخدم مديرها، فيكتب بياناتها الأساسية
-    await F.setDoc(F.doc(fs, 'companies', cid, 'settings', 'main'), { companyName: name, updatedAt: now.toISOString() });
     pend.clear();
     return cid;
   }
-  function showCreateCompany(u, pre) {
-    pre = pre || {};
+  // نموذج بيانات الشركة: للتسجيل الأول، ولتعديل الطلب قبل اعتماده أو بعد رفضه
+  function showCreateCompany(u, pre, existing) {
+    pre = pre || {}; const pr = (existing && existing.profile) || pre.profile || {};
     lastShow = null;
-    card(`<h2>بيانات شركتك</h2><p>حسابك <b dir="ltr">${esc(u.email)}</b> جاهز. أكمل بيانات الشركة لبدء التجربة المجانية.</p>
-      <form id="kf" style="display:grid;gap:12px">
-      <label>اسم الشركة<input id="kn" type="text" maxlength="120" value="${esc(pre.name || '')}" required></label>
-      <label>رقم الجوال<input id="kph" type="text" inputmode="tel" dir="ltr" placeholder="05xxxxxxxx" value="${esc(pre.phone || '')}"></label>
-      <div class="err" id="kerr"></div><button class="pri" id="kb">إنشاء الشركة والدخول</button></form>
-      <div class="row"><button class="lnk" id="k-out">خروج</button></div>`);
+    if (!document.getElementById('auth-form-css')) { const st = document.createElement('style'); st.id = 'auth-form-css'; st.textContent = FORM_CSS; document.head.appendChild(st); }
+    const inp = ([k, l, t, req]) => `<label><span>${l}${req ? ' <b class="rq">*</b>' : ''}</span><input name="${k}" ${t === 'num' ? 'inputmode="numeric" dir="ltr"' : t === 'tel' ? 'inputmode="tel" dir="ltr" placeholder="05xxxxxxxx"' : t === 'email' ? 'type="email" dir="ltr"' : 'type="text"'} maxlength="120" value="${esc(pr[k] || (k === 'legalName' ? pre.name || '' : k === 'contactName' ? pre.uname || '' : k === 'contactMobile' ? pre.phone || '' : ''))}" ${req ? 'required' : ''}></label>`;
+    card(`<h2>${existing ? 'تعديل بيانات الطلب' : 'بيانات شركتك الرسمية'}</h2>
+      <p>حسابك <b dir="ltr">${esc(u.email)}</b> جاهز. أكمل بيانات الشركة كما في السجل التجاري، وسيتواصل معك فريقنا للتحقق ثم اعتماد الحساب.</p>
+      <form id="kf" style="display:grid;gap:14px">
+      <label><span>اسم الشركة (يظهر في النظام) <b class="rq">*</b></span><input id="kn" type="text" maxlength="120" value="${esc(existing ? existing.name : pre.name || '')}" required></label>
+      ${PF.map(([t, fs_]) => `<fieldset><legend>${t}</legend>${fs_.map(inp).join('')}</fieldset>`).join('')}
+      <fieldset><legend>المستندات (PDF أو صورة، حتى 700 كيلوبايت)</legend>
+        ${DOCS.map(([k, l, req]) => `<label><span>${l}${req && !existing ? ' <b class="rq">*</b>' : ''}</span><input type="file" data-kind="${k}" accept="application/pdf,image/*" ${req && !existing ? 'required' : ''}></label>`).join('')}
+        ${existing ? '<div class="fl" style="grid-column:1/-1">المستندات التي رفعتها سابقاً محفوظة. أضف مستنداً جديداً عند الحاجة فقط.</div>' : ''}
+      </fieldset>
+      <div class="err" id="kerr"></div><button class="pri" id="kb">${existing ? 'حفظ وإعادة إرسال الطلب' : 'إرسال طلب التسجيل'}</button></form>
+      <div class="row">${existing ? '<button class="lnk" id="k-back">رجوع</button>' : ''}<button class="lnk" id="k-out">خروج</button></div>`);
+    document.querySelector('#auth .card').classList.add('wide');
     const f = document.getElementById('kf');
-    f.onsubmit = async e => { e.preventDefault(); const b = document.getElementById('kb'); b.disabled = true; const er = document.getElementById('kerr');
-      const name = document.getElementById('kn').value.trim(); const phone = document.getElementById('kph').value.trim() ? normPhone(document.getElementById('kph').value) : '';
-      if (name.length < 2) { er.textContent = 'اكتب اسم الشركة'; b.disabled = false; return; }
-      if (phone && !/^05\d{8}$/.test(phone)) { er.textContent = 'رقم الجوال يبدأ بـ 05 ويتكون من 10 أرقام'; b.disabled = false; return; }
-      try { await createCompany(u, { name, phone, uname: pre.uname }); entered = false; enter(u); }
-      catch (err) { console.warn(err); er.textContent = 'تعذر إنشاء الشركة. قد يكون حسابك مسجلاً في شركة أخرى.'; b.disabled = false; } };
+    f.onsubmit = async e => { e.preventDefault(); const b = document.getElementById('kb'); b.disabled = true; const er = document.getElementById('kerr'); er.textContent = '';
+      const fail = m => { er.textContent = m; b.disabled = false; };
+      const name = document.getElementById('kn').value.trim(); if (name.length < 2) return fail('اكتب اسم الشركة');
+      const profile = {}; PF.forEach(([, fl]) => fl.forEach(([k, , t]) => { let v = f.elements[k].value.trim(); if (t === 'num') v = v.replace(/[٠-٩]/g, c => AR.indexOf(c)); if (t === 'tel' && v) v = normPhone(v); profile[k] = v; }));
+      if (!/^\d{10}$/.test(profile.crNumber)) return fail('رقم السجل التجاري 10 أرقام');
+      if (profile.vatNumber && !/^3\d{13}3$/.test(profile.vatNumber)) return fail('الرقم الضريبي 15 رقماً يبدأ وينتهي بـ 3');
+      if (profile.unifiedNumber && !/^7\d{9}$/.test(profile.unifiedNumber)) return fail('الرقم الوطني الموحد 10 أرقام يبدأ بـ 7');
+      for (const k of ['companyPhone', 'contactMobile']) if (profile[k] && !/^0\d{8,9}$/.test(profile[k])) return fail('تأكد من أرقام الهاتف والجوال');
+      if (!/^\d{5}$/.test(profile.postalCode)) return fail('الرمز البريدي 5 أرقام');
+      const files = [...f.querySelectorAll('input[type=file]')].filter(i => i.files[0]).map(i => [i.dataset.kind, i.files[0]]);
+      try { for (const [, x] of files) if (!/^image\//.test(x.type) && x.size > 700e3) return fail(`حجم الملف «${x.name}» أكبر من 700 كيلوبايت`); } catch (x) {}
+      try {
+        let cid;
+        if (existing) { cid = existing.id;
+          await F.updateDoc(F.doc(fs, 'companies', cid), { name, profile, phone: profile.contactMobile || '', status: 'pending', submittedAt: new Date().toISOString(), updatedAt: new Date().toISOString() }); }
+        else cid = await createCompany(u, { name, phone: profile.contactMobile || pre.phone || '', uname: pre.uname || profile.contactName, profile });
+        try { await uploadDocs(u, cid, files); } catch (x) { console.warn(x); alert('سُجّل الطلب، لكن تعذر رفع بعض المستندات. يمكنك رفعها لاحقاً من «تعديل بيانات الطلب».'); }
+        entered = false; enter(u);
+      } catch (err) { console.warn(err); fail(existing ? 'تعذر الحفظ، حاول مرة أخرى' : 'تعذر إرسال الطلب. قد يكون حسابك مسجلاً في شركة أخرى.'); } };
+    const bk = document.getElementById('k-back'); if (bk) bk.onclick = () => { entered = false; enter(u); };
     document.getElementById('k-out').onclick = window.__fbSignOut;
+  }
+  // الطلب قيد المراجعة أو مرفوض: لا دخول للنظام حتى الاعتماد
+  function showPending(u) {
+    lastShow = () => showPending(u);
+    const rej = COMPANY.status === 'rejected';
+    card(`<h2>${rej ? 'لم يُعتمد الطلب' : 'طلبك قيد المراجعة'}</h2>
+      <p>${rej ? `راجعنا طلب تسجيل <b>${esc(COMPANY.name)}</b> ولم يُعتمد بعد${COMPANY.rejectReason ? '، والسبب:' : '.'}` : `استلمنا طلب تسجيل <b>${esc(COMPANY.name)}</b>. سيتواصل معك فريقنا للتحقق من البيانات، ثم يُعتمد الحساب وتصلك إمكانية الدخول.`}</p>
+      ${rej && COMPANY.rejectReason ? `<p style="background:#FEF3F2;border-radius:10px;padding:10px 12px;color:#B42318">${esc(COMPANY.rejectReason)}</p>` : ''}
+      ${rej ? '<p>عدّل البيانات المطلوبة ثم أعد إرسال الطلب.</p>' : ''}
+      ${SUPPORT_CONTACT ? `<p>للتواصل: <span dir="ltr">${esc(SUPPORT_CONTACT)}</span></p>` : ''}
+      <button class="pri" id="pd-r">${rej ? 'تعديل البيانات وإعادة الإرسال' : 'تحديث الحالة'}</button>
+      <div class="row">${rej ? '' : '<button class="lnk" id="pd-e">تعديل بيانات الطلب</button>'}<button class="lnk" id="pd-out">خروج</button></div>`);
+    const edit = () => showCreateCompany(u, {}, { id: CID, ...COMPANY });
+    document.getElementById('pd-r').onclick = rej ? edit : () => { entered = false; enter(u); };
+    const e = document.getElementById('pd-e'); if (e) e.onclick = edit;
+    document.getElementById('pd-out').onclick = window.__fbSignOut;
   }
   function showSuspended(u) {
     lastShow = () => showSuspended(u);
@@ -284,7 +353,7 @@ export async function start() {
   }
   function showSuperChoice(u, hasCompany) {
     lastShow = null;
-    card(`<h2>مرحباً ${esc(u.displayName || '')}</h2><p>أنت مالك المنصة. اختر وجهتك:</p>
+    card(`<h2>مرحباً ${esc(u.displayName || '')}</h2><p>أنت من فريق إدارة المنصة. اختر وجهتك:</p>
       <a class="pri" href="admin.html" style="text-align:center;text-decoration:none;display:block;padding:12px;border-radius:10px;background:var(--acc,#0E5A44);color:#fff;font-weight:600">لوحة تحكم المالك (الشركات والاشتراكات)</a>
       ${hasCompany ? `<button class="pri" id="sc-co" style="background:#fff;color:var(--acc,#0E5A44);border:2px solid var(--acc,#0E5A44)">الدخول إلى نظام شركتي</button>` : ''}
       <div class="row"><button class="lnk" id="sc-out">خروج</button></div>`);
@@ -303,6 +372,8 @@ export async function start() {
     try { const m = await F.getDoc(F.doc(fs, 'members', email)); mem = m.exists() ? m.data() : null; } catch (e) { mem = null; }
     if (!mem) {
       if (isSuper) return showSuperChoice(u, false);
+      // موظف في فريق المنصة: يذهب للوحة التحكم
+      try { const st = await F.getDoc(F.doc(fs, 'staff', email)); if (st.exists() && st.data().active) return showSuperChoice(u, false); } catch (e) {}
       if (isPhoneAcct(u.email)) return showNoAccess(u);
       const p = pend.get();
       return showCreateCompany(u, p && p.email === email ? p : { uname: u.displayName || '' });
@@ -311,13 +382,16 @@ export async function start() {
     CID = mem.companyId;
     try { const c = await F.getDoc(F.doc(fs, 'companies', CID)); COMPANY = c.exists() ? c.data() : null; } catch (e) { COMPANY = null; }
     if (!COMPANY) return showNoAccess(u);
-    if (!['trial', 'active'].includes(COMPANY.status)) return showSuspended(u);
     const isOwner = email === String(COMPANY.ownerEmail || '').toLowerCase();
+    if (['pending', 'rejected'].includes(COMPANY.status)) return isOwner ? showPending(u) : showNoAccess(u);
+    if (!['trial', 'active'].includes(COMPANY.status)) return showSuspended(u);
     let access = null;
     if (!isOwner) {
       try { const s = await F.getDoc(F.doc(fs, P('access'), email)); access = s.exists() ? s.data() : null; } catch (e) { access = null; }
       if (!access) return showNoAccess(u);
     }
+    // أول دخول بعد الاعتماد: تُكتب بيانات الشركة الأساسية في إعدادات النظام
+    if (isOwner) { try { const sm = await F.getDoc(F.doc(fs, P('settings'), 'main')); if (!sm.exists()) await F.setDoc(F.doc(fs, P('settings'), 'main'), { companyName: COMPANY.name, updatedAt: new Date().toISOString() }); } catch (e) { console.warn(e); } }
     entered = true;
     window.__companyId = CID; window.__company = { id: CID, ...COMPANY }; window.OWNER_EMAIL = String(COMPANY.ownerEmail || '').toLowerCase();
     window.__companySetSys = async sysEmail => { await F.updateDoc(F.doc(fs, 'companies', CID), { sysEmail, updatedAt: new Date().toISOString() }); };

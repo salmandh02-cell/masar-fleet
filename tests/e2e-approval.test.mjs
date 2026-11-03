@@ -1,0 +1,127 @@
+import pw from '/opt/node-tools/node_modules/playwright/index.js'; const { chromium } = pw;
+import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
+const SITE = '/tmp/claude-0/e2e/site', FBDIR = '/tmp/claude-0/emu/node_modules/firebase', SHOTS = '/tmp/claude-0/e2e/shots';
+fs.mkdirSync(SHOTS, { recursive: true });
+const AUTH = 'http://127.0.0.1:9099', PRJ = 'demo-fleet';
+await fetch(`http://127.0.0.1:8080/emulator/v1/projects/${PRJ}/databases/(default)/documents`, { method: 'DELETE' });
+await fetch(`${AUTH}/emulator/v1/projects/${PRJ}/accounts`, { method: 'DELETE' });
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png' };
+const srv = http.createServer((q, r) => { let p = decodeURIComponent(q.url.split('?')[0]); if (p.endsWith('/')) p += 'index.html'; const f = path.join(SITE, p);
+  if (!fs.existsSync(f)) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'Content-Type': types[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r); }).listen(8000);
+const B = 'http://127.0.0.1:8000/';
+let pass = 0, fail = 0; const ok = (c, m) => { c ? pass++ : fail++; console.log(c ? '  ✓' : '  ✗', m); };
+const browser = await chromium.launch();
+async function newPage(w = 420) {
+  const ctx = await browser.newContext({ locale: 'ar', viewport: { width: w, height: 900 } }); const page = await ctx.newPage();
+  await ctx.route('**/*', route => { const u = route.request().url();
+    if (u.startsWith('https://www.gstatic.com/firebasejs/')) return route.fulfill({ path: path.join(FBDIR, u.split('/').pop()), contentType: 'text/javascript' });
+    if (u.startsWith(B) || u.startsWith('http://127.0.0.1:9099') || u.startsWith('http://127.0.0.1:8080') || u.startsWith('blob:') || u.startsWith('data:') || u.startsWith('about:')) return route.continue();
+    return route.abort(); });
+  page.on('pageerror', e => console.log('    [pageerror]', e.message)); page.on('dialog', d => d.accept());
+  return page;
+}
+async function verifyAll() { const j = await (await fetch(`${AUTH}/emulator/v1/projects/${PRJ}/oobCodes`)).json(); for (const c of j.oobCodes || []) if (c.requestType === 'VERIFY_EMAIL') await fetch(c.oobLink); }
+fs.writeFileSync('/tmp/claude-0/e2e/cr.pdf', '%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF');
+
+console.log('١) تسجيل شركة جديدة ← بانتظار الاعتماد');
+const p = await newPage();
+await p.goto(B + '?signup=1'); await p.waitForSelector('#cn', { timeout: 20000 });
+await p.fill('#cn', 'شركة النخبة للنقل'); await p.fill('#cu', 'أحمد'); await p.fill('#ce', 'ahmed@nukhba.sa'); await p.fill('#cph', '0551234567'); await p.fill('#cp', 'secret123');
+await p.click('#cb'); await p.waitForSelector('#vb', { timeout: 15000 }); ok(true, 'شاشة تأكيد البريد');
+await verifyAll(); await p.click('#vb');
+await p.waitForSelector('#kf', { timeout: 15000 });
+ok(await p.inputValue('#kn') === 'شركة النخبة للنقل', 'نموذج البيانات الرسمية معبأ بالاسم');
+await p.screenshot({ path: SHOTS + '/1-form.png', fullPage: true });
+const fill = { legalName: 'شركة النخبة للنقل المحدودة', crNumber: '1010123456', vatNumber: '310123456700003', activity: 'نقل', fleetSize: '25', city: 'الرياض', district: 'العليا', street: 'التخصصي', buildingNo: '1234', postalCode: '12211', officialEmail: 'info@nukhba.sa', companyPhone: '0112345678', contactName: 'أحمد', contactMobile: '0551234567' };
+for (const [k, v] of Object.entries(fill)) await p.fill(`#kf [name=${k}]`, v);
+await p.setInputFiles('#kf input[data-kind=cr]', '/tmp/claude-0/e2e/cr.pdf');
+await p.fill('#kf [name=crNumber]', '123'); await p.click('#kb'); await p.waitForTimeout(400);
+ok((await p.textContent('#kerr')).includes('10 أرقام'), 'تحقق من رقم السجل');
+await p.fill('#kf [name=crNumber]', '1010123456'); await p.click('#kb');
+await p.waitForSelector('#pd-r', { timeout: 20000 });
+ok((await p.textContent('#auth')).includes('قيد المراجعة'), 'شاشة «طلبك قيد المراجعة»');
+ok(!(await p.evaluate(() => window.__companyId)), 'لم يدخل النظام قبل الاعتماد');
+await p.screenshot({ path: SHOTS + '/2-pending.png' });
+
+console.log('٢) مالك المنصة يراجع ويعتمد');
+const a = await newPage(1280);
+await a.goto(B + 'admin.html'); await a.waitForSelector('#l-new', { timeout: 20000 });
+await a.click('#l-new'); await a.fill('#ce', 'salmandh02@gmail.com'); await a.fill('#cp', 'owner123'); await a.click('#cf button.pri');
+await a.waitForSelector('#vb', { timeout: 15000 }); await verifyAll(); await a.click('#vb');
+await a.waitForSelector('#rows tr[data-id]', { timeout: 20000 });
+ok((await a.textContent('#reqBadge')).trim() === '1', 'شارة الطلبات = 1');
+ok((await a.textContent('#rows')).includes('1010123456'), 'السجل التجاري ظاهر في القائمة');
+await a.screenshot({ path: SHOTS + '/3-requests.png' });
+await a.fill('#q', 'الرياض'); ok(await a.locator('#rows tr[data-id]').count() === 1, 'البحث بالمدينة'); await a.fill('#q', 'xyz'); ok(await a.locator('#rows tr[data-id]').count() === 0, 'بحث بلا نتائج'); await a.fill('#q', '');
+await a.click('#rows tr[data-id]'); await a.waitForSelector('#sheet [data-f=approve]');
+await a.waitForSelector('#fDocs [data-doc]', { timeout: 10000 }); ok(true, 'مستند السجل التجاري ظاهر في الملف');
+ok((await a.textContent('#sheet')).includes('310123456700003'), 'الرقم الضريبي في ملف الشركة');
+await a.fill('#noteF [name=text]', 'تم الاتصال والتحقق من السجل'); await a.click('#noteF button'); await a.waitForSelector('#fNotes .note'); ok(true, 'سجل المتابعة');
+await a.screenshot({ path: SHOTS + '/4-file.png', fullPage: false });
+await a.click('#sheet [data-f=approve]'); await a.click('#dlg button[value=ok]');
+await a.waitForFunction(() => document.querySelector('#sheet .top').textContent.includes('تجربة'), null, { timeout: 10000 }); ok(true, 'اعتُمدت الشركة (تجربة)');
+
+console.log('٣) الشركة تدخل بعد الاعتماد');
+await p.click('#pd-r');
+await p.waitForFunction(() => window.__companyId && document.getElementById('auth').hidden, null, { timeout: 25000 }); ok(true, 'دخلت الشركة النظام');
+await p.waitForTimeout(2000);
+await p.evaluate(async () => { const db = await window.claude.use('db'); await db.collection('vehicles').doc('v1').set({ plateLetters: 'أ ب ج', plateNumbers: '1234', make: 'تويوتا', model: 'هايلكس', status: 'available' }); });
+ok(true, 'أضافت سيارة');
+
+console.log('٤) الإعدادات والفريق والفواتير');
+await a.click('#sheet [data-f=close]');
+await a.click('nav [data-t=settings]'); await a.waitForSelector('#setg [name=sellerName]');
+await a.fill('#setg [name=sellerName]', 'شركة النظام للتقنية'); await a.fill('#setg [name=vatNumber]', '300000000000003'); await a.fill('#setg [name=pricePerVehicle]', '30'); await a.fill('#setg [name=iban]', 'SA0000000000000000000000');
+await a.click('#setf button'); await a.waitForTimeout(800);
+await a.click('nav [data-t=team]'); await a.click('#addStaff');
+await a.fill('#df [name=email]', 'acc@plat.com'); await a.fill('#df [name=name]', 'سعد المحاسب'); await a.selectOption('#df [name=role]', 'accountant'); await a.click('#dlg button[value=ok]');
+await a.waitForSelector('#srows td:has-text("acc@plat.com")', { timeout: 10000 }); ok(true, 'أُضيف المحاسب');
+await a.click('#addStaff'); await a.fill('#df [name=email]', 'sales@plat.com'); await a.fill('#df [name=name]', 'منى'); await a.selectOption('#df [name=role]', 'sales'); await a.click('#dlg button[value=ok]');
+await a.waitForSelector('#srows td:has-text("sales@plat.com")'); await a.screenshot({ path: SHOTS + '/5-team.png' });
+await a.click('nav [data-t=companies]'); await a.click('#reload'); await a.waitForTimeout(1500);
+await a.click('nav [data-t=invoices]'); await a.click('#newInv'); await a.waitForSelector('#isum');
+ok((await a.inputValue('#df [name=qty]')) === '1', 'عدد السيارات من النظام: ' + await a.inputValue('#df [name=qty]'));
+await a.fill('#df [name=months]', '3'); await a.waitForTimeout(200);
+ok((await a.textContent('#isum')).includes('103.50'), 'الحساب: 1×30×3 + 15% = 103.50');
+await a.screenshot({ path: SHOTS + '/6-newinv.png' });
+await a.click('#dlg button[value=ok]'); await a.waitForSelector('#irows td:has-text("INV-")', { timeout: 10000 }); ok(true, 'صدرت الفاتورة');
+const [pop] = await Promise.all([a.context().waitForEvent('page'), a.click('#irows [data-i=print]')]);
+await pop.waitForLoadState(); ok((await pop.textContent('body')).includes('فاتورة ضريبية مبسطة') && await pop.locator('img[alt=QR]').count() === 1, 'صفحة الطباعة مع رمز QR');
+await pop.setViewportSize({ width: 900, height: 1100 }); await pop.screenshot({ path: SHOTS + '/7-print.png', fullPage: true }); await pop.close();
+await a.click('#irows [data-i=pay]'); await a.click('#dlg button[value=ok]'); await a.waitForSelector('#irows .p-paid', { timeout: 10000 }); ok(true, 'سُجّل الدفع');
+await a.waitForTimeout(800);
+const co = await a.evaluate(() => 0); 
+await a.click('nav [data-t=companies]'); ok((await a.textContent('#rows')).includes('مفعّلة'), 'الاشتراك تفعّل بعد الدفع');
+await a.screenshot({ path: SHOTS + '/8-companies.png' });
+
+console.log('٥) دخول المحاسب بصلاحياته');
+const s = await newPage(1280);
+await s.goto(B + 'admin.html'); await s.waitForSelector('#l-new'); await s.click('#l-new'); await s.fill('#ce', 'acc@plat.com'); await s.fill('#cp', 'acc12345'); await s.click('#cf button.pri');
+await s.waitForSelector('#vb'); await verifyAll(); await s.click('#vb');
+await s.waitForSelector('#nav [data-t=invoices]', { timeout: 15000 });
+ok(await s.locator('#nav [data-t=team]').count() === 0, 'المحاسب لا يرى تبويب الفريق');
+await s.click('nav [data-t=companies]'); await s.waitForSelector('#rows tr[data-id]'); await s.click('#rows tr[data-id]'); await s.waitForSelector('#sheet .top');
+ok(await s.locator('#sheet [data-f=suspend]').count() === 0 && await s.locator('#sheet [data-f=invoice]').count() > 0, 'المحاسب: فاتورة نعم، إيقاف لا');
+ok(await s.locator('#fData').count() === 0, 'المحاسب لا يرى بيانات الشركة التشغيلية');
+
+console.log('٦) مدير المبيعات يرفض طلباً');
+const p2 = await newPage();
+await p2.goto(B + '?signup=1'); await p2.waitForSelector('#cn'); await p2.fill('#cn', 'مؤسسة الريان'); await p2.fill('#cu', 'خالد'); await p2.fill('#ce', 'k@rayan.sa'); await p2.fill('#cp', 'secret123');
+await p2.click('#cb'); await p2.waitForSelector('#vb'); await verifyAll(); await p2.click('#vb'); await p2.waitForSelector('#kf');
+for (const [k, v] of Object.entries({ ...fill, crNumber: '1010999999', officialEmail: 'i@rayan.sa' })) await p2.fill(`#kf [name=${k}]`, v);
+await p2.setInputFiles('#kf input[data-kind=cr]', '/tmp/claude-0/e2e/cr.pdf'); await p2.click('#kb'); await p2.waitForSelector('#pd-r', { timeout: 20000 });
+const m = await newPage(1280);
+await m.goto(B + 'admin.html'); await m.waitForSelector('#l-new'); await m.click('#l-new'); await m.fill('#ce', 'sales@plat.com'); await m.fill('#cp', 'sales123'); await m.click('#cf button.pri');
+await m.waitForSelector('#vb'); await verifyAll(); await m.click('#vb'); await m.waitForSelector('#rows tr[data-id]', { timeout: 15000 });
+await m.click('#rows tr[data-id]'); await m.waitForSelector('#sheet [data-f=reject]'); await m.click('#sheet [data-f=reject]');
+await m.fill('#df [name=r]', 'صورة السجل غير واضحة، أعد رفعها'); await m.click('#dlg button[value=ok]');
+await m.waitForFunction(() => document.querySelector('#sheet .top').textContent.includes('مرفوضة'), null, { timeout: 10000 }); ok(true, 'رُفض الطلب');
+await p2.click('#pd-r'); await p2.waitForTimeout(100); // تحديث
+await p2.reload(); await p2.waitForSelector('#pd-r', { timeout: 20000 });
+ok((await p2.textContent('#auth')).includes('صورة السجل غير واضحة'), 'الشركة ترى سبب الرفض');
+await p2.screenshot({ path: SHOTS + '/9-rejected.png' });
+await p2.click('#pd-r'); await p2.waitForSelector('#kf'); ok(await p2.inputValue('#kf [name=crNumber]') === '1010999999', 'النموذج معبأ ببياناتها');
+await p2.setInputFiles('#kf input[data-kind=cr]', '/tmp/claude-0/e2e/cr.pdf'); await p2.click('#kb'); await p2.waitForSelector('#pd-e', { timeout: 15000 }); ok(true, 'أُعيد إرسال الطلب');
+
+console.log(`\n${pass} نجح، ${fail} فشل`);
+await browser.close(); srv.close(); process.exit(fail ? 1 : 0);
