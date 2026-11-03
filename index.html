@@ -794,7 +794,7 @@ async function boot(){
 }
 
 /* ---------- push notifications ---------- */
-const PUSH_PUBLIC='BJ1fVn6HzABhpn-4gf7x5SXrOW26AgWia3kthfbN-9Sz3CeHHVkMwp1DfK430T8Y1lyh9n6ijs_uqOoem3Rf31Q';
+const PUSH_PUBLIC='BOrIcCMkeIBxvAz1HnPQD6FFVpMyBH7EVi7frgi61TBDguAHLH3uKxn1cEfOSfC6FcpCh7yXIqh9Pj6qZNyHE1c';
 const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 const isStandalone=()=>window.matchMedia&&matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 const pushSupported=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
