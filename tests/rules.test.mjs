@@ -209,6 +209,13 @@ await t('owner saves plans in public', sup.doc('platform/public').set({ plans: [
 await t('visitor reads public plans', U('vz', 'v@z.com').doc('platform/public').get());
 await t('sales cannot edit public plans', sales.doc('platform/public').set({ yearlyDiscount: 90 }, { merge: true }), false);
 
+console.log('رقم العميل');
+await t('sales issues customer number counter', sales.doc('platform/customers').set({ n: 1001 }, { merge: true }));
+await t('accountant cannot touch customer counter', acct.doc('platform/customers').set({ n: 5 }, { merge: true }), false);
+await t('company admin cannot set own customer number', alice.doc('companies/ca-111').update({ customerNo: '1', updatedAt: pnow }), false);
+await t('company admin saves logo in settings', alice.doc('companies/ca-111/settings/main').set({ companyName: 'A', logo: 'data:image/png;base64,AAAA' }));
+await t('bob cannot read A logo', bob.doc('companies/ca-111/settings/main').get(), false);
+
 console.log(`\n${pass} نجح، ${fail} فشل`);
 await env.cleanup();
 process.exit(fail ? 1 : 0);

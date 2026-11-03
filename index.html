@@ -60,6 +60,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.3
 .menu-btn{display:none;width:40px;height:40px;border-radius:9px;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;cursor:pointer;place-items:center}
 .menu-btn svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none}
 .brand-mark{width:38px;height:26px;border:2px solid #fff;border-radius:4px;display:grid;place-items:center;font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.06em}
+.brand-mark.has-logo{width:auto;height:36px;border:0;background:#fff;border-radius:8px;padding:3px 6px;display:grid!important}.brand-mark.has-logo img{height:30px;max-width:96px;object-fit:contain;display:block}
 .brand h1{font-size:18px;font-weight:600}
 .brand small{display:block;font-size:12px;opacity:.75;font-family:var(--f-body)}
 .brand .spacer{flex:1}
@@ -685,6 +686,20 @@ const bById=id=>S.branches.find(b=>b.id===id);
 const brOf=v=>v&&bById(v.branchId);
 const brLabel=v=>{const b=brOf(v);return b?`${b.name} · ${b.city}`:''};
 const company=()=>(S.settings.find(s=>s.id==='main')||{}).companyName||'';
+// شعار الشركة: يُحفظ في إعداداتها فلا يظهر إلا داخل نظامها
+const coLogo=()=>{const l=(S.settings.find(s=>s.id==='main')||{}).logo||'';return /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(l)?l:''};
+const logoImg=(h=44)=>coLogo()?`<img src="${coLogo()}" alt="" style="display:block;height:${h}px;max-width:${h*3}px;object-fit:contain;margin-bottom:6px">`:'';
+const custNo=()=>{const c=window.__plat&&window.__plat.company();return c&&c.customerNo||''};
+async function makeLogo(file){
+  if(!/^image\/(png|jpeg|webp|svg\+xml|gif)$/.test(file.type))throw new Error('اختر صورة PNG أو JPG');
+  const url=URL.createObjectURL(file);
+  try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('تعذر قراءة الصورة'));i.src=url});
+    const r=Math.min(1,360/Math.max(img.naturalWidth||360,img.naturalHeight||360));const w=Math.max(1,Math.round((img.naturalWidth||360)*r)),h=Math.max(1,Math.round((img.naturalHeight||360)*r));
+    const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+    let d=c.toDataURL('image/png');if(d.length>150000||!d.startsWith('data:image/png'))d=c.toDataURL('image/webp',0.9);if(!d.startsWith('data:image/webp')||d.length>150000)d=c.toDataURL('image/jpeg',0.85);
+    if(d.length>300000)throw new Error('الصورة كبيرة جداً');return d}
+  finally{URL.revokeObjectURL(url)}
+}
 const branchesSorted=()=>[...S.branches].sort((a,b)=>(a.city||'').localeCompare(b.city||'','ar')||(a.name||'').localeCompare(b.name||'','ar'));
 const vInScope=(v,city,br)=>(br==='all'||(br==='none'?!v.branchId:v.branchId===br))&&(city==='all'||(brOf(v)?.city===city));
 const plateTxt=v=>v?`${v.plateLetters||''} ${v.plateNumbers||''}`.trim():'—';
@@ -932,6 +947,7 @@ function vBilling(){
   const st={trial:'تجربة مجانية',active:'اشتراك فعّال'}[s.c.status]||s.c.status;
   return `<div class="head"><div><h2>الاشتراك والفواتير</h2><p>حالة اشتراك شركتك وفواتيرها، والدفع الإلكتروني أو إرفاق إيصال التحويل</p></div><div class="actions"><button class="btn" data-act="bill-reload">تحديث</button></div></div>
   <section class="panel"><div class="panel-b" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+    ${s.c.customerNo?`<div><div class="sub">رقم العميل</div><b class="num" dir="ltr">${esc(s.c.customerNo)}</b></div>`:''}
     <div><div class="sub">الحالة</div><b>${esc(st)}</b></div>
     <div><div class="sub">${s.trial?'نهاية التجربة':'مدفوع حتى'}</div><b class="num">${esc(s.end||'—')}</b>${s.left!=null?`<div class="sub">${s.left<0?'منتهٍ':`متبقٍ ${s.left} يوم`}</div>`:''}</div>
     <div><div class="sub">الباقة</div><b>${esc(s.c.plan&&s.c.plan!=='trial'?s.c.plan:'—')}</b>${s.c.billingCycle==='yearly'?'<div class="sub">دفع سنوي</div>':''}</div>
@@ -1092,6 +1108,7 @@ function render(){
   let html='';
   const demo=COLS.some(c=>RAW(c).some(x=>x.demo));
   if(company())document.querySelector('.brand small').textContent=company();
+  {const bm=document.querySelector('.brand-mark');if(bm){const l=coLogo();if(l&&!bm.classList.contains('has-logo')||l&&bm.dataset.l!==String(l.length)){bm.innerHTML=`<img src="${l}" alt="">`;bm.classList.add('has-logo');bm.dataset.l=String(l.length)}else if(!l&&bm.classList.contains('has-logo')){bm.textContent='KSA';bm.classList.remove('has-logo');delete bm.dataset.l}}}
   document.body.classList.toggle('drvmode',r==='driver'||(role==='driver'&&r==='inbox'));
   {const mb=$('#msgbadge');if(mb){const n=unreadCount();mb.textContent=n>9?'9+':n;mb.hidden=!n}}
   if(demo&&!readOnly&&r!=='driver')html+=`<div class="banner"><div><b>بيانات توضيحية:</b> السجلات الحالية أمثلة لتجربة النظام. احذفها متى ما بدأت بإدخال بيانات سيارات شركتك.</div><button class="btn sm" data-act="clear-demo">حذف الأمثلة</button></div>`;
@@ -1187,7 +1204,7 @@ function vSettings(){
   return `<div class="head"><div><h2>الإعدادات</h2><p>بيانات الشركة، الاستيراد، التنبيهات التلقائية، والنسخ الاحتياطي</p></div></div>
   <section class="panel"><div class="panel-h"><h3>الشروحات للمستخدمين الجدد</h3><button class="btn sm${TIPS?'':' primary'}" data-act="${TIPS?'tips-off':'tips-on'}">${TIPS?'إخفاء الشروحات':'إظهار الشروحات'}</button></div><div class="panel-b sub">مربعات إرشادية مظللة أعلى كل صفحة ونموذج، وتلميح تحت الخانات المهمة. الإعداد خاص بجهازك ومتصفحك.</div></section>
   <section class="panel"><div class="panel-h"><h3>الإشعارات على هذا الجهاز</h3></div><div class="panel-b">${pushCard(false)}</div></section>
-  <section class="panel"><div class="panel-h"><h3>بيانات الشركة</h3>${isAdmin()&&!readOnly?'<button class="btn sm" data-act="co-edit">تعديل</button>':''}</div><div class="panel-b"><b style="font-family:var(--f-display);font-size:17px">${esc(company()||'اسم الشركة غير مسجل')}</b><div class="sub">يظهر أعلى النظام وفي رأس المحاضر وتقارير الإدارة</div></div></section>
+  <section class="panel"><div class="panel-h"><h3>بيانات الشركة</h3>${isAdmin()&&!readOnly?'<button class="btn sm" data-act="co-edit">تعديل</button>':''}</div><div class="panel-b" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">${coLogo()?`<img src="${coLogo()}" alt="شعار الشركة" style="height:56px;max-width:160px;object-fit:contain;border:1px solid var(--line);border-radius:10px;padding:4px;background:#fff">`:''}<div><b style="font-family:var(--f-display);font-size:17px">${esc(company()||'اسم الشركة غير مسجل')}</b>${custNo()?`<div class="sub">رقم العميل: <b dir="ltr">${esc(custNo())}</b></div>`:''}<div class="sub">الاسم والشعار يظهران أعلى النظام وفي رأس المحاضر وتقارير الإدارة، ولا يراهما إلا مستخدمو شركتك${coLogo()?'':'. أضف شعار شركتك من «تعديل»'}</div></div></div></section>
   <section class="panel"><div class="panel-h"><h3>استيراد البيانات من Excel</h3><span>مع معاينة قبل الحفظ</span></div><div class="panel-b actions">${Object.entries(IMP).map(([k,v])=>`<button class="btn" data-act="imp" data-id="${k}" ${readOnly?'disabled':''}>${v.label}</button>`).join('')}</div></section>
   <section class="panel"><div class="panel-h"><h3>صفحة السائقين للفحص الأسبوعي (كل جمعة)</h3><a class="btn sm" href="#driver">فتح الصفحة</a></div><div class="panel-b sub">افتح الصفحة، ثم انسخ الرابط من شريط العنوان وأرسله للسائقين. أضف السائق من «المستخدمون والصلاحيات» بنوع «مستخدم المركبة» واربطه بملف السائق، ثم أرسل له رابط التفعيل بالواتساب، ويدخل برقم جواله وكلمة مرور يختارها، فيرى سياراته فقط.</div></section>
   ${remPanel()}
@@ -1306,8 +1323,13 @@ function branchForm(id){
   {extraFoot:id&&!readOnly?`<button class="btn danger" type="button" data-act="b-del" data-id="${id}" style="margin-inline-start:auto">حذف</button>`:''});
 }
 function companyForm(){
-  formModal('بيانات الشركة',`${fld('اسم الشركة',inp('companyName',company()),{w:1,hint:'يظهر في أعلى النظام وفي رأس محاضر التسليم والاستلام'})}`,
-  async f=>{await put('settings','main',{companyName:f.companyName.trim(),updatedAt:new Date().toISOString()})});
+  let LOGO=coLogo();
+  const prev=()=>{const b=$('#lg-prev');if(b)b.innerHTML=LOGO?`<img src="${LOGO}" alt="" style="height:64px;max-width:200px;object-fit:contain;border:1px solid var(--line);border-radius:10px;padding:4px;background:#fff"><button class="btn sm ghost" type="button" id="lg-rm">إزالة الشعار</button>`:'<span class="sub">لا يوجد شعار</span>';const rm=$('#lg-rm');if(rm)rm.onclick=()=>{LOGO='';prev()}};
+  formModal('بيانات الشركة',`${fld('اسم الشركة',inp('companyName',company()),{w:1,hint:'يظهر في أعلى النظام وفي رأس محاضر التسليم والاستلام'})}
+    ${fld('شعار الشركة',`<div id="lg-prev" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px"></div><input type="file" id="f-logo" accept="image/png,image/jpeg,image/webp,image/svg+xml">`,{w:1,hint:'PNG بخلفية شفافة أفضل. يظهر داخل نظام شركتك فقط: أعلى الصفحات وفي المحاضر والتقارير المطبوعة'})}`,
+  async f=>{const data={...(S.settings.find(s=>s.id==='main')||{}),companyName:f.companyName.trim(),logo:LOGO,updatedAt:new Date().toISOString()};delete data.id;await put('settings','main',data)});
+  prev();
+  $('#f-logo').onchange=async e=>{const fl=e.target.files[0];if(!fl)return;try{LOGO=await makeLogo(fl);prev()}catch(x){toast(x.message||'تعذر قراءة الصورة');e.target.value=''}};
 }
 
 function vVehicles(){
@@ -1477,7 +1499,7 @@ const vLink=id=>location.origin+location.pathname.replace(/index\.html$/,'')+'#v
 async function qrLib(){if(!window.qrcode)await loadScript('qr.js')}
 function qrData(text){const q=window.qrcode(0,'M');q.addData(text);q.make();return q.createDataURL(10,0)}
 function stickerHTML(v){
-  return `<div class="qrs"><div class="qrs-h"><div class="qrs-co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="qrs-t">ملف السيارة الرقمي</div></div>
+  return `<div class="qrs"><div class="qrs-h">${logoImg(36)}<div class="qrs-co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="qrs-t">ملف السيارة الرقمي</div></div>
   <div class="qrs-b"><div class="qrs-pl">${plate(v,1)}</div><div class="qrs-vn">${esc(vName(v))}${v.year?' · '+esc(v.year):''}</div>
     <div class="qrs-q"><i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i><img src="${qrData(vLink(v.id))}" alt=""></div>
     <div class="qrs-cap"><b>امسح الرمز بكاميرا الجوال</b><span>الفحص الأسبوعي · ملف السيارة · التسليم والاستلام</span></div></div>
@@ -2117,7 +2139,7 @@ function sheetHTML(h){
   const no=(h.id||'').slice(-6).toUpperCase();
   const row=(a,b,c,dd)=>`<tr><th>${a}</th><td>${b}</td>${c!==undefined?`<th>${c}</th><td>${dd}</td>`:'<td colspan="2"></td>'}</tr>`;
   const fuelBar=`<span class="fb">${Array.from({length:8},(_,i)=>`<i class="${i<(+h.fuel||0)?'on':''}"></i>`).join('')}</span> ${h.fuel??'—'}/8`;
-  return `<div class="ph"><div><div class="co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="cs">إدارة الحركة والأسطول</div>${brOf(v)?`<div class="cs">${esc(brLabel(v))}</div>`:''}</div>
+  return `<div class="ph"><div>${logoImg()}<div class="co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="cs">إدارة الحركة والأسطول</div>${brOf(v)?`<div class="cs">${esc(brLabel(v))}</div>`:''}</div>
     <div class="pt">${out?'محضر تسليم سيارة':'محضر استلام سيارة'}<small>${out?'تسليم عهدة إلى سائق':'إعادة عهدة من سائق'}</small></div>
     <div class="pn">رقم المحضر<b>${esc(no)}</b>التاريخ<b>${fmtDT(h.at)}</b></div></div>
   <div class="sec2">بيانات السيارة والسائق</div>
@@ -2165,7 +2187,7 @@ async function downloadPdf(id){
     await addSheet(sheetHTML(h));
     const ph=h.photos||[];const v0=vById(h.vehicleId);
     for(let i=0;i<ph.length;i+=6){
-      await addSheet(`<div class="ph"><div><div class="co">${esc(company()||'إدارة أسطول الشركة')}</div></div><div class="pt">صور السيارة<small>ملحق ${h.type==='out'?'محضر التسليم':'محضر الاستلام'}</small></div><div class="pn">اللوحة<b>${esc(plateTxt(v0))}</b>التاريخ<b>${fmtDT(h.at)}</b></div></div>
+      await addSheet(`<div class="ph"><div>${logoImg()}<div class="co">${esc(company()||'إدارة أسطول الشركة')}</div></div><div class="pt">صور السيارة<small>ملحق ${h.type==='out'?'محضر التسليم':'محضر الاستلام'}</small></div><div class="pn">اللوحة<b>${esc(plateTxt(v0))}</b>التاريخ<b>${fmtDT(h.at)}</b></div></div>
         <div class="pgrid">${ph.slice(i,i+6).map(id=>`<img src="_blob/${id}" alt="">`).join('')}</div><div class="pf">صفحة ${Math.floor(i/6)+2} · صدر من نظام أسطول الشركة</div>`);
     }
     const v=vById(h.vehicleId);
@@ -2346,7 +2368,7 @@ function receiptForm(accId){
 function receiptPdf(accId){
   const a=S.accidents.find(x=>x.id===accId);const r=a&&claimOf(a).receipt;if(!r){toast('احفظ السند أولاً');return}
   const M={transfer:'حوالة بنكية',cheque:'شيك',cash:'نقداً'};
-  const html=`<div class="ph"><div><div class="co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="cs">الإدارة المالية</div></div><div class="pt" style="font-size:26px">سند قبض<small>Receipt Voucher</small></div><div class="pn">رقم السند<b>${esc(r.no)}</b>التاريخ<b>${fmtD(r.date)}</b></div></div>
+  const html=`<div class="ph"><div>${logoImg()}<div class="co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="cs">الإدارة المالية</div></div><div class="pt" style="font-size:26px">سند قبض<small>Receipt Voucher</small></div><div class="pn">رقم السند<b>${esc(r.no)}</b>التاريخ<b>${fmtD(r.date)}</b></div></div>
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div class="g">${esc(hijri(r.date))}</div><div class="rv-amt">${nf.format(+r.amount)}.${String(Math.round((+r.amount%1)*100)).padStart(2,'0')} <small>ر.س</small></div></div>
   <table class="rv"><tbody>
     <tr><th>استلمنا من السادة</th><td>${esc(r.from)}</td></tr>
@@ -2384,7 +2406,7 @@ function mgmtSheets(){
   const inP=s=>String(s||'').startsWith(pk);
   const viol=S.violations.filter(x=>ids.has(x.vehicleId)&&inP(x.date)),acc=S.accidents.filter(x=>ids.has(x.vehicleId)&&inP(x.date));
   const scope=UI.rb!=='all'&&bById(UI.rb)?brLabel({branchId:UI.rb}):UI.rc!=='all'?'مدينة '+UI.rc:'جميع الفروع';
-  const head=(t,sub)=>`<div class="ph"><div><div class="co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="cs">${esc(scope)}</div></div><div class="pt">${t}<small>${sub}</small></div><div class="pn">الفترة<b>${esc(pk)}</b>صدر في<b>${fmtD(today())}</b></div></div>`;
+  const head=(t,sub)=>`<div class="ph"><div>${logoImg()}<div class="co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="cs">${esc(scope)}</div></div><div class="pt">${t}<small>${sub}</small></div><div class="pn">الفترة<b>${esc(pk)}</b>صدر في<b>${fmtD(today())}</b></div></div>`;
   const docs=[];vs.forEach(v=>{[['istimaraExp','الاستمارة'],['insuranceExp','التأمين'],['fahasExp','الفحص الدوري'],...(v.hasOpCard?[['opCardExp','بطاقة التشغيل']]:[])].forEach(([f,l])=>{const d=daysUntil(v[f]);if(d!==null&&d<=30&&v.status!=='out')docs.push({v,l,d,date:v[f]})})});docs.sort((a,b)=>a.d-b.d);
   const openAcc=S.accidents.filter(a=>ids.has(a.vehicleId)&&a.status!=='closed');const pendClaims=S.accidents.filter(a=>ids.has(a.vehicleId)&&['submitted','review','approved'].includes(claimOf(a).stage));
   const shop=S.maintenance.filter(m=>m.status==='open'&&ids.has(m.vehicleId));const oil=vs.filter(v=>v.status!=='out'&&oilState(v).sev==='crit');
@@ -2441,7 +2463,7 @@ function reportPdf(){
     kpis=[['المسافة',km(T('dist'))],['الوقود',money(T('fc'))],['الصيانة',money(T('mc'))],['تجديد الوثائق',money(T('rn'))],['المخالفات',money(T('xc'))],['الحوادث',money(T('ac'))],['الإجمالي',money(T('total'))]];}
   else{const r=typedReport();const keep=r.cols.map((c,i)=>c?i:-1).filter(i=>i>=0);cols=keep.map(i=>r.cols[i]);rows=r.rows.map(row=>keep.map(i=>txt(row[i])));kpis=r.kpis.map(([l,v])=>[l,typeof v==='number'?nf.format(v):strip(v)]);}
   const scope=UI.rb!=='all'&&bById(UI.rb)?brLabel({branchId:UI.rb}):UI.rc!=='all'?'مدينة '+UI.rc:'جميع الفروع';
-  const head=`<div class="ph"><div><div class="co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="cs">${esc(scope)}</div></div><div class="pt">تقرير ${esc(t[1])}<small>${esc(t[2])} · ${esc(periodName())}</small></div><div class="pn">الفترة<b>${esc(pk)}</b>صدر في<b>${fmtD(today())}</b></div></div>`;
+  const head=`<div class="ph"><div>${logoImg()}<div class="co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="cs">${esc(scope)}</div></div><div class="pt">تقرير ${esc(t[1])}<small>${esc(t[2])} · ${esc(periodName())}</small></div><div class="pn">الفترة<b>${esc(pk)}</b>صدر في<b>${fmtD(today())}</b></div></div>`;
   const tbl=rs=>`<table class="kvt tb rt"><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rs.length?rs.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${cols.length}">لا توجد بيانات في هذه الفترة</td></tr>`}</tbody></table>`;
   const pages=[];const first=16,next=24;let i=0,n=1;
   const total=Math.max(1,1+Math.ceil(Math.max(0,rows.length-first)/next));

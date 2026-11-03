@@ -289,6 +289,17 @@ function show(t) {
 }
 
 /* ---------- التحميل ---------- */
+// رقم العميل: تسلسلي يبدأ من 1001 ويُسند عند اعتماد الشركة
+async function nextCustomerNo() {
+  const n = await F.runTransaction(fs, async tr => { const r = F.doc(fs, 'platform', 'customers'); const s = await tr.get(r); const v = Math.max(1000, (s.exists() && s.data().n) || 0) + 1; tr.set(r, { n: v }, { merge: true }); return v; });
+  return String(n);
+}
+// الشركات المعتمدة قبل إضافة رقم العميل: يُسند لها رقم بترتيب اعتمادها (مرة واحدة، من حساب المالك)
+async function backfillCustomerNo() {
+  const need = COS.filter(c => !c.customerNo && !['pending', 'rejected'].includes(c.status)).sort((a, b) => String(a.approvedAt || a.createdAt).localeCompare(String(b.approvedAt || b.createdAt)));
+  for (const c of need) { try { const no = await nextCustomerNo(); await F.updateDoc(F.doc(fs, 'companies', c.id), { customerNo: no, updatedAt: nowIso() }); c.customerNo = no; } catch (e) { console.warn('backfill', e); break; } }
+  if (need.length) render();
+}
 async function loadAll() {
   $('#rows').innerHTML = `<tr><td colspan="8" class="empty">جارٍ التحميل…</td></tr>`;
   try { const s = await F.getDoc(F.doc(fs, 'platform', 'settings')); SET = s.exists() ? s.data() : {}; } catch (e) { SET = {}; }
@@ -300,6 +311,7 @@ async function loadAll() {
   } catch (e) { console.error(e); $('#rows').innerHTML = `<tr><td colspan="8" class="empty">تعذر تحميل الشركات: ${esc(e.code || e.message)}</td></tr>`; return; }
   try { const s = await F.getDocs(F.collection(fs, 'invoices')); INVS = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.seq || 0) - (a.seq || 0)); } catch (e) { INVS = []; }
   render(); renderInv();
+  if (ME.super) backfillCustomerNo();
   await Promise.all(COS.filter(c => !isOpen(c)).map(async c => { try { c.vehicles = (await F.getCountFromServer(F.collection(fs, 'companies', c.id, 'vehicles'))).data().count; } catch (e) { c.vehicles = '؟'; } }));
   render();
 }
@@ -316,14 +328,14 @@ function kpis() {
   $('#kpis').innerHTML = [['بانتظار الاعتماد', req, req ? 'hot' : ''], ['مفعّلة', n('active')], ['تجربة', n('trial')], ['منتهية', n('expired')], ['موقوفة', n('suspended')], ['إجمالي السيارات', veh],
     ['فواتير غير مدفوعة (ريال)', money(unpaid)], ['المحصّل هذا الشهر', money(got)]].map(([l, v, c]) => `<div class="kpi ${c || ''}"><b>${v}</b><span>${l}</span></div>`).join('');
 }
-const hay = c => [c.name, c.id, c.ownerEmail, c.ownerName, c.phone, c.note, ...Object.values(c.profile || {})].map(x => String(x || '').toLowerCase()).join(' ');
+const hay = c => [c.name, c.id, c.customerNo, c.ownerEmail, c.ownerName, c.phone, c.note, ...Object.values(c.profile || {})].map(x => String(x || '').toLowerCase()).join(' ');
 function render() {
   kpis();
   const q = $('#q').value.trim().toLowerCase(), f = $('#fs').value;
   const list = COS.filter(c => { const s = stOf(c); return (f === 'all' || (f === 'reqs' ? isOpen(c) : s === f)) && (!q || hay(c).includes(q)); })
     .sort((a, b) => (TAB === 'requests' ? (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1) : 0));
   $('#rows').innerHTML = list.length ? list.map(c => { const p = c.profile || {}; return `<tr class="click" data-id="${esc(c.id)}">
-    <td><b>${esc(c.name)}</b>${p.legalName && p.legalName !== c.name ? `<small>${esc(p.legalName)}</small>` : ''}${c.note ? `<small>📝 ${esc(c.note)}</small>` : ''}</td>
+    <td><b>${esc(c.name)}</b>${c.customerNo ? `<small>رقم العميل <b dir="ltr">${esc(c.customerNo)}</b></small>` : ''}${p.legalName && p.legalName !== c.name ? `<small>${esc(p.legalName)}</small>` : ''}${c.note ? `<small>📝 ${esc(c.note)}</small>` : ''}</td>
     <td dir="ltr" style="text-align:right">${esc(p.crNumber || '—')}<small>${esc(p.vatNumber || '')}</small></td>
     <td>${esc(c.ownerName || '')}<small dir="ltr" style="text-align:right">${esc(c.ownerEmail)}</small>${c.phone ? `<small dir="ltr" style="text-align:right">${esc(c.phone)}</small>` : ''}</td>
     <td>${esc(p.city || '—')}</td>
@@ -360,7 +372,7 @@ function openFile(id, keep) {
   if (can('edit')) act.push(`<button class="btn" data-f="edit">تعديل البيانات</button>`);
   act.push(`<button class="btn" data-f="close">إغلاق ✕</button>`);
   const myInv = INVS.filter(i => i.cid === id);
-  $('#sheet').innerHTML = `<div class="top"><div><h2>${esc(c.name)} ${pill(ST, st)}</h2><small style="color:var(--muted)" dir="ltr">${esc(c.id)}</small></div><div class="acts">${act.join('')}</div></div>
+  $('#sheet').innerHTML = `<div class="top"><div><h2>${esc(c.name)} ${pill(ST, st)}</h2><small style="color:var(--muted)">${c.customerNo ? `رقم العميل: <b dir="ltr" style="color:var(--ink)">${esc(c.customerNo)}</b> · ` : ''}<span dir="ltr">${esc(c.id)}</span></small></div><div class="acts">${act.join('')}</div></div>
   <div class="body">
     ${c.status === 'rejected' && c.rejectReason ? `<div class="sec" style="border-color:#F4C7C3"><b>سبب الرفض:</b> ${esc(c.rejectReason)}</div>` : ''}
     ${PF.map(([t, fl]) => `<div class="sec"><h4>${t}</h4>${kv(fl)}</div>`).join('')}
@@ -425,6 +437,8 @@ $('#file').onclick = e => {
       ${planSel((PLANS().find(p => p.featured) || PLANS()[0] || {}).id, 'monthly')}
       <label>نهاية التجربة / الاشتراك<input name="until" type="date" value="${addDays(today(), TRIAL_DAYS)}" required></label>`,
     async fd => { const pf = planFields(fd.get('planId'), fd.get('cycle'));
+      let customerNo = c.customerNo; if (!customerNo) try { customerNo = await nextCustomerNo(); } catch (e) { console.warn('customerNo', e); }
+      if (customerNo) pf.customerNo = customerNo;
       if (await saveCo(c.id, fd.get('mode') === 'active' ? { status: 'active', plan: 'شهري', ...pf, paidUntil: fd.get('until'), approvedAt: nowIso(), approvedBy: ME.email, rejectReason: '' } : { status: 'trial', ...pf, trialEnds: fd.get('until'), approvedAt: nowIso(), approvedBy: ME.email, rejectReason: '' }, 'تم اعتماد الشركة ✓')) notify({ action: 'decision', cid: c.id }); }, 'اعتماد');
   if (a === 'reject') dialog(`<h3>رفض طلب ${esc(c.name)}</h3><label>السبب (يظهر للشركة لتعدّل بياناتها)<textarea name="r" rows="3" required></textarea></label>`,
     async fd => { if (await saveCo(c.id, { status: 'rejected', rejectReason: fd.get('r').trim() }, 'تم رفض الطلب')) notify({ action: 'decision', cid: c.id }); }, 'رفض');
@@ -452,7 +466,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#file'
 const vatRate = () => (SET.vatRate === '' || SET.vatRate == null ? 15 : +SET.vatRate);
 function renderInv() {
   const q = $('#iq').value.trim().toLowerCase(), f = $('#ifs').value;
-  const list = INVS.filter(i => (f === 'all' || istOf(i) === f) && (!q || [i.number, i.companyName, i.buyer && i.buyer.vatNumber].some(x => String(x || '').toLowerCase().includes(q))));
+  const list = INVS.filter(i => (f === 'all' || istOf(i) === f) && (!q || [i.number, i.companyName, i.customerNo, i.buyer && i.buyer.vatNumber].some(x => String(x || '').toLowerCase().includes(q))));
   $('#irows').innerHTML = list.length ? list.map(i => `<tr>
     <td dir="ltr" style="text-align:right"><b>${esc(i.number)}</b></td><td>${esc(i.companyName)}</td><td>${fmt(i.issueDate)}<small>الاستحقاق ${fmt(i.dueDate)}</small></td>
     <td>${fmt(i.periodFrom)} ← ${fmt(i.periodTo)}<small>${esc(i.qty)} سيارة × ${money(i.unitPrice)}</small></td><td><b>${money(i.total)}</b><small>منها ضريبة ${money(i.vat)}</small></td>
@@ -502,7 +516,7 @@ function newInvoice(c0) {
       try {
         const seq = await F.runTransaction(fs, async tr => { const r = F.doc(fs, 'platform', 'counters'); const s = await tr.get(r); const n = ((s.exists() && s.data().invoice) || 0) + 1; tr.set(r, { invoice: n }, { merge: true }); return n; });
         const p = x.profile || {};
-        const inv = { number: `INV-${today().slice(0, 4)}-${String(seq).padStart(4, '0')}`, seq, cid: x.id, companyName: x.name, issueDate: today(), issuedAt: nowIso(), dueDate: fd.get('due'),
+        const inv = { number: `INV-${today().slice(0, 4)}-${String(seq).padStart(4, '0')}`, seq, cid: x.id, companyName: x.name, customerNo: x.customerNo || '', issueDate: today(), issuedAt: nowIso(), dueDate: fd.get('due'),
           periodFrom: fd.get('from'), periodTo: fd.get('to'), months: t.months, qty: t.qty, unitPrice: t.price, discount: t.disc, minApplied: t.minApplied, desc: fd.get('desc').trim() + (planOf(fd.get('planId')) ? ` – باقة ${planOf(fd.get('planId')).name}${fd.get('cycle') === 'yearly' ? ' (سنوي)' : ''}` : ''), planId: fd.get('planId') || '', billingCycle: fd.get('cycle') || 'monthly',
           subtotal: t.sub, vatRate: t.rate, vat: t.vat, total: t.total, status: 'unpaid', createdBy: ME.email,
           buyer: { name: p.legalName || x.name, vatNumber: p.vatNumber || '', crNumber: p.crNumber || '', address: [p.buildingNo, p.street, p.district, p.city, p.postalCode].filter(Boolean).join('، ') } };

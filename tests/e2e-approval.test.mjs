@@ -71,6 +71,7 @@ await a.fill('#noteF [name=text]', 'تم الاتصال والتحقق من ال
 await a.screenshot({ path: SHOTS + '/4-file.png', fullPage: false });
 await a.click('#sheet [data-f=approve]'); await a.click('#dlg button[value=ok]');
 await a.waitForFunction(() => document.querySelector('#sheet .top').textContent.includes('تجربة'), null, { timeout: 10000 }); ok(true, 'اعتُمدت الشركة (تجربة)');
+await a.waitForTimeout(500); ok((await a.textContent('#sheet .top')).includes('1001'), 'رقم العميل 1001 أُسند عند الاعتماد');
 
 console.log('٣) الشركة تدخل بعد الاعتماد');
 await p.click('#pd-r');
@@ -234,6 +235,16 @@ await p.goto(B + '#billing'); await p.reload(); await p.waitForSelector('[data-a
 await p.screenshot({ path: SHOTS + '/19-billing-plan.png', fullPage: true });
 await p.goto(B + '#vehicles'); await p.waitForSelector('[data-act=v-new]', { timeout: 20000 }); await p.click('[data-act=v-new]'); await p.waitForTimeout(500);
 ok((await p.textContent('body')).includes('حد باقتك'), 'منع إضافة سيارة فوق حد الباقة');
+
+console.log('١٥) رقم العميل وشعار الشركة');
+await p.goto(B + '#billing'); await p.reload(); await p.waitForSelector('[data-act=plan-req]', { timeout: 20000 }); ok((await p.textContent('#main')).includes('1001'), 'الشركة ترى رقم العميل');
+await p.goto(B + '#company'); await p.waitForSelector('[data-act=co-edit]', { timeout: 20000 }); await p.click('[data-act=co-edit]'); await p.waitForSelector('#f-logo');
+await p.setInputFiles('#f-logo', '/tmp/claude-0/e2e/logo.png'); await p.waitForSelector('#lg-prev img'); await p.click('#frm [type=submit]'); await p.waitForTimeout(1500);
+ok(await p.locator('.brand-mark.has-logo img').count() === 1, 'الشعار ظاهر أعلى النظام');
+ok((await p.textContent('.brand small')).length > 0 && await p.locator('[data-act=co-edit]').count() === 1, 'اسم الشركة باقٍ بعد حفظ الشعار');
+await p.screenshot({ path: SHOTS + '/20-logo.png' });
+const p2s = await (async () => { await p2.goto(B); await p2.waitForTimeout(3000); return p2.locator('.brand-mark.has-logo').count(); })(); ok(p2s === 0, 'شركة أخرى لا ترى الشعار');
+const invs = (await adm('invoices')).documents || []; ok(invs.some(d => d.fields.customerNo && d.fields.customerNo.stringValue === '1001'), 'رقم العميل في الفاتورة');
 
 console.log(`\n${pass} نجح، ${fail} فشل`);
 await browser.close(); srv.close(); process.exit(fail ? 1 : 0);

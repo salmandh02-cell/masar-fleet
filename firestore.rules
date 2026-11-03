@@ -61,7 +61,7 @@ service cloud.firestore {
         // صاحب الطلب: يعدّل بياناته ويعيد الإرسال ما دام الطلب لم يُعتمد
         || (open && nw == 'pending' && k.hasOnly(['name', 'phone', 'ownerName', 'profile', 'status', 'submittedAt', 'updatedAt']) && isCoOwner(cid))
         // فريق المنصة حسب الصلاحية
-        || (open && nw in ['trial', 'active', 'rejected'] && k.hasOnly(['status', 'trialEnds', 'plan', 'paidUntil', 'approvedAt', 'approvedBy', 'rejectReason', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'updatedAt']) && platCan('approve'))
+        || (open && nw in ['trial', 'active', 'rejected'] && k.hasOnly(['status', 'trialEnds', 'plan', 'paidUntil', 'approvedAt', 'approvedBy', 'rejectReason', 'customerNo', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'updatedAt']) && platCan('approve'))
         || (!open && nw in ['trial', 'active', 'suspended'] && k.hasOnly(['status', 'plan', 'paidUntil', 'suspendedAt', 'suspendReason', 'lastNotice', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'updatedAt']) && platCan('status'))
         || (!open && nw == 'trial' && k.hasOnly(['status', 'trialEnds', 'updatedAt']) && platCan('trial'))
         || (k.hasOnly(['name', 'phone', 'ownerName', 'profile', 'plan', 'note', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'updatedAt']) && platCan('edit'))
@@ -210,7 +210,7 @@ service cloud.firestore {
     match /platform/{id} {
       // public: الأسعار وبيانات التواصل للصفحة التعريفية ومفتاح الدفع العام
       allow read: if isPlat() || id == 'public';
-      allow write: if isSuper() || (id == 'counters' && platCan('invoices'));
+      allow write: if isSuper() || (id == 'counters' && platCan('invoices')) || (id == 'customers' && platCan('approve'));
     }
     // مستندات الشركة (السجل التجاري، شهادة الضريبة، العنوان الوطني)
     match /kyc/{id} {
