@@ -216,6 +216,13 @@ await t('company admin cannot set own customer number', alice.doc('companies/ca-
 await t('company admin saves logo in settings', alice.doc('companies/ca-111/settings/main').set({ companyName: 'A', logo: 'data:image/png;base64,AAAA' }));
 await t('bob cannot read A logo', bob.doc('companies/ca-111/settings/main').get(), false);
 
+console.log('استهلاك الذكاء الاصطناعي');
+await t('owner writes AI usage', sup.doc('aiuse/ca-111_2026-11-06').set({ cid: 'ca-111', day: '2026-11-06', n: 1 }));
+await t('company admin reads own AI usage', alice.doc('aiuse/ca-111_2026-11-06').get());
+await t('other company cannot read AI usage', bob.doc('aiuse/ca-111_2026-11-06').get(), false);
+await t('company cannot reset own AI usage', alice.doc('aiuse/ca-111_2026-11-06').update({ n: 0 }), false);
+await t('accountant reads AI usage', acct.doc('aiuse/ca-111_2026-11-06').get());
+
 console.log(`\n${pass} نجح، ${fail} فشل`);
 await env.cleanup();
 process.exit(fail ? 1 : 0);

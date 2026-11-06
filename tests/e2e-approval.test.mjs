@@ -9,11 +9,17 @@ import { createRequire } from 'node:module'; const require = createRequire(impor
 const wp = require('/tmp/claude-0/w/fleet-saas/functions/node_modules/web-push'); const vk = wp.generateVAPIDKeys();
 Object.assign(process.env, { FB_PROJECT: PRJ, FB_API_KEY: 'fake-api-key', SYS_EMAIL: 'sys-test@m.manhalfleet.app', SYS_PASS: 'sysPass12345', FIRESTORE_EMULATOR_HOST: '127.0.0.1:8080', FIREBASE_AUTH_EMULATOR_HOST: '127.0.0.1:9099',
   VAPID_PUBLIC: vk.publicKey, VAPID_PRIVATE: vk.privateKey, VAPID_SUBJECT: 'mailto:t@t.com', SITE_URL: 'http://127.0.0.1:8000', MOYASAR_SECRET: 'sk_test_x' });
-const plat = require('/tmp/claude-0/w/fleet-saas/functions/plat.js'); const CALLS = [];
+const plat = require('/tmp/claude-0/w/fleet-saas/functions/plat.js');
+const aif = require('/tmp/claude-0/w/fleet-saas/functions/ai.js'); const AIREQ = [];
+aif._setClient({ beta: { messages: { create: async (p) => { AIREQ.push(p);
+  if (p.output_config && p.output_config.format) { const props = Object.keys(p.output_config.format.schema.properties); const v = Object.fromEntries(props.map(k => [k, /name/i.test(k) ? 'محمد أحمد العتيبي' : ''])); return { content: [{ type: 'text', text: JSON.stringify(v) }], stop_reason: 'end_turn', usage: { input_tokens: 1500, output_tokens: 60 } }; }
+  return { content: [{ type: 'text', text: '**أكثر السائقين مخالفات**\n- لا توجد مخالفات مسجلة\n\n| السيارة | الوقود |\n|---|---|\n| أ ب ج 1234 | 0 |' }], stop_reason: 'end_turn', usage: { input_tokens: 9000, output_tokens: 120 } }; } } } }); const CALLS = [];
 const realFetch = globalThis.fetch; let PAY = null;
 globalThis.fetch = (u, o) => String(u).startsWith('https://api.moyasar.com/') ? Promise.resolve(new Response(JSON.stringify(PAY || {}), { status: PAY ? 200 : 404, headers: { 'Content-Type': 'application/json' } })) : realFetch(u, o);
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png' };
 const srv = http.createServer(async (q, r) => {
+  if (q.url.startsWith('/.netlify/functions/ai')) { let body = ''; for await (const c of q) body += c;
+    const out = await aif.handler({ httpMethod: q.method, headers: q.headers, body }); r.writeHead(out.statusCode, { 'Content-Type': 'application/json' }); return r.end(out.body); }
   if (q.url.startsWith('/.netlify/functions/plat')) { let body = ''; for await (const c of q) body += c;
     const out = await plat.handler({ httpMethod: q.method, headers: q.headers, body }); let j = {}; try { j = JSON.parse(out.body); } catch (e) {} CALLS.push({ action: (JSON.parse(body || '{}')).action, code: out.statusCode, j });
     r.writeHead(out.statusCode, { 'Content-Type': 'application/json' }); return r.end(out.body); }
@@ -245,6 +251,31 @@ ok((await p.textContent('.brand small')).length > 0 && await p.locator('[data-ac
 await p.screenshot({ path: SHOTS + '/20-logo.png' });
 const p2s = await (async () => { await p2.goto(B); await p2.waitForTimeout(3000); return p2.locator('.brand-mark.has-logo').count(); })(); ok(p2s === 0, 'شركة أخرى لا ترى الشعار');
 const invs = (await adm('invoices')).documents || []; ok(invs.some(d => d.fields.customerNo && d.fields.customerNo.stringValue === '1001'), 'رقم العميل في الفاتورة');
+
+console.log('١٦) الذكاء الاصطناعي');
+await a.click('nav [data-t=settings]'); await a.waitForSelector('#setg [name=aiEnabled]'); await a.fill('#setg [name=aiEnabled]', 'yes'); await a.click('#setf button.pri'); await a.waitForTimeout(500);
+ok((await a.textContent('#toast')).includes('on أو off'), 'تحقق من قيمة تفعيل الذكاء الاصطناعي');
+await a.fill('#setg [name=aiEnabled]', 'on'); await a.fill('#setg [name=aiDaily]', '50'); await a.click('#setf button.pri'); await a.waitForTimeout(1200);
+await p.goto(B + '#ai'); await p.reload(); await p.waitForTimeout(3500);
+ok((await p.textContent('#main')).includes('غير متاح في باقتك'), 'الباقة الأساسية بلا ذكاء اصطناعي: يظهر طلب الترقية');
+await a.click('nav [data-t=settings]'); await a.waitForSelector('#plrows [data-pl="0"][data-k=ai]'); await a.check('#plrows [data-pl="0"][data-k=ai]'); await a.click('#setf button.pri'); await a.waitForTimeout(1200);
+await p.reload(); await p.waitForSelector('#ai-q', { timeout: 20000 }); ok(await p.locator('#side a[href="#ai"]').count() === 1, 'المساعد الذكي ظاهر في القائمة بعد تفعيله في الباقة');
+await p.click('[data-act=ai-ex]'); await p.waitForSelector('.ai-a b', { timeout: 15000 });
+ok((await p.textContent('.ai-a')).includes('أكثر السائقين مخالفات') && await p.locator('.ai-a table').count() === 1, 'إجابة المساعد بتنسيق (عناوين وجداول)');
+const ar = AIREQ[AIREQ.length - 1]; ok(ar.system[1].text.includes('1234') && !ar.system[1].text.includes('data:image'), 'بيانات الشركة أُرسلت للمساعد بلا صور');
+ok(ar.fallbacks === 'default' && ar.betas.includes('server-side-fallback-2026-07-01'), 'تفعيل البديل الاحتياطي عند الرفض');
+await p.screenshot({ path: SHOTS + '/21-ai-chat.png', fullPage: true });
+await p.goto(B + '#drivers'); await p.waitForSelector('[data-act=d-new]', { timeout: 20000 }); await p.click('[data-act=d-new]'); await p.waitForSelector('[data-act=ai-scan]');
+const [fc2] = await Promise.all([p.waitForEvent('filechooser'), p.click('[data-act=ai-scan]')]); await fc2.setFiles('/tmp/claude-0/e2e/logo.png');
+await p.waitForSelector('#frm .ai-filled', { timeout: 15000 }); ok((await p.inputValue('#frm .ai-filled')).includes('محمد'), 'تعبئة نموذج السائق من صورة المستند');
+const sr = AIREQ[AIREQ.length - 1]; ok(sr.messages[0].content[0].type === 'image' && sr.output_config.format.type === 'json_schema', 'الصورة ترسل مع مخطط الحقول');
+await p.screenshot({ path: SHOTS + '/22-ai-scan.png' });
+const use = (await adm('aiuse')).documents || []; ok(use.length === 1 && +use[0].fields.n.integerValue === 2, 'تسجيل الاستهلاك اليومي للشركة');
+await a.click('nav [data-t=reports]'); await a.waitForTimeout(1500); await a.click('nav [data-t=companies]'); await a.click('nav [data-t=reports]'); await a.waitForTimeout(500);
+ok((await a.textContent('#t-reports')).includes('استخدام الذكاء الاصطناعي'), 'تقرير استخدام الذكاء الاصطناعي في لوحة المنصة');
+await a.screenshot({ path: SHOTS + '/23-ai-report.png', fullPage: true });
+const p3 = await (async () => { const t = await p2.evaluate(async () => window.__plat ? await window.__plat.token() : null); if (!t) return 'no-session'; const r = await realFetch(B + '.netlify/functions/ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t }, body: JSON.stringify({ action: 'ask', question: 'x', data: '' }) }); return r.status; })();
+ok(p3 === 403 || p3 === 'no-session', 'شركة غير معتمدة لا تستخدم الذكاء الاصطناعي: ' + p3);
 
 console.log(`\n${pass} نجح، ${fail} فشل`);
 await browser.close(); srv.close(); process.exit(fail ? 1 : 0);

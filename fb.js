@@ -426,6 +426,7 @@ export async function start() {
     entered = true; ENTERED_UID = u.uid;
     window.__plat = {
       company: () => ({ id: CID, ...COMPANY }), isOwner, email,
+      token: () => u.getIdToken(),
       invoices: () => coInvoices(CID),
       receipts: async () => { const s = await F.getDocs(F.query(F.collection(fs, 'kyc'), F.where('cid', '==', CID), F.where('kind', '==', 'receipt'))); return s.docs.map(d => ({ id: d.id, ...d.data() })); },
       attachReceipt: (inv, note) => pickFile().then(f => f ? attachReceipt(u, CID, inv, f, note).then(() => true) : false),

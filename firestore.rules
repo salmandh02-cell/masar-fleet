@@ -244,6 +244,11 @@ service cloud.firestore {
       allow create, update: if isPlat() && request.resource.data.key == myEmail();
       allow delete: if platCan('notify') || (signedIn() && resource.data.key == myEmail());
     }
+    // استهلاك الذكاء الاصطناعي اليومي لكل شركة: يكتبه الحساب الآلي فقط
+    match /aiuse/{id} {
+      allow read: if platCan('view') || coBoss(resource.data.cid);
+      allow write: if isSuper() || platCan('notify');
+    }
     // سجل نشاط فريق المنصة: إضافة فقط
     match /platlog/{id} {
       allow read: if platCan('log');

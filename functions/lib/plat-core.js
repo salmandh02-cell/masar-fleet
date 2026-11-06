@@ -50,6 +50,12 @@ async function patch(tok, path, data) {
   const r = await fetch(`${ROOT()}/${path}?${mask}&currentDocument.exists=true`, { method: 'PATCH', headers: H(tok), body: JSON.stringify({ fields: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, enc(v)])) }) });
   if (!r.ok) throw new Error(`patch ${path} ${r.status} ${await r.text()}`);
 }
+// كتابة مستند بمعرّف محدد (إنشاء أو تحديث الحقول المذكورة فقط)
+async function upsert(tok, path, data) {
+  const mask = Object.keys(data).map(k => 'updateMask.fieldPaths=' + encodeURIComponent(k)).join('&');
+  const r = await fetch(`${ROOT()}/${path}?${mask}`, { method: 'PATCH', headers: H(tok), body: JSON.stringify({ fields: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, enc(v)])) }) });
+  if (!r.ok) throw new Error(`upsert ${path} ${r.status}`);
+}
 async function create(tok, col, data) {
   const r = await fetch(`${ROOT()}/${col}`, { method: 'POST', headers: H(tok), body: JSON.stringify({ fields: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, enc(v)])) }) });
   if (!r.ok) throw new Error(`create ${col} ${r.status}`);
@@ -111,4 +117,4 @@ async function notifyCompanyUser(tok, cid, email, msg) {
     return await pushSubs(tok, subs, msg);
   } catch (e) { return 0; }
 }
-module.exports = { get, list, patch, create, whoIs, sys, mail, esc, btn, notifyStaff, notifyCompanyUser, SUPER, APP, SITE };
+module.exports = { get, list, patch, upsert, create, whoIs, sys, mail, esc, btn, notifyStaff, notifyCompanyUser, SUPER, APP, SITE };

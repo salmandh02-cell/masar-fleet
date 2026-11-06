@@ -131,7 +131,7 @@ dl.kv dt{font-size:12px;color:var(--muted)}dl.kv dd{margin:0;font-weight:500;wor
       <form id="setf"><div class="form-grid" id="setg"></div>
         <div style="padding:0 14px"><h3 style="margin:8px 0">الباقات <small style="color:var(--muted);font-weight:400">تظهر في الصفحة التعريفية، وتُختار عند الاعتماد والتفعيل والفوترة. اتركها فارغة للتسعير الموحّد أعلاه.</small></h3>
           <div class="g2" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:8px"><label style="display:grid;gap:5px;font-size:13px;color:var(--muted)">خصم الدفع السنوي %<input name="yearlyDiscount" type="number" min="0" max="50" style="font:inherit;padding:8px;border:1px solid var(--line);border-radius:9px;width:120px"></label><button type="button" class="btn" id="addPlan">+ إضافة باقة</button></div>
-          <div class="tw"><table class="mini" style="min-width:900px"><thead><tr><th>الاسم</th><th>ريال/سيارة/شهر</th><th>الحد الأدنى الشهري</th><th>أقصى سيارات</th><th>أقصى مستخدمين</th><th>المزايا (سطر لكل ميزة)</th><th>مميّزة</th><th>فعّالة</th><th></th></tr></thead><tbody id="plrows"></tbody></table></div></div>
+          <div class="tw"><table class="mini" style="min-width:900px"><thead><tr><th>الاسم</th><th>ريال/سيارة/شهر</th><th>الحد الأدنى الشهري</th><th>أقصى سيارات</th><th>أقصى مستخدمين</th><th>المزايا (سطر لكل ميزة)</th><th>ذكاء اصطناعي</th><th>مميّزة</th><th>فعّالة</th><th></th></tr></thead><tbody id="plrows"></tbody></table></div></div>
         <div style="padding:14px"><button class="btn pri">حفظ الإعدادات</button></div></form>
     </section>
   </main>
@@ -180,9 +180,10 @@ const LTR = new Set(['crNumber', 'unifiedNumber', 'vatNumber', 'buildingNo', 'po
 const DOCK = { cr: 'السجل التجاري', vat: 'شهادة ضريبة القيمة المضافة', address: 'شهادة العنوان الوطني', other: 'مستند آخر', receipt: 'إيصال تحويل' };
 const SET_F = [['sellerName', 'اسم شركة النظام (البائع)'], ['sellerNameEn', 'الاسم بالإنجليزية'], ['vatNumber', 'الرقم الضريبي'], ['crNumber', 'السجل التجاري'], ['address', 'العنوان'], ['phone', 'الهاتف'], ['email', 'البريد'],
   ['bankName', 'البنك'], ['iban', 'رقم الآيبان (IBAN)'], ['pricePerVehicle', 'سعر السيارة شهرياً (ريال، قبل الضريبة)'], ['minMonthly', 'الحد الأدنى الشهري (ريال)'], ['vatRate', 'نسبة الضريبة %'], ['invoiceNote', 'ملاحظة أسفل الفاتورة'],
-  ['graceDays', 'مهلة السماح بعد انتهاء الاشتراك المدفوع (أيام)'], ['autoSuspend', 'الإيقاف التلقائي عند الانتهاء (on / off)'], ['moyasarPk', 'مفتاح ميسر العام (Publishable key)']];
+  ['graceDays', 'مهلة السماح بعد انتهاء الاشتراك المدفوع (أيام)'], ['autoSuspend', 'الإيقاف التلقائي عند الانتهاء (on / off)'], ['moyasarPk', 'مفتاح ميسر العام (Publishable key)'],
+  ['aiEnabled', 'الذكاء الاصطناعي للشركات (on / off)'], ['aiDaily', 'حد طلبات الذكاء الاصطناعي اليومي لكل شركة']];
 // تُنشر للعامة (الصفحة التعريفية والفواتير وصفحة الدفع). لا تضع هنا أي مفتاح سري
-const PUBLIC_F = ['sellerName', 'sellerNameEn', 'vatNumber', 'crNumber', 'address', 'phone', 'email', 'bankName', 'iban', 'pricePerVehicle', 'minMonthly', 'vatRate', 'invoiceNote', 'moyasarPk'];
+const PUBLIC_F = ['sellerName', 'sellerNameEn', 'vatNumber', 'crNumber', 'address', 'phone', 'email', 'bankName', 'iban', 'pricePerVehicle', 'minMonthly', 'vatRate', 'invoiceNote', 'moyasarPk', 'aiEnabled'];
 // الباقات: تُعرّف في الإعدادات وتُنسخ حدودها إلى وثيقة الشركة عند الاعتماد أو التفعيل
 const PLANS = () => (SET.plans || []).filter(p => p && p.name);
 const planOf = id => PLANS().find(p => p.id === id);
@@ -643,8 +644,15 @@ function renderReports() {
       <div style="display:flex;align-items:flex-end;gap:6px;height:200px;padding:16px 14px 8px;overflow-x:auto">${byM.map(([m, v]) => `<div style="flex:1;min-width:34px;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end" title="${m}: ${money(v)}"><small style="font-size:11px;color:var(--muted)">${v ? Math.round(v).toLocaleString('en-US') : ''}</small><div style="width:100%;max-width:38px;height:${Math.max(v ? 4 : 1, v / max * 150)}px;background:${m === mon ? 'var(--acc)' : '#7FB5A2'};border-radius:5px 5px 0 0"></div><small style="font-size:11px;color:var(--muted)">${m.slice(5)}/${m.slice(2, 4)}</small></div>`).join('')}</div></div>
     <div class="panel"><div class="bar"><h3 style="flex:1">فواتير متأخرة السداد</h3></div><div class="tw"><table><thead><tr><th>الفاتورة</th><th>الشركة</th><th>الاستحقاق</th><th>التأخير</th><th>المبلغ</th></tr></thead><tbody>${overdue.length ? overdue.map(i => `<tr><td dir="ltr" style="text-align:right">${esc(i.number)}</td><td>${esc(i.companyName)}</td><td>${fmt(i.dueDate)}</td><td>${Math.round((Date.parse(t) - Date.parse(i.dueDate)) / 864e5)} يوم</td><td>${money(i.total)}</td></tr>`).join('') : '<tr><td colspan="5" class="empty">لا توجد فواتير متأخرة</td></tr>'}</tbody></table></div></div>
     <div class="panel"><div class="bar"><h3 style="flex:1">تنتهي خلال 14 يوماً</h3></div><div class="tw"><table><thead><tr><th>الشركة</th><th>النوع</th><th>تنتهي في</th><th>السيارات</th></tr></thead><tbody>${ending.length ? ending.map(({ c, end }) => `<tr class="click" data-id="${esc(c.id)}"><td>${esc(c.name)}</td><td>${c.status === 'trial' ? 'تجربة' : 'اشتراك'}</td><td>${end}</td><td>${c.vehicles ?? '—'}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">لا يوجد</td></tr>'}</tbody></table></div></div>`;
+  if (AIU === null) { AIU = []; F.getDocs(F.query(F.collection(fs, 'aiuse'), F.where('day', '>=', mon + '-01'))).then(q => { AIU = q.docs.map(d => d.data()); if (TAB === 'reports') renderReports(); }).catch(() => {}); }
+  const aiBy = {}; AIU.forEach(u => { const x = aiBy[u.cid] || (aiBy[u.cid] = { n: 0, scan: 0, ask: 0, ti: 0, to: 0 }); x.n += +u.n || 0; x.scan += +u.scan || 0; x.ask += +u.ask || 0; x.ti += +u.tokensIn || 0; x.to += +u.tokensOut || 0; });
+  const aiRows = Object.entries(aiBy).sort((a, b) => b[1].n - a[1].n);
+  // تقدير التكلفة بأسعار Claude Opus 5.5 ($4 / $20 لكل مليون رمز) وسعر صرف 3.75
+  const aiCost = x => (x.ti * 4 + x.to * 20) / 1e6 * 3.75;
+  box.insertAdjacentHTML('beforeend', `<div class="panel"><div class="bar"><h3 style="flex:1">استخدام الذكاء الاصطناعي هذا الشهر</h3><small style="color:var(--muted)">التكلفة تقديرية بالريال</small></div><div class="tw"><table><thead><tr><th>الشركة</th><th>الطلبات</th><th>قراءة مستندات</th><th>أسئلة المساعد</th><th>التكلفة التقديرية</th></tr></thead><tbody>${aiRows.length ? aiRows.map(([cid, x]) => `<tr class="click" data-id="${esc(cid)}"><td>${esc((COS.find(c => c.id === cid) || {}).name || cid)}</td><td>${x.n}</td><td>${x.scan}</td><td>${x.ask}</td><td>${money(aiCost(x))}</td></tr>`).join('') + `<tr><td><b>الإجمالي</b></td><td><b>${aiRows.reduce((s, [, x]) => s + x.n, 0)}</b></td><td></td><td></td><td><b>${money(aiRows.reduce((s, [, x]) => s + aiCost(x), 0))}</b></td></tr>` : `<tr><td colspan="5" class="empty">لا يوجد استخدام هذا الشهر</td></tr>`}</tbody></table></div></div>`);
   box.querySelectorAll('tr[data-id]').forEach(r => r.onclick = () => openFile(r.dataset.id));
 }
+let AIU = null;
 
 /* ---------- سجل النشاط ---------- */
 let LOGS = [];
@@ -665,17 +673,17 @@ const plInp = (i, k, v, t = 'text', w = 90) => `<input data-pl="${i}" data-k="${
 function renderPlans() {
   $('#plrows').innerHTML = PL_EDIT.length ? PL_EDIT.map((p, i) => `<tr><td>${plInp(i, 'name', p.name, 'text', 120)}</td><td>${plInp(i, 'pricePerVehicle', p.pricePerVehicle, 'number')}</td><td>${plInp(i, 'minMonthly', p.minMonthly, 'number')}</td><td>${plInp(i, 'maxVehicles', p.maxVehicles, 'number', 80)}</td><td>${plInp(i, 'maxUsers', p.maxUsers, 'number', 80)}</td>
     <td><textarea data-pl="${i}" data-k="features" rows="2" style="font:inherit;font-size:13px;padding:6px;border:1px solid var(--line);border-radius:8px;width:220px">${esc(p.features || '')}</textarea></td>
-    <td><input type="radio" name="featured" data-pl="${i}" data-k="featured" ${p.featured ? 'checked' : ''}></td><td><input type="checkbox" data-pl="${i}" data-k="active" ${p.active !== false ? 'checked' : ''}></td><td><button type="button" class="btn bad" data-plrm="${i}">حذف</button></td></tr>`).join('')
-    : `<tr><td colspan="9" class="empty" style="padding:12px">لا توجد باقات: يُستخدم سعر السيارة الموحّد أعلاه. أقترح ثلاث باقات: أساسية، احترافية، مؤسسات.</td></tr>`;
+    <td><input type="checkbox" data-pl="${i}" data-k="ai" ${p.ai ? 'checked' : ''}></td><td><input type="radio" name="featured" data-pl="${i}" data-k="featured" ${p.featured ? 'checked' : ''}></td><td><input type="checkbox" data-pl="${i}" data-k="active" ${p.active !== false ? 'checked' : ''}></td><td><button type="button" class="btn bad" data-plrm="${i}">حذف</button></td></tr>`).join('')
+    : `<tr><td colspan="10" class="empty" style="padding:12px">لا توجد باقات: يُستخدم سعر السيارة الموحّد أعلاه. أقترح ثلاث باقات: أساسية، احترافية، مؤسسات.</td></tr>`;
 }
 $('#addPlan').onclick = () => { if (!PL_EDIT.length) PL_EDIT = [
     { id: 'basic', name: 'الأساسية', pricePerVehicle: 25, minMonthly: 250, maxVehicles: 20, maxUsers: 3, features: 'السيارات والسائقون والعهد\nالفحص الأسبوعي\nالتنبيهات', active: true },
-    { id: 'pro', name: 'الاحترافية', pricePerVehicle: 35, minMonthly: 500, maxVehicles: 100, maxUsers: 10, features: 'كل مزايا الأساسية\nالوقود وكشف التلاعب\nكشف الخصومات للموارد البشرية\nالفروع ومشرفو الفروع', featured: true, active: true },
-    { id: 'ent', name: 'المؤسسات', pricePerVehicle: 30, minMonthly: 2500, maxVehicles: 0, maxUsers: 0, features: 'كل المزايا\nسيارات ومستخدمون بلا حدود\nمدير حساب مخصص\nتدريب للفريق', active: true }].map(p => ({ ...p, features: p.features.replace(/\\n/g, '\n') }));
+    { id: 'pro', name: 'الاحترافية', pricePerVehicle: 35, minMonthly: 500, maxVehicles: 100, maxUsers: 10, features: 'كل مزايا الأساسية\nالوقود وكشف التلاعب\nكشف الخصومات للموارد البشرية\nالفروع ومشرفو الفروع\nالذكاء الاصطناعي: قراءة المستندات بالتصوير والمساعد الذكي', featured: true, ai: true, active: true },
+    { id: 'ent', name: 'المؤسسات', pricePerVehicle: 30, minMonthly: 2500, maxVehicles: 0, maxUsers: 0, features: 'كل المزايا\nسيارات ومستخدمون بلا حدود\nمدير حساب مخصص\nتدريب للفريق\nالذكاء الاصطناعي بحد أعلى', ai: true, active: true }].map(p => ({ ...p, features: p.features.replace(/\\n/g, '\n') }));
   else PL_EDIT.push({ id: 'p' + Date.now().toString(36), name: '', pricePerVehicle: '', minMonthly: '', maxVehicles: '', maxUsers: '', features: '', active: true });
   renderPlans(); };
 $('#plrows').oninput = $('#plrows').onchange = e => { const t = e.target; if (t.dataset.pl == null) return; const p = PL_EDIT[+t.dataset.pl];
-  if (t.dataset.k === 'featured') PL_EDIT.forEach((x, j) => x.featured = j === +t.dataset.pl); else if (t.dataset.k === 'active') p.active = t.checked; else p[t.dataset.k] = t.type === 'number' ? (t.value === '' ? '' : +t.value) : t.value; };
+  if (t.dataset.k === 'featured') PL_EDIT.forEach((x, j) => x.featured = j === +t.dataset.pl); else if (t.dataset.k === 'active' || t.dataset.k === 'ai') p[t.dataset.k] = t.checked; else p[t.dataset.k] = t.type === 'number' ? (t.value === '' ? '' : +t.value) : t.value; };
 $('#plrows').onclick = e => { const b = e.target.closest('[data-plrm]'); if (b && confirm('حذف الباقة؟ الشركات المشتركة فيها تحتفظ بحدودها الحالية.')) { PL_EDIT.splice(+b.dataset.plrm, 1); renderPlans(); } };
 function renderSettings() {
   PL_EDIT = JSON.parse(JSON.stringify(SET.plans || [])); renderPlans(); $('#setf').yearlyDiscount.value = SET.yearlyDiscount ?? '';
@@ -685,7 +693,9 @@ $('#setf').onsubmit = async e => { e.preventDefault(); const fd = new FormData(e
   if (d.vatNumber && !/^3\d{13}3$/.test(d.vatNumber)) return toast('الرقم الضريبي 15 رقماً يبدأ وينتهي بـ 3');
   if (d.moyasarPk && !/^pk_(test|live)_/.test(d.moyasarPk)) return toast('مفتاح ميسر العام يبدأ بـ pk_live_ أو pk_test_ (لا تضع المفتاح السري هنا)');
   if (d.autoSuspend && !['on', 'off'].includes(d.autoSuspend)) return toast('الإيقاف التلقائي: on أو off');
-  const plans = PL_EDIT.filter(p => String(p.name || '').trim()).map(p => ({ id: p.id || ('p' + Date.now().toString(36)), name: String(p.name).trim(), pricePerVehicle: +p.pricePerVehicle || 0, minMonthly: +p.minMonthly || 0, maxVehicles: +p.maxVehicles || 0, maxUsers: +p.maxUsers || 0, features: String(p.features || '').trim(), featured: !!p.featured, active: p.active !== false }));
+  if (d.aiEnabled && !['on', 'off'].includes(d.aiEnabled)) return toast('الذكاء الاصطناعي: on أو off');
+  if (d.aiDaily && !(+d.aiDaily > 0)) return toast('حد الذكاء الاصطناعي اليومي رقم أكبر من صفر');
+  const plans = PL_EDIT.filter(p => String(p.name || '').trim()).map(p => ({ id: p.id || ('p' + Date.now().toString(36)), name: String(p.name).trim(), pricePerVehicle: +p.pricePerVehicle || 0, minMonthly: +p.minMonthly || 0, maxVehicles: +p.maxVehicles || 0, maxUsers: +p.maxUsers || 0, features: String(p.features || '').trim(), featured: !!p.featured, ai: !!p.ai, active: p.active !== false }));
   if (plans.some(p => !p.pricePerVehicle)) return toast('حدد سعر السيارة لكل باقة');
   d.plans = plans; d.yearlyDiscount = Math.max(0, Math.min(50, +fd.get('yearlyDiscount') || 0));
   try { await F.setDoc(F.doc(fs, 'platform', 'settings'), { ...d, updatedAt: nowIso() }, { merge: true }); SET = { ...SET, ...d };
