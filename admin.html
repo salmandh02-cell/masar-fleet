@@ -133,6 +133,7 @@ dl.kv dt{font-size:12px;color:var(--muted)}dl.kv dd{margin:0;font-weight:500;wor
           <div class="g2" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:8px"><label style="display:grid;gap:5px;font-size:13px;color:var(--muted)">خصم الدفع السنوي %<input name="yearlyDiscount" type="number" min="0" max="50" style="font:inherit;padding:8px;border:1px solid var(--line);border-radius:9px;width:120px"></label><button type="button" class="btn" id="addPlan">+ إضافة باقة</button></div>
           <div class="tw"><table class="mini" style="min-width:900px"><thead><tr><th>الاسم</th><th>ريال/سيارة/شهر</th><th>الحد الأدنى الشهري</th><th>أقصى سيارات</th><th>أقصى مستخدمين</th><th>المزايا (سطر لكل ميزة)</th><th>ذكاء اصطناعي</th><th>مميّزة</th><th>فعّالة</th><th></th></tr></thead><tbody id="plrows"></tbody></table></div></div>
         <div style="padding:14px"><button class="btn pri">حفظ الإعدادات</button></div></form>
+      <div id="bkBox" style="padding:0 14px 14px"></div>
     </section>
   </main>
 </div>
@@ -685,7 +686,23 @@ $('#addPlan').onclick = () => { if (!PL_EDIT.length) PL_EDIT = [
 $('#plrows').oninput = $('#plrows').onchange = e => { const t = e.target; if (t.dataset.pl == null) return; const p = PL_EDIT[+t.dataset.pl];
   if (t.dataset.k === 'featured') PL_EDIT.forEach((x, j) => x.featured = j === +t.dataset.pl); else if (t.dataset.k === 'active' || t.dataset.k === 'ai') p[t.dataset.k] = t.checked; else p[t.dataset.k] = t.type === 'number' ? (t.value === '' ? '' : +t.value) : t.value; };
 $('#plrows').onclick = e => { const b = e.target.closest('[data-plrm]'); if (b && confirm('حذف الباقة؟ الشركات المشتركة فيها تحتفظ بحدودها الحالية.')) { PL_EDIT.splice(+b.dataset.plrm, 1); renderPlans(); } };
+// النسخ الاحتياطي اليومي (مالك المنصة فقط)
+async function renderBackup() {
+  const box = $('#bkBox'); if (!box) return; if (!ME.super) { box.innerHTML = ''; return; }
+  let b = {}; try { const d = await F.getDoc(F.doc(fs, 'platform', 'backup')); b = d.exists() ? d.data() : {}; } catch (e) {}
+  const when = b.lastAt ? new Date(b.lastAt).toLocaleString('ar-SA-u-nu-latn', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+  box.innerHTML = `<h3 style="margin:8px 0">النسخ الاحتياطي</h3><div style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px;font-size:14px">
+    ${b.lastAt ? `<div>آخر نسخة ناجحة: <b>${esc(when)}</b> <small style="color:var(--muted)" dir="ltr">${esc(b.path || '')}</small></div>` : '<div>لم تُؤخذ نسخة احتياطية بعد.</div>'}
+    ${b.ok === false && b.error ? `<div style="color:var(--bad,#B42318)">آخر محاولة فشلت: ${esc(b.error)}</div>` : ''}
+    <div style="color:var(--muted)">تُؤخذ نسخة كاملة تلقائياً كل يوم الساعة 2 فجراً، وتُحفظ آخر 30 يوماً، وتُستعاد عند الحاجة بأداة الاستيراد في Google Cloud.</div>
+    <div><button type="button" class="btn" id="bkNow">نسخة احتياطية الآن</button> <span id="bkMsg" style="font-size:13px"></span></div></div>`;
+  $('#bkNow').onclick = async () => { const m = $('#bkMsg'); $('#bkNow').disabled = true; m.textContent = 'جارٍ البدء…';
+    try { const t = await auth.currentUser.getIdToken(); const r = await (await fetch('/.netlify/functions/backup', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t }, body: '{}' })).json();
+      m.textContent = r.ok ? 'بدأت النسخة ✓ تكتمل خلال دقائق' : r.error === 'not-configured' ? 'النسخ الاحتياطي غير مُعدّ بعد (حساب الخدمة والحاوية في Netlify)' : 'تعذر: ' + (r.error || ''); if (r.ok) setTimeout(renderBackup, 1500); }
+    catch (e) { m.textContent = 'تعذر الاتصال'; } finally { $('#bkNow').disabled = false; } };
+}
 function renderSettings() {
+  renderBackup();
   PL_EDIT = JSON.parse(JSON.stringify(SET.plans || [])); renderPlans(); $('#setf').yearlyDiscount.value = SET.yearlyDiscount ?? '';
   $('#setg').innerHTML = SET_F.map(([k, l]) => `<label>${l}${k === 'invoiceNote' || k === 'address' ? `<textarea name="${k}" rows="2">${esc(SET[k] || '')}</textarea>` : `<input name="${k}" value="${esc(SET[k] ?? (k === 'vatRate' ? 15 : ''))}" ${['vatNumber', 'crNumber', 'phone', 'email', 'iban', 'sellerNameEn', 'pricePerVehicle', 'minMonthly', 'vatRate'].includes(k) ? 'dir="ltr"' : ''}>`}</label>`).join('');
 }

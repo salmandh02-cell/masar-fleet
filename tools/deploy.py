@@ -15,7 +15,7 @@ FILES = ['index.html', 'admin.html', 'fb.js', 'sw.js', 'config.js', 'qr.js', 'i1
          'welcome.html', 'privacy.html', 'terms.html', 'pay.html', 'invoice.js', 'moyasar.js', 'moyasar.css']
 # الدوال المجمّعة: python3 tools/deploy.py build/push.js build/remind.js
 BUNDLES = sys.argv[1:]
-SCHEDULES = {'remind': '0 4,5,6 * * *'}  # 7 و8 و9 صباحاً بتوقيت الرياض
+SCHEDULES = {'remind': '0 4,5,6 * * *', 'backup-daily': '0 23 * * *'}  # التذكيرات 7 و8 و9 صباحاً، والنسخ الاحتياطي 2 فجراً بتوقيت الرياض
 
 def api(method, path, body=None, ctype='application/json'):
     data = body if isinstance(body, (bytes, type(None))) else json.dumps(body).encode()
