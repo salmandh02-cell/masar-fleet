@@ -12,7 +12,7 @@ if not TOKEN or not SITE: raise SystemExit('NETLIFY_AUTH_TOKEN and NETLIFY_SITE_
 # حماية: لا يُنشر نظام SaaS فوق موقع منهل الحالي
 if SITE == 'b77a682e-f03d-4456-b363-340daaab3764': raise SystemExit('refusing to deploy over the live Manhal site')
 FILES = ['index.html', 'admin.html', 'fb.js', 'sw.js', 'config.js', 'qr.js', 'i18n.js', 'manifest.json', 'icon.svg', 'icon-192.png', 'icon-512.png', '_redirects',
-         'welcome.html', 'privacy.html', 'terms.html', 'pay.html', 'invoice.js', 'moyasar.js', 'moyasar.css']
+         'welcome.html', 'hero-fleet.svg', 'privacy.html', 'terms.html', 'pay.html', 'invoice.js', 'moyasar.js', 'moyasar.css']
 # الدوال المجمّعة: python3 tools/deploy.py build/push.js build/remind.js
 BUNDLES = sys.argv[1:]
 SCHEDULES = {'remind': '0 4,5,6 * * *', 'backup-daily': '0 23 * * *'}  # التذكيرات 7 و8 و9 صباحاً، والنسخ الاحتياطي 2 فجراً بتوقيت الرياض

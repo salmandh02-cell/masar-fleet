@@ -208,8 +208,12 @@ ok(res.suspended.includes('cexp-old'), 'أُوقفت الشركة المنتهي
 const res2 = await daily.run(stok); ok(res2.notices === 0, 'لا يتكرر التنبيه في نفس اليوم');
 
 console.log('١٣) الصفحة التعريفية');
-const v = await newPage(1280); await v.goto(B); await v.waitForURL(/welcome\.html/, { timeout: 15000 }); ok(true, 'الزائر يُحوَّل للصفحة التعريفية');
-await v.waitForTimeout(1500); ok((await v.textContent('#plans')).includes('30'), 'السعر من إعدادات المنصة');
+const v = await newPage(1280); await v.goto(B); await v.waitForSelector('#auth.land #auth-slot #af', { timeout: 15000 }); ok(true, 'الزائر يرى صفحة الدخول التعريفية مع خانات الدخول');
+ok(await v.locator('#lp-ba .lp-col.bef li').count() === 5 && await v.locator('#lp-offer .lp-feat').count() === 9, 'أقسام قبل وبعد وماذا نقدم ظاهرة');
+await v.click('.lp-top [data-go=co]'); await v.waitForSelector('#auth-slot #cf'); ok(true, 'زر «سجّل شركتك» يفتح نموذج التسجيل في نفس الصفحة');
+await v.click('.lp-top [data-go=login]'); await v.waitForSelector('#auth-slot #af');
+const lm = await newPage(390); await lm.goto(B); await lm.waitForSelector('#auth-slot #af'); ok(await lm.evaluate(() => document.getElementById('auth').scrollWidth <= 392), 'صفحة الدخول بلا تمرير أفقي على الجوال');
+await v.goto(B + 'welcome.html'); await v.waitForTimeout(1500); ok((await v.textContent('#plans')).includes('30'), 'السعر من إعدادات المنصة');
 await v.screenshot({ path: SHOTS + '/15-welcome.png', fullPage: true });
 await v.goto(B + 'privacy.html'); await v.waitForTimeout(800); ok((await v.textContent('main')).includes('شركة النظام للتقنية'), 'الخصوصية تعرض اسم المشغّل');
 const vm = await newPage(390); await vm.goto(B + 'welcome.html'); await vm.waitForTimeout(1200); await vm.screenshot({ path: SHOTS + '/16-welcome-mobile.png', fullPage: false });

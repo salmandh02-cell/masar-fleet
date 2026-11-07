@@ -42,7 +42,64 @@ const AUTH_CSS = `
 #auth p{margin:0;line-height:1.7;font-size:14px}
 .lang-pick{display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
 .lang-pick button{font:500 13px "IBM Plex Sans Arabic",system-ui,sans-serif;padding:6px 12px;min-height:34px;border-radius:17px;border:1px solid var(--line,#D6DDD9);background:transparent;color:inherit;cursor:pointer}
-.lang-pick button.on{background:var(--acc,#0E5A44);border-color:var(--acc,#0E5A44);color:#fff}`;
+.lang-pick button.on{background:var(--acc,#0E5A44);border-color:var(--acc,#0E5A44);color:#fff}
+#auth.land{display:block;place-items:normal;overflow-y:auto;padding:0;background:#F5F3EE;color:#15201B;scroll-behavior:smooth}
+#auth.land .lp-w{max-width:1180px;margin:0 auto;padding:0 20px}
+#auth.land .lp-top{position:sticky;top:0;z-index:5;background:#0B3F30;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+#auth.land .lp-top .lp-w{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px}
+#auth.land .lp-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;min-width:0}
+#auth.land .lp-brand b{font:700 18px var(--f-display,"Readex Pro",sans-serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#auth.land .lp-brand .mk{border-color:#C9A227;color:#C9A227}
+#auth.land .lp-top nav{display:flex;align-items:center;gap:16px}
+#auth.land .lp-top nav>a{color:rgba(255,255,255,.8);text-decoration:none;font-size:15px}
+#auth.land .lp-top nav>a:hover{color:#fff}
+#auth.land .lp-top .lang-pick button{border-color:rgba(255,255,255,.3);color:#fff;min-height:30px;padding:4px 10px}
+#auth.land .lp-top .lang-pick button.on{background:rgba(255,255,255,.18);border-color:transparent}
+#auth.land .lp-btn{font:600 15px var(--f-body,"IBM Plex Sans Arabic",sans-serif);padding:9px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;cursor:pointer;white-space:nowrap}
+#auth.land .lp-btn.gold{background:#C9A227;border-color:#C9A227;color:#1b1405}
+#auth.land .lp-hero{position:relative;color:#fff;padding:64px 0 72px;min-height:620px;background:linear-gradient(270deg,rgba(6,42,32,.94) 0%,rgba(6,42,32,.82) 42%,rgba(6,42,32,.45) 100%),#0B3F30 url(hero-fleet.svg) center/cover no-repeat}
+#auth.land[dir=ltr] .lp-hero{background:linear-gradient(90deg,rgba(6,42,32,.94) 0%,rgba(6,42,32,.82) 42%,rgba(6,42,32,.45) 100%),#0B3F30 url(hero-fleet.svg) center/cover no-repeat}
+#auth.land .lp-hgrid{display:grid;grid-template-columns:1fr 420px;gap:56px;align-items:center}
+#auth.land .lp-kick{display:inline-block;font-size:14px;color:#C9A227;border:1px solid rgba(201,162,39,.5);border-radius:20px;padding:4px 14px;margin-bottom:18px}
+#auth.land .lp-copy h1{font:700 clamp(30px,4.2vw,50px)/1.3 var(--f-display,"Readex Pro",sans-serif);margin:0 0 16px}
+#auth.land .lp-copy p{font-size:18px;line-height:1.8;color:rgba(255,255,255,.88);max-width:560px;margin:0 0 26px}
+#auth.land .lp-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
+#auth.land .lp-chips li{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(6px);border-radius:12px;padding:8px 14px;font-size:15px}
+#auth.land .lp-chips svg{color:#C9A227;width:20px;height:20px}
+#auth.land #auth-slot .card{width:100%;color:#15201B}
+#auth.land .lp-mpick{display:none}
+#auth.land .lp-sec{padding:76px 0}#auth.land .lp-sec.alt{background:#fff}
+#auth.land .lp-t{font:700 32px var(--f-display,"Readex Pro",sans-serif);text-align:center;margin:0 0 8px}
+#auth.land .lp-st{text-align:center;color:#5A6862;margin:0 auto 40px;max-width:620px;font-size:17px}
+#auth.land .lp-ba{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+#auth.land .lp-col{border-radius:18px;padding:28px;background:#fff;border:1px solid #E2DED3}
+#auth.land .lp-col.aft{background:#0B3F30;color:#fff;border-color:#0B3F30}
+#auth.land .lp-col h3{margin:0 0 16px;font:700 22px var(--f-display,"Readex Pro",sans-serif)}
+#auth.land .lp-col.bef h3{color:#B42318}#auth.land .lp-col.aft h3{color:#C9A227}
+#auth.land .lp-col ul{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+#auth.land .lp-col li{display:flex;gap:12px;align-items:flex-start;font-size:16px;line-height:1.7}
+#auth.land .lp-col li svg{flex:none;width:22px;height:22px;margin-top:3px;border-radius:50%;padding:3px}
+#auth.land .lp-col.bef li svg{background:#FDE7E5;color:#B42318}#auth.land .lp-col.aft li svg{background:rgba(61,214,140,.18);color:#3DD68C}
+#auth.land .lp-feats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+#auth.land .lp-feat{border:1px solid #E2DED3;border-radius:16px;padding:22px;background:#F9F8F4}
+#auth.land .lp-feat i{display:grid;place-items:center;width:46px;height:46px;border-radius:12px;background:#E3EFE9;color:#0E5A44}
+#auth.land .lp-feat h3{margin:14px 0 6px;font:600 18px var(--f-display,"Readex Pro",sans-serif)}
+#auth.land .lp-feat p{margin:0;color:#5A6862;font-size:15px}
+#auth.land .lp-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:s}
+#auth.land .lp-steps li{background:#fff;border:1px solid #E2DED3;border-radius:16px;padding:22px;display:grid;gap:4px}
+#auth.land .lp-steps li::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#0E5A44;color:#fff;font-weight:700;margin-bottom:8px}
+#auth.land .lp-steps b{font:600 18px var(--f-display,"Readex Pro",sans-serif)}#auth.land .lp-steps span{color:#5A6862;font-size:15px}
+#auth.land .lp-cta{background:#0B3F30 url(hero-fleet.svg) center/cover;border-radius:22px;padding:48px 24px;text-align:center;color:#fff;box-shadow:inset 0 0 0 2000px rgba(6,42,32,.82)}
+#auth.land .lp-cta h2{margin:0 0 8px;font:700 30px var(--f-display,"Readex Pro",sans-serif)}#auth.land .lp-cta p{font-size:17px;margin:0 0 22px;color:rgba(255,255,255,.88)}
+#auth.land .lp-foot{border-top:1px solid #E2DED3;padding:26px 0;color:#5A6862;font-size:14px}
+#auth.land .lp-foot .lp-w{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}#auth.land .lp-foot a{color:#5A6862}#auth.land .lp-foot .lp-w>span:last-child{display:flex;gap:8px 18px;flex-wrap:wrap}
+@media (max-width:980px){#auth.land .lp-feats{grid-template-columns:1fr 1fr}#auth.land .lp-steps{grid-template-columns:1fr 1fr}#auth.land .lp-hide{display:none}}
+@media (max-width:860px){#auth.land .lp-hgrid{grid-template-columns:1fr;gap:24px}#auth.land .lp-hero{min-height:0;padding:32px 0 40px;background:linear-gradient(rgba(6,42,32,.86),rgba(6,42,32,.86)),#0B3F30 url(hero-fleet.svg) 60% center/cover no-repeat}
+  #auth.land .lp-copy p{font-size:16px;margin-bottom:0}#auth.land .lp-chips{display:none}#auth.land .lp-kick{margin-bottom:12px}
+  #auth.land .lp-ba{grid-template-columns:1fr}#auth.land .lp-sec{padding:52px 0}#auth.land .lp-t{font-size:26px}}
+@media (max-width:560px){#auth.land .lp-feats,#auth.land .lp-steps{grid-template-columns:1fr}#auth.land .lp-top .lp-w{min-height:56px}#auth.land .lp-brand b{font-size:15px}
+  #auth.land .lp-top nav{gap:8px}#auth.land .lp-top .lang-pick{display:none}#auth.land .lp-mpick{display:block}#auth.land .lp-btn{padding:7px 12px;font-size:14px}#auth.land .lp-btn.gold{display:none}#auth.land .lp-cta .lp-btn.gold{display:inline-block}
+  #auth.land .lp-copy h1{font-size:26px}}`;
 const ERR = {
   'auth/invalid-credential': 'الإيميل أو كلمة المرور غير صحيحة', 'auth/wrong-password': 'كلمة المرور غير صحيحة', 'auth/user-not-found': 'لا يوجد حساب بهذا الإيميل',
   'auth/invalid-email': 'الإيميل غير صحيح', 'auth/email-already-in-use': 'يوجد حساب بهذا الإيميل – سجّل الدخول', 'auth/weak-password': 'كلمة المرور قصيرة (6 أحرف على الأقل)',
@@ -59,15 +116,94 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 function authRoot() {
   let r = document.getElementById('auth');
   if (!r) { const st = document.createElement('style'); st.textContent = AUTH_CSS; document.head.appendChild(st); r = document.createElement('div'); r.id = 'auth'; document.body.appendChild(r); }
+  if (!r.dataset.go) { r.dataset.go = '1'; r.addEventListener('click', e => {
+    const g = e.target.closest('[data-go]'); if (!g || !AUTH_GO[g.dataset.go]) return; e.preventDefault(); AUTH_GO[g.dataset.go]();
+    const sl = document.getElementById('auth-slot'); if (sl) { r.scrollTo({ top: 0, behavior: 'smooth' }); if (innerWidth < 860) setTimeout(() => sl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60); } }); }
   r.hidden = false; return r;
 }
 const T = (s, v) => (window.I18N ? window.I18N.t(s, v) : s);
 let lastShow = null;
+/* صفحة الدخول: تظهر كصفحة تعريفية كاملة للزائر غير المسجّل، وكبطاقة فقط بعد الدخول */
+let AUTH_REF = null, AUTH_GO = {};
+const IC = {
+  car: '<path d="M3 13l2-5.5A2 2 0 0 1 6.9 6h10.2a2 2 0 0 1 1.9 1.5L21 13v5h-2.5M5.5 18H3v-5h18"/><circle cx="7.5" cy="16.5" r="1.8"/><circle cx="16.5" cy="16.5" r="1.8"/>',
+  sign: '<path d="M4 20h16M6 16l9.5-9.5a2.1 2.1 0 0 1 3 3L9 19H6z"/>',
+  cam: '<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  wrench: '<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-2-2z"/>',
+  fuel: '<path d="M5 20V5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v15M4 20h11M5 10h9M14 8l3 2v7a1.5 1.5 0 0 0 3 0V9l-3-3"/>',
+  ticket: '<path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M10 7v10" stroke-dasharray="2 2"/>',
+  users: '<circle cx="9" cy="8" r="3"/><path d="M3 19c0-3.3 2.7-5 6-5s6 1.7 6 5M16 5.5a3 3 0 0 1 0 5.5M18 14c2 .6 3 2.2 3 5"/>',
+  chart: '<path d="M4 20V4M4 20h16M8 16v-4M12 16V8M16 16v-6"/>',
+  spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',
+  bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/>',
+  x: '<path d="M7 7l10 10M17 7L7 17"/>', ok: '<path d="M5 12.5l4.5 4.5L19 7.5"/>'
+};
+const ic = n => `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
+function landingHTML() {
+  const ar = !window.I18N || window.I18N.ui === 'ar';
+  const name = esc(APP_NAME || T('نظام أسطول الشركة'));
+  const BA = [
+    ['السيارات في جداول Excel وأوراق متفرقة، ولكل موظف نسخته الخاصة', 'ملف إلكتروني لكل سيارة بوثائقها وصورها وسجلها الكامل'],
+    ['تنتهي الاستمارة أو التأمين أو رخصة السائق دون أن ينتبه أحد', 'تنبيه على الجوال قبل الانتهاء بأيام، مرتّب حسب الأولوية'],
+    ['تصل المخالفة ولا يُعرف من كان يقود السيارة يومها', 'كل مخالفة تُربط بسائقها تلقائياً من سجل التسليم والاستلام'],
+    ['فواتير الوقود تُدفع دون مقارنتها بالمسافة المقطوعة', 'معدل استهلاك لكل سيارة يكشف الهدر والتلاعب'],
+    ['تقرير التكاليف يُجمع يدوياً آخر كل شهر', 'تقرير التكاليف جاهز بنقرة، PDF أو Excel']];
+  const OF = [
+    ['car', 'ملف لكل سيارة', 'الاستمارة والتأمين والفحص الدوري والصور، وملصق QR يفتح ملفها مباشرة.'],
+    ['sign', 'تسليم واستلام بتوقيع إلكتروني', 'محضر بالعداد والصور يوقّعه السائق من جواله، فتُعرف العهدة في كل يوم.'],
+    ['cam', 'فحص أسبوعي بالصور', 'السائق يصوّر سيارته كل أسبوع، وتعرف فوراً من تأخر.'],
+    ['wrench', 'الصيانة وتغيير الزيت', 'سجل الإصلاحات وتكلفتها، وتنبيه موعد الزيت حسب العداد.'],
+    ['fuel', 'الوقود وكشف الهدر', 'استيراد كشوف المحطات من Excel، ومقارنة استهلاك كل سيارة بمتوسط الأسطول.'],
+    ['ticket', 'المخالفات والحوادث', 'ربط كل مخالفة بسائقها وقت وقوعها، وكشف خصومات شهري للموارد البشرية.'],
+    ['users', 'فروع وصلاحيات', 'مدير نظام، ومشرف يرى فرعه فقط، وسائق يرى سيارته فقط.'],
+    ['chart', 'تقارير جاهزة', 'تكلفة كل سيارة وكل فرع بالريال، وملخص للإدارة العليا.'],
+    ['spark', 'الذكاء الاصطناعي', 'صوّر الفاتورة أو المخالفة فتُعبّأ الحقول تلقائياً، واسأل المساعد عن بيانات أسطولك.']];
+  const top = `<header class="lp-top"><div class="lp-w">
+    <a class="lp-brand" href="#" data-go="login"><span class="mk">KSA</span><b>${name}</b></a>
+    <nav>${ar ? `<a class="lp-hide" href="#lp-ba">${T('قبل وبعد')}</a><a class="lp-hide" href="#lp-offer">${T('ماذا نقدم')}</a><a class="lp-hide" href="welcome.html#pricing">${T('الأسعار')}</a>` : ''}
+      ${window.I18N ? window.I18N.picker() : ''}
+      <button class="lp-btn" data-go="login">${T('تسجيل الدخول')}</button>${ar ? `<button class="lp-btn gold" data-go="co">${T('سجّل شركتك')}</button>` : ''}</nav></div></header>`;
+  const hero = `<section class="lp-hero"><div class="lp-w lp-hgrid">
+    <div class="lp-copy">${ar ? `<span class="lp-kick">منصة سعودية لإدارة أساطيل الشركات</span>
+      <h1>كل سيارة في أسطولك، برقمها وحالتها وتكلفتها</h1>
+      <p>اعرف من يقود كل سيارة، ومتى تنتهي وثائقها، وكم تكلّفك، من شاشة واحدة على الجوال أو الكمبيوتر.</p>
+      <ul class="lp-chips"><li>${ic('bell')}تنبيهات قبل انتهاء الوثائق</li><li>${ic('sign')}عهدة موقّعة إلكترونياً</li><li>${ic('fuel')}كشف هدر الوقود</li></ul>`
+      : `<h1>${name}</h1>`}</div>
+    <div id="auth-slot"></div></div></section>`;
+  if (!ar) return top + hero;
+  return top + hero + `
+  <section class="lp-sec" id="lp-ba"><div class="lp-w">
+    <h2 class="lp-t">ماذا يتغيّر في شركتك؟</h2><p class="lp-st">نفس الأسطول ونفس الفريق، لكن بمعلومة واضحة في وقتها.</p>
+    <div class="lp-ba">
+      <div class="lp-col bef"><h3>قبل النظام</h3><ul>${BA.map(x => `<li>${ic('x')}<span>${x[0]}</span></li>`).join('')}</ul></div>
+      <div class="lp-col aft"><h3>بعد النظام</h3><ul>${BA.map(x => `<li>${ic('ok')}<span>${x[1]}</span></li>`).join('')}</ul></div>
+    </div></div></section>
+  <section class="lp-sec alt" id="lp-offer"><div class="lp-w">
+    <h2 class="lp-t">ماذا نقدّم لك</h2><p class="lp-st">كل ما يحتاجه مدير الأسطول في نظام واحد، بالعربية، ويعمل دون تثبيت.</p>
+    <div class="lp-feats">${OF.map(f => `<div class="lp-feat"><i>${ic(f[0])}</i><h3>${f[1]}</h3><p>${f[2]}</p></div>`).join('')}</div>
+  </div></section>
+  <section class="lp-sec"><div class="lp-w">
+    <h2 class="lp-t">ابدأ في أربع خطوات</h2><p class="lp-st">بدون أجهزة ولا تركيب.</p>
+    <ol class="lp-steps"><li><b>سجّل شركتك</b><span>بيانات المنشأة والسجل التجاري.</span></li><li><b>نعتمد الحساب</b><span>نراجع البيانات ونتواصل معك.</span></li><li><b>أضف سياراتك</b><span>يدوياً أو باستيراد ملف Excel.</span></li><li><b>ادعُ السائقين</b><span>برمز تفعيل على جوالاتهم.</span></li></ol>
+  </div></section>
+  <section class="lp-sec"><div class="lp-w"><div class="lp-cta">
+    <h2>جرّب النظام على أسطولك</h2><p>تجربة مجانية ${TRIAL_DAYS} يوماً بكامل المزايا، بدون بطاقة ائتمانية.</p>
+    <div><button class="lp-btn gold" data-go="co">سجّل شركتك الآن</button> <button class="lp-btn" data-go="login">لدي حساب</button></div>
+  </div></div></section>
+  <footer class="lp-foot"><div class="lp-w"><span>© ${new Date().getFullYear()} ${name}</span>
+    <span><a href="welcome.html#pricing">الأسعار</a><a href="privacy.html">سياسة الخصوصية</a><a href="terms.html">شروط الاستخدام</a>${SUPPORT_CONTACT ? `<a href="mailto:${esc(SUPPORT_CONTACT)}" dir="ltr">${esc(SUPPORT_CONTACT)}</a>` : ''}</span></div></footer>`;
+}
 function card(inner) {
   if (window.I18N) window.I18N.use(window.I18N.lang);
   const r = authRoot();
-  r.innerHTML = `<div class="card" role="dialog" aria-label="${T('تسجيل الدخول')}">${window.I18N ? window.I18N.picker() : ''}<div class="lg"><span class="mk">KSA</span><div><b>${esc(APP_NAME || T('نظام أسطول الشركة'))}</b><small>${T('إدارة السيارات والسائقين والتكاليف')}</small></div></div>${inner}</div>`;
-  r.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { window.I18N.set(b.dataset.lang); window.I18N.use(b.dataset.lang); if (lastShow) lastShow(); });
+  const land = !(AUTH_REF && AUTH_REF.currentUser);
+  const ui = window.I18N ? window.I18N.ui : 'ar';
+  const box = `<div class="card" role="dialog" aria-label="${T('تسجيل الدخول')}">${land ? (window.I18N ? `<div class="lp-mpick">${window.I18N.picker()}</div>` : '') : (window.I18N ? window.I18N.picker() : '') + `<div class="lg"><span class="mk">KSA</span><div><b>${esc(APP_NAME || T('نظام أسطول الشركة'))}</b><small>${T('إدارة السيارات والسائقين والتكاليف')}</small></div></div>`}${inner}</div>`;
+  if (land) {
+    if (r.dataset.mode !== 'land' || r.dataset.lang !== ui) { r.innerHTML = landingHTML(); r.dataset.mode = 'land'; r.dataset.lang = ui; r.classList.add('land'); }
+    r.querySelector('#auth-slot').innerHTML = box;
+  } else { r.innerHTML = box; r.dataset.mode = 'card'; r.classList.remove('land'); }
+  r.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { window.I18N.set(b.dataset.lang); window.I18N.use(b.dataset.lang); if (lastShow) lastShow(); else if (land && AUTH_GO.login) AUTH_GO.login(); });
 }
 
 export async function start() {
@@ -77,7 +213,7 @@ export async function start() {
     import(`${FB}/firebase-app.js`), import(`${FB}/firebase-auth.js`), import(`${FB}/firebase-firestore.js`)]);
   await swP;
   const app = initializeApp(FIREBASE_CONFIG);
-  const auth = A.getAuth(app);
+  const auth = A.getAuth(app); AUTH_REF = auth;
   let fs;
   try { fs = F.initializeFirestore(app, { localCache: F.persistentLocalCache({ tabManager: F.persistentMultipleTabManager() }) }); }
   catch (e) { fs = F.getFirestore(app); }
@@ -565,6 +701,7 @@ export async function start() {
     return { use: async x => ({ db, assets, downloads, user })[x] || null, standalone: true };
   }
 
+  AUTH_GO = { login: () => showLogin(), co: () => showCompanySignup() };
   const qp = new URLSearchParams(location.search); let join = qp.get('join') ? { phone: qp.get('join'), code: qp.get('c') || '' } : null;
   A.onAuthStateChanged(auth, async u => {
     if (busyAuth) return;
@@ -572,9 +709,6 @@ export async function start() {
     // تغيّر الحساب من تبويب آخر (مثل دخول المالك للوحة المنصة): نعيد التحميل بالحساب الجديد
     if (entered && (!u || u.uid !== ENTERED_UID)) { location.reload(); return; }
     if (u) enter(u); else { entered = false;
-      // الزائر الجديد يرى الصفحة التعريفية، ومن ضغط «دخول» أو فتح التطبيق المثبّت يرى شاشة الدخول
-      const app = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-      if (!join && !qp.has('signup') && !qp.has('login') && !app && !localStorage.getItem('fleet-was-in')) { location.replace('welcome.html'); return; }
       join ? showActivate(join) : qp.has('signup') ? showCompanySignup() : showLogin(); } });
 }
 start().catch(e => { console.error(e); card(`<h2>تعذر تشغيل النظام</h2><p>تأكد من اتصالك بالإنترنت ثم أعد تحميل الصفحة.</p><p class="err" dir="ltr">${esc(e && e.message)}</p>`); });
