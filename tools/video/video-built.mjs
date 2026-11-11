@@ -10,5 +10,5 @@ const p=await ctx.newPage();const T0=Date.now();
 await p.goto('http://127.0.0.1:8003/howbuilt.html',{waitUntil:'networkidle'});await p.waitForTimeout(1200);
 const total=await p.evaluate(()=>window.__total);const START=(Date.now()-T0)/1000;
 await p.evaluate(()=>play());await p.waitForTimeout(total+600);
-const END=(Date.now()-T0)/1000;await ctx.close();await b.close();srv.close();
-const vid=fs.readdirSync(OUT).find(f=>f.endsWith('.webm'));fs.writeFileSync(OUT+'/cut.json',JSON.stringify({file:OUT+'/'+vid,start:START,end:END}));console.log('done',START,END);
+const starts=await p.evaluate(()=>window.__starts);const END=(Date.now()-T0)/1000;await ctx.close();await b.close();srv.close();
+const vid=fs.readdirSync(OUT).find(f=>f.endsWith('.webm'));fs.writeFileSync(OUT+'/cut.json',JSON.stringify({file:OUT+'/'+vid,start:START,end:END,marks:starts.map(x=>x/1000)}));console.log('done',START,END);
