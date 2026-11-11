@@ -1,0 +1,340 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta property="og:title" content="ملف مسار التعريفي"><meta property="og:description" content="منصة سعودية لإدارة أساطيل الشركات"><meta property="og:image" content="https://vehicle-fleet-041e7b.netlify.app/masar-logo.png"></head><body><title>ملف مسار التعريفي</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+/* Layout: a printed brochure lying on a deep-emerald desk; two-page spread that turns right-to-left like an Arabic book, single swipeable pages on phones. Deliberately one look (brand colours), both host themes see the same. */
+:root{
+  --desk:#061C17; --desk-2:#0B2C24; --em:#0E3B30; --em-2:#145244; --em-ink:#0B2A22;
+  --gold:#C9A24F; --gold-2:#E4C680; --gold-ink:#8C6A2B;
+  --paper:#FBF9F4; --paper-2:#F3EFE5; --ink:#132A23; --muted:#5E6B65; --rule:#E3DCCB;
+  --crit:#B42318; --ok:#1E7A4B;
+  --f-d:"Alexandria","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --f-b:"IBM Plex Sans Arabic","Alexandria",system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%;overflow-x:clip}
+.stage{overflow-x:clip}
+body{direction:rtl;margin:0;background:radial-gradient(1100px 600px at 70% -10%,rgba(201,162,79,.13),transparent 60%),radial-gradient(900px 700px at 0% 110%,rgba(20,82,68,.55),transparent 60%),var(--desk);color:#EFE9DA;font-family:var(--f-b);display:flex;flex-direction:column;overflow-x:hidden}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));flex-wrap:wrap}
+.bar .t{display:flex;align-items:center;gap:10px;font:500 15px var(--f-d)}
+.bar .t img{width:34px;height:34px;border-radius:9px;background:#fff;padding:3px;box-sizing:border-box}
+.bar .t small{display:block;font:400 12px var(--f-b);color:var(--gold-2)}
+.ctl{display:flex;align-items:center;gap:8px}
+.ctl button{width:42px;height:42px;border-radius:12px;border:1px solid rgba(228,198,128,.35);background:rgba(255,255,255,.05);color:#F6EBCF;cursor:pointer;display:grid;place-items:center}
+.ctl button:hover:not(:disabled){background:rgba(228,198,128,.14)}
+.ctl button:disabled{opacity:.35;cursor:default}
+.ctl button:focus-visible{outline:2px solid var(--gold-2);outline-offset:2px}
+.ctl svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+.ctl .pg{min-width:118px;text-align:center;font:500 13px var(--f-d);color:#E9DFC6;font-variant-numeric:tabular-nums}
+.stage{flex:1;display:grid;place-items:center;padding-block:8px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-height:0}
+.hint{text-align:center;font-size:12.5px;color:rgba(239,233,218,.55);padding-bottom:18px}
+
+/* ---------- الكتاب (سطح المكتب) ---------- */
+.book{--pw:min(540px,calc((100vw - 64px)/2),calc((100vh - 150px)/1.414));position:relative;width:calc(var(--pw)*2);height:calc(var(--pw)*1.414);perspective:2600px}
+.book::after{content:"";position:absolute;inset:auto 4% -26px;height:30px;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent);z-index:-1}
+.leaf{position:absolute;top:0;left:0;width:50%;height:100%;transform-origin:right center;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.3,.1,.2,1)}
+.leaf.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.face.back{transform:rotateY(180deg)}
+.face::after{content:"";position:absolute;inset:0;pointer-events:none}
+.face.front::after{background:linear-gradient(270deg,rgba(0,0,0,.16),rgba(0,0,0,0) 7%)}
+.face.back::after{background:linear-gradient(90deg,rgba(0,0,0,.16),rgba(0,0,0,0) 7%)}
+.book.closed-front .leaf:first-child .face.front::after,.book .face.cover::after{background:none}
+.leaf{cursor:pointer}
+@media (prefers-reduced-motion:reduce){.leaf{transition:none}}
+
+/* ---------- الصفحة ---------- */
+.page{position:absolute;inset:0;background:var(--paper);color:var(--ink);container-type:inline-size;display:flex;flex-direction:column;direction:rtl}
+.pin{flex:1;display:flex;flex-direction:column;gap:3.4cqw;padding:8cqw 8cqw 6cqw;min-height:0}
+.pf{display:flex;justify-content:space-between;align-items:center;padding:0 8cqw 5cqw;font:500 2.3cqw var(--f-d);color:var(--muted)}
+.pf b{color:var(--gold-ink);font-weight:600;font-variant-numeric:tabular-nums}
+.kick{font:600 2.5cqw var(--f-d);color:var(--gold-ink);letter-spacing:.02em}
+.h{font:600 6.6cqw/1.25 var(--f-d);margin:0;text-wrap:balance;color:var(--em-ink)}
+.h::after{content:"";display:block;width:12cqw;height:.7cqw;border-radius:1cqw;margin-top:2.6cqw;background:linear-gradient(90deg,var(--gold),rgba(201,162,79,.15))}
+.lead{font-size:3.2cqw;line-height:1.85;color:#2E423B;margin:0}
+.p{font-size:2.85cqw;line-height:1.8;color:#3A4C46;margin:0}
+
+/* الغلاف */
+.cover{background:radial-gradient(90cqw 70cqw at 80% 0%,rgba(201,162,79,.22),transparent 60%),linear-gradient(160deg,#0F3F33,#08251E 70%);color:#F5EEDC}
+.cover .pin{justify-content:space-between;padding:10cqw 9cqw}
+.cover .logo{width:34cqw;background:#FBF9F4;border-radius:5cqw;padding:5cqw 6cqw;box-shadow:0 2cqw 6cqw rgba(0,0,0,.35),0 0 0 .4cqw rgba(201,162,79,.6);align-self:center}
+.cover .logo img{display:block;width:100%}
+.cover h1{font:600 7.4cqw/1.3 var(--f-d);margin:0;text-wrap:balance}
+.cover .sub{font-size:3.4cqw;line-height:1.8;color:rgba(245,238,220,.82);margin:2.4cqw 0 0}
+.cover .meta{display:flex;justify-content:space-between;border-top:.25cqw solid rgba(201,162,79,.45);padding-top:3cqw;font:500 2.6cqw var(--f-d);color:var(--gold-2)}
+.road{position:absolute;inset:auto 0 0 0;height:38cqw;opacity:.13;pointer-events:none}
+
+/* عناصر */
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:2.6cqw;margin-top:auto}
+.fact{background:#fff;border:.25cqw solid var(--rule);border-radius:3cqw;padding:3.6cqw 3cqw;display:grid;gap:1cqw}
+.fact b{font:600 5.4cqw var(--f-d);color:var(--em)}
+.fact span{font-size:2.4cqw;line-height:1.55;color:var(--muted)}
+.ba{display:grid;gap:2.2cqw}
+.ba-r{display:grid;grid-template-columns:1fr 3.6cqw 1fr;gap:2cqw;align-items:center}
+.ba-r div{border-radius:2.6cqw;padding:2.6cqw 3cqw;font-size:2.5cqw;line-height:1.6}
+.ba-r .b{background:var(--paper-2);color:#5A625E}
+.ba-r .a{background:#fff;border:.25cqw solid rgba(201,162,79,.55);color:var(--em-ink);font-weight:500}
+.ba-r svg{width:3.6cqw;height:3.6cqw;stroke:var(--gold-ink);fill:none;stroke-width:2.2;transform:scaleX(-1)}
+.ba-h{display:grid;grid-template-columns:1fr 3.6cqw 1fr;gap:2cqw;font:600 2.5cqw var(--f-d);color:var(--muted)}
+.ba-h span:last-child{color:var(--gold-ink)}
+.flow{display:grid;gap:0;margin-top:1cqw}
+.st{display:grid;grid-template-columns:8cqw 1fr;gap:3cqw;position:relative;padding-bottom:3.6cqw}
+.st:not(:last-child)::before{content:"";position:absolute;right:3.9cqw;top:8cqw;bottom:0;width:.3cqw;background:linear-gradient(var(--gold),rgba(201,162,79,.2))}
+.st i{width:8cqw;height:8cqw;border-radius:50%;background:var(--em);color:var(--gold-2);display:grid;place-items:center;font:600 3.2cqw var(--f-d);font-style:normal;box-shadow:0 0 0 .7cqw var(--paper),0 0 0 .95cqw rgba(201,162,79,.5)}
+.st b{display:block;font:600 3.2cqw var(--f-d);color:var(--em-ink);margin-top:.6cqw}
+.st span{font-size:2.6cqw;line-height:1.65;color:var(--muted)}
+.feats{display:grid;gap:2.4cqw}
+.ft{display:grid;grid-template-columns:9cqw 1fr;gap:3cqw;align-items:start;padding:2.6cqw 0;border-bottom:.25cqw solid var(--rule)}
+.ft:last-child{border-bottom:0}
+.ft .ic{width:9cqw;height:9cqw;border-radius:2.6cqw;background:linear-gradient(145deg,var(--em-2),var(--em-ink));display:grid;place-items:center}
+.ft .ic svg{width:4.6cqw;height:4.6cqw;stroke:var(--gold-2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ft b{display:block;font:600 3.2cqw var(--f-d);color:var(--em-ink)}
+.ft span{font-size:2.55cqw;line-height:1.65;color:#4A5A54}
+.shot{border-radius:2.4cqw;overflow:hidden;border:.3cqw solid var(--rule);box-shadow:0 2cqw 5cqw -2cqw rgba(11,42,34,.35);background:#fff}
+.shot img{display:block;width:100%}
+.cap{font-size:2.45cqw;line-height:1.6;color:var(--muted)}
+.notes{display:grid;gap:1.8cqw;margin:0;padding:0;list-style:none}
+.notes li{display:grid;grid-template-columns:2.4cqw 1fr;gap:2cqw;font-size:2.6cqw;line-height:1.6;color:#3A4C46}
+.notes li::before{content:"";width:1.6cqw;height:1.6cqw;margin-top:1.2cqw;border-radius:50%;background:var(--gold);box-shadow:0 0 0 .6cqw rgba(201,162,79,.2)}
+.phones{display:grid;grid-template-columns:1fr 1fr;gap:4cqw;align-items:start}
+.phone{border-radius:6cqw;padding:1.6cqw;background:#0B2A22;box-shadow:0 3cqw 6cqw -2cqw rgba(0,0,0,.4)}
+.phone .scr{border-radius:4.6cqw;overflow:hidden;aspect-ratio:9/17.5;background:#fff}
+.phone img{display:block;width:100%}
+.langs{display:flex;gap:2cqw;flex-wrap:wrap}
+.langs span{border:.25cqw solid rgba(201,162,79,.6);border-radius:10cqw;padding:1cqw 3cqw;font:500 2.6cqw var(--f-d);color:var(--em-ink);background:#fff}
+.roles{width:100%;border-collapse:collapse;font-size:2.5cqw}
+.roles td{padding:2.1cqw 0;border-bottom:.25cqw solid var(--rule);vertical-align:top;line-height:1.55;color:#43544E}
+.roles td:first-child{font:600 2.7cqw var(--f-d);color:var(--em-ink);white-space:nowrap;padding-inline-end:3cqw;width:1%}
+.sec{display:grid;grid-template-columns:1fr 1fr;gap:2.4cqw}
+.sec div{background:#fff;border:.25cqw solid var(--rule);border-radius:2.6cqw;padding:2.8cqw}
+.sec b{display:block;font:600 2.8cqw var(--f-d);color:var(--em-ink);margin-bottom:.8cqw}
+.sec span{font-size:2.4cqw;line-height:1.6;color:var(--muted)}
+.plan{margin-top:auto;border-radius:3.4cqw;padding:4.4cqw;background:linear-gradient(150deg,#0F3F33,#08251E);color:#F3EAD3;display:grid;gap:1.6cqw}
+.plan b{font:600 3.6cqw var(--f-d);color:var(--gold-2)}
+.plan span{font-size:2.6cqw;line-height:1.7;color:rgba(243,234,211,.85)}
+.endc .pin{justify-content:center;align-items:center;text-align:center;gap:5cqw}
+.endc .url{font:500 3cqw var(--f-b);direction:ltr;background:rgba(255,255,255,.08);border:.25cqw solid rgba(201,162,79,.5);border-radius:2.4cqw;padding:2.2cqw 4cqw;color:#F6EBCF;user-select:all}
+
+/* ---------- الجوال: صفحات تُسحب ---------- */
+.reel{display:none}
+@media (max-width:860px){
+  .book{display:none}
+  .reel{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;width:100%;padding-bottom:8px;direction:rtl;scrollbar-width:none}
+  .reel::-webkit-scrollbar{display:none}
+  .reel .sheet{flex:0 0 100%;scroll-snap-align:center;position:relative;aspect-ratio:1/1.414;border-radius:6px;overflow:hidden;box-shadow:0 16px 40px -18px rgba(0,0,0,.7)}
+  .stage{place-items:start center}
+  .bar .t small{display:none}
+}
+</style>
+
+<header class="bar">
+  <div class="t"><img src="../masar-mark.png" alt=""><div>مسار<small>الملف التعريفي 2026</small></div></div>
+  <div class="ctl" role="group" aria-label="التنقل بين الصفحات">
+    <button id="prev" aria-label="الصفحة السابقة"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    <div class="pg" id="pg" aria-live="polite"></div>
+    <button id="next" aria-label="الصفحة التالية"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+  </div>
+</header>
+<main class="stage"><div class="book" id="book"></div><div class="reel" id="reel"></div></main>
+<div class="hint" id="hint">اضغط على الصفحة أو استخدم الأسهم لتقليب الكتيّب</div>
+
+<template id="pages">
+<!-- 1 الغلاف -->
+<section class="page cover"><div class="pin">
+  <div class="meta"><span>الملف التعريفي</span><span>2026</span></div>
+  <div class="logo"><img src="../masar-logo.png" alt="مسار Masar"></div>
+  <div><h1>كل سيارة في أسطولك، برقمها وحالتها وتكلفتها</h1><p class="sub">منصة سعودية لإدارة أساطيل الشركات: السيارات والسائقون والعهد والصيانة والمخالفات في مكان واحد.</p></div>
+</div><svg class="road" viewBox="0 0 400 150" preserveAspectRatio="none"><path d="M0 150 C120 120 150 60 240 40 S370 10 400 0" stroke="#E4C680" stroke-width="2" fill="none" stroke-dasharray="10 8"/></svg></section>
+
+<!-- 2 عن مسار -->
+<section class="page"><div class="pin">
+  <span class="kick">عن مسار</span>
+  <h2 class="h">نظام واحد يعرف أين كل سيارة ومع من</h2>
+  <p class="lead">«مسار» منصة سحابية تدير أسطول شركتك من لحظة دخول السيارة إلى الخدمة حتى خروجها منها. تسجّل كل سيارة بوثائقها، وتسلّمها لسائقها بمحضر يوقّعه إلكترونياً، وتتابع فحصها وصيانتها ووقودها ومخالفاتها، ثم تعطيك تكلفتها الحقيقية بالريال.</p>
+  <p class="p">صُممت المنصة لشركات النقل والتوزيع والمقاولات وكل جهة تملك أسطولاً من السيارات، صغيراً كان أو كبيراً، في فرع واحد أو عدة مدن.</p>
+  <div class="facts">
+    <div class="fact"><b>3</b><span>لغات لصفحة السائق: العربية والإنجليزية والأردية</span></div>
+    <div class="fact"><b>24/7</b><span>تعمل من الجوال والكمبيوتر بلا تثبيت برامج</span></div>
+    <div class="fact"><b>5</b><span>أدوار صلاحيات، لكل مستخدم ما يخصه فقط</span></div>
+  </div>
+</div><div class="pf"><span>مسار لإدارة الأساطيل</span><b>2</b></div></section>
+
+<!-- 3 قبل وبعد -->
+<section class="page"><div class="pin">
+  <span class="kick">التحدي</span>
+  <h2 class="h">ماذا يتغيّر في شركتك؟</h2>
+  <p class="p">نفس الأسطول ونفس الفريق، لكن بمعلومة واضحة في وقتها.</p>
+  <div class="ba">
+    <div class="ba-h"><span>قبل مسار</span><span></span><span>مع مسار</span></div>
+    <div class="ba-r"><div class="b">السيارات في جداول Excel وأوراق متفرقة، ولكل موظف نسخته</div><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg><div class="a">ملف إلكتروني لكل سيارة بوثائقها وصورها وسجلها الكامل</div></div>
+    <div class="ba-r"><div class="b">تنتهي الاستمارة أو التأمين أو رخصة السائق دون أن ينتبه أحد</div><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg><div class="a">تنبيه على الجوال قبل الانتهاء، مرتّب حسب الأولوية</div></div>
+    <div class="ba-r"><div class="b">تصل المخالفة ولا يُعرف من كان يقود السيارة يومها</div><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg><div class="a">كل مخالفة تُربط بسائقها تلقائياً من سجل التسليم</div></div>
+    <div class="ba-r"><div class="b">فواتير الوقود تُدفع دون مقارنتها بالمسافة المقطوعة</div><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg><div class="a">معدل استهلاك لكل سيارة يكشف الهدر والتلاعب</div></div>
+    <div class="ba-r"><div class="b">تقرير التكاليف يُجمع يدوياً آخر كل شهر</div><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg><div class="a">تقرير التكاليف جاهز بنقرة، PDF أو Excel</div></div>
+  </div>
+</div><div class="pf"><span>مسار لإدارة الأساطيل</span><b>3</b></div></section>
+
+<!-- 4 دورة حياة السيارة -->
+<section class="page"><div class="pin">
+  <span class="kick">الحل</span>
+  <h2 class="h">رحلة السيارة كاملة داخل مسار</h2>
+  <div class="flow">
+    <div class="st"><i>1</i><div><b>تسجيل السيارة</b><span>اللوحة والاستمارة والتأمين والفحص الدوري وبطاقة التشغيل، أو استيراد الأسطول كاملاً من Excel.</span></div></div>
+    <div class="st"><i>2</i><div><b>تسليمها لسائقها</b><span>محضر تسليم بالعداد والوقود والصور، يوقّعه السائق من جواله، فتُعرف العهدة في كل يوم.</span></div></div>
+    <div class="st"><i>3</i><div><b>الفحص الدوري</b><span>السائق يفحص الإطارات والزيت والماء والأنوار ويصوّرها، في الموعد الذي تحدده شركتك.</span></div></div>
+    <div class="st"><i>4</i><div><b>التشغيل اليومي</b><span>الصيانة وتغيير الزيت، وتعبئات الوقود، والمخالفات والحوادث، كلها مربوطة بالسيارة والسائق.</span></div></div>
+    <div class="st"><i>5</i><div><b>الاستلام والتقارير</b><span>محضر استلام يقارن حالة السيارة، وتقرير يبيّن تكلفة الكيلومتر لكل سيارة وكل فرع.</span></div></div>
+  </div>
+</div><div class="pf"><span>مسار لإدارة الأساطيل</span><b>4</b></div></section>
+
+<!-- 5 المزايا 1 -->
+<section class="page"><div class="pin">
+  <span class="kick">المزايا</span>
+  <h2 class="h">كل ما يحتاجه مدير الأسطول</h2>
+  <div class="feats">
+    <div class="ft"><span class="ic"><svg viewBox="0 0 24 24"><path d="M5 16l1.5-5a2 2 0 0 1 2-1.4h7a2 2 0 0 1 2 1.4L19 16"/><rect x="3.5" y="15" width="17" height="4" rx="1.5"/><circle cx="7.5" cy="19.5" r="1.3"/><circle cx="16.5" cy="19.5" r="1.3"/></svg></span><div><b>ملف لكل سيارة</b><span>الوثائق والصور والسجل الكامل، وملصق QR يفتح ملف السيارة مباشرة.</span></div></div>
+    <div class="ft"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 19c3-1 4-5 7-5s2 4 5 4 3-3 4-3"/><path d="M14 4l6 6-8 8H6v-6z"/></svg></span><div><b>تسليم واستلام بتوقيع إلكتروني</b><span>محاضر رسمية بصيغة PDF، موقّعة ومؤرخة، تحفظ حق الشركة والسائق.</span></div></div>
+    <div class="ft"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg></span><div><b>فحص أسبوعي بالصور</b><span>موعد ثابت أو لكل سيارة أو مرن، أسبوعياً أو كل أسبوعين، مع تذكير السائق آلياً.</span></div></div>
+    <div class="ft"><span class="ic"><svg viewBox="0 0 24 24"><path d="M14.5 5.5a4 4 0 0 0-5 5L4 16l4 4 5.5-5.5a4 4 0 0 0 5-5l-2.5 2.5-3-3z"/></svg></span><div><b>الصيانة وتغيير الزيت</b><span>سجل الإصلاحات وتكلفتها، وتنبيه موعد الزيت حسب قراءة العداد.</span></div></div>
+    <div class="ft"><span class="ic"><svg viewBox="0 0 24 24"><path d="M5 20V5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v15M3.5 20h12"/><path d="M14 9h2.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V8l-2.5-2.5"/><path d="M7.5 8h4"/></svg></span><div><b>الوقود وكشف الهدر</b><span>استيراد كشوف المحطات، ومقارنة استهلاك كل سيارة بمتوسط الأسطول.</span></div></div>
+  </div>
+</div><div class="pf"><span>مسار لإدارة الأساطيل</span><b>5</b></div></section>
+
+<!-- 6 المزايا 2 -->
+<section class="page"><div class="pin">
+  <span class="kick">المزايا</span>
+  <h2 class="h">وأدوات تختصر عمل الفريق</h2>
+  <div class="feats">
+    <div class="ft"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h4M7 14h7"/><circle cx="17" cy="11" r="1.6"/></svg></span><div><b>المخالفات والحوادث</b><span>ربط كل مخالفة بسائقها وقت وقوعها، وكشف خصومات شهري للموارد البشرية.</span></div></div>
+    <div class="ft"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 4l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V7z"/><path d="M9 12l2 2 4-4"/></svg></span><div><b>تجديد الوثائق</b><span>تنبيهات قبل انتهاء الاستمارة والتأمين والفحص الدوري ورخص السائقين، وسجل لكل تجديد.</span></div></div>
+    <div class="ft"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><div><b>تقارير جاهزة</b><span>تكلفة كل سيارة وكل فرع بالريال، وتقرير ملخص للإدارة العليا بصيغة PDF أو Excel.</span></div></div>
+    <div class="ft"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></span><div><b>الذكاء الاصطناعي</b><span>صوّر الفاتورة أو المخالفة فتُعبّأ الحقول تلقائياً، واسأل المساعد عن بيانات أسطولك.</span></div></div>
+    <div class="ft"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg></span><div><b>الرسائل والتنبيهات</b><span>محادثة مباشرة مع السائقين، وإشعارات على الجوال وملخص يومي للإدارة.</span></div></div>
+  </div>
+</div><div class="pf"><span>مسار لإدارة الأساطيل</span><b>6</b></div></section>
+
+<!-- 7 لوحة القيادة -->
+<section class="page"><div class="pin">
+  <span class="kick">من داخل النظام</span>
+  <h2 class="h">الرئيسية: صورة الأسطول في نظرة</h2>
+  <div class="shot"><img src="img/1280-dashboard.jpg" alt="الصفحة الرئيسية في مسار"></div>
+  <ul class="notes">
+    <li>أربع بطاقات تعرض السيارات المتاحة ومع السائقين وفي الورشة وخارج الخدمة.</li>
+    <li>قائمة «يحتاج قرارك» ترتّب التنبيهات: الأحمر عاجل والبرتقالي قريب.</li>
+    <li>توزيع الأسطول حسب الفرع، وأزرار سريعة للتسليم والاستلام والصيانة والوقود.</li>
+  </ul>
+</div><div class="pf"><span>مسار لإدارة الأساطيل</span><b>7</b></div></section>
+
+<!-- 8 السيارات والتقارير -->
+<section class="page"><div class="pin">
+  <span class="kick">من داخل النظام</span>
+  <h2 class="h">السيارات والتقارير</h2>
+  <div class="shot"><img src="img/1280-vehicles.jpg" alt="صفحة السيارات"></div>
+  <p class="cap">بطاقة لكل سيارة باللوحة السعودية وحالة وثائقها وقراءة العداد وموعد الزيت.</p>
+  <div class="shot"><img src="img/1280-reports.jpg" alt="صفحة التقارير"></div>
+  <p class="cap">تكاليف الوقود والصيانة والمخالفات والحوادث، وتكلفة الكيلومتر لكل فرع.</p>
+</div><div class="pf"><span>مسار لإدارة الأساطيل</span><b>8</b></div></section>
+
+<!-- 9 الجوال -->
+<section class="page"><div class="pin">
+  <span class="kick">على الجوال</span>
+  <h2 class="h">في جيب المدير والسائق</h2>
+  <div class="phones">
+    <div class="phone"><div class="scr"><img src="img/390-dashboard.jpg" alt="الرئيسية على الجوال"></div></div>
+    <div class="phone"><div class="scr"><img src="img/390-vehicles.jpg" alt="السيارات على الجوال"></div></div>
+  </div>
+  <p class="p">يدخل السائق برقم جواله، فيرى سياراته المسلّمة له فقط، ويفحصها ويصوّرها، ويوقّع محاضره، ويتلقى الإشعارات بلغته:</p>
+  <div class="langs"><span>العربية</span><span>English</span><span>اردو</span></div>
+</div><div class="pf"><span>مسار لإدارة الأساطيل</span><b>9</b></div></section>
+
+<!-- 10 الصلاحيات والأمان -->
+<section class="page"><div class="pin">
+  <span class="kick">الصلاحيات والأمان</span>
+  <h2 class="h">كل مستخدم يرى ما يخصه فقط</h2>
+  <table class="roles"><tbody>
+    <tr><td>مدير النظام</td><td>كل الصلاحيات: البيانات والإعدادات والمستخدمين والحذف</td></tr>
+    <tr><td>مدير الحركة</td><td>كل العمليات اليومية والتقارير، بدون الإعدادات والمستخدمين</td></tr>
+    <tr><td>مشرف فرع</td><td>يسلّم ويستلم سيارات فرعه فقط، ولا يرى غيرها</td></tr>
+    <tr><td>مسؤول اطلاع</td><td>عرض البيانات والتقارير والتصدير، بدون أي تعديل</td></tr>
+    <tr><td>مستخدم المركبة</td><td>سياراته المسلّمة له، والفحص الأسبوعي، وتوقيع المحاضر</td></tr>
+  </tbody></table>
+  <div class="sec">
+    <div><b>بيانات معزولة</b><span>بيانات كل شركة منفصلة تماماً عن غيرها بقواعد أمان على مستوى الخادم.</span></div>
+    <div><b>سجل لكل تعديل</b><span>من أضاف ومن عدّل ومتى، في سجل لا يُحذف.</span></div>
+    <div><b>نسخ احتياطي</b><span>نسخة يومية من بيانات الشركة، وتصدير كامل في أي وقت.</span></div>
+    <div><b>توقيع موثّق</b><span>كل توقيع يُحفظ بوقته وهوية الموقّع وجهازه.</span></div>
+  </div>
+</div><div class="pf"><span>مسار لإدارة الأساطيل</span><b>10</b></div></section>
+
+<!-- 11 كيف تبدأ -->
+<section class="page"><div class="pin">
+  <span class="kick">البداية</span>
+  <h2 class="h">جاهز للعمل في يوم واحد</h2>
+  <div class="flow">
+    <div class="st"><i>1</i><div><b>سجّل شركتك</b><span>من صفحة المنصة: اسم الشركة وبيانات المسؤول وعدد السيارات التقريبي.</span></div></div>
+    <div class="st"><i>2</i><div><b>نعتمد الحساب</b><span>يراجع فريق مسار الطلب ويفعّل حسابك وتبدأ فترة التجربة.</span></div></div>
+    <div class="st"><i>3</i><div><b>أضف أسطولك</b><span>أدخل السيارات والسائقين يدوياً، أو استوردهم دفعة واحدة من ملف Excel.</span></div></div>
+    <div class="st"><i>4</i><div><b>ادعُ فريقك</b><span>أضف المشرفين والسائقين، وأرسل لكل سائق رابط التفعيل عبر الواتساب.</span></div></div>
+  </div>
+  <div class="plan"><b>تجربة مجانية، ثم اشتراك حسب عدد السيارات</b><span>السعر لكل سيارة شهرياً، مع خصم عند الدفع السنوي، وفواتير إلكترونية ودفع بالبطاقة أو التحويل.</span></div>
+</div><div class="pf"><span>مسار لإدارة الأساطيل</span><b>11</b></div></section>
+
+<!-- 12 الغلاف الخلفي -->
+<section class="page cover endc"><div class="pin">
+  <div class="logo"><img src="../masar-logo.png" alt="مسار Masar"></div>
+  <div><h1 style="font-size:6.6cqw">ابدأ بإدارة أسطولك اليوم</h1><p class="sub">سجّل شركتك وجرّب المنصة مجاناً.</p></div>
+  <div class="url">vehicle-fleet-041e7b.netlify.app</div>
+</div></section>
+</template>
+
+<script>
+(function(){
+  const tpl=document.getElementById('pages');
+  const pages=[...tpl.content.querySelectorAll('section.page')];
+  const N=pages.length, L=Math.ceil(N/2);
+  const book=document.getElementById('book'), reel=document.getElementById('reel');
+  const pg=document.getElementById('pg'), prev=document.getElementById('prev'), next=document.getElementById('next');
+  // سطح المكتب: أوراق، وجه كل ورقة صفحة وظهرها التي تليها
+  const leaves=[];
+  for(let i=0;i<L;i++){
+    const leaf=document.createElement('div');leaf.className='leaf';
+    const f=document.createElement('div');f.className='face front'+(i===0?' cover':'');f.appendChild(pages[2*i].cloneNode(true));leaf.appendChild(f);
+    const b=document.createElement('div');b.className='face back';if(pages[2*i+1])b.appendChild(pages[2*i+1].cloneNode(true));if(2*i+1===N-1)b.classList.add('cover');leaf.appendChild(b);
+    leaf.addEventListener('click',()=>{if(leaf.classList.contains('flipped'))go(cur-1);else go(cur+1)});
+    book.appendChild(leaf);leaves.push(leaf);
+  }
+  // الجوال: صفحات متتالية
+  pages.forEach(p=>{const s=document.createElement('div');s.className='sheet';s.appendChild(p.cloneNode(true));reel.appendChild(s)});
+  let cur=0; // عدد الأوراق المقلوبة
+  function z(){leaves.forEach((l,i)=>{l.style.zIndex=l.classList.contains('flipped')?i+1:L-i+1})}
+  function mobile(){return getComputedStyle(reel).display!=='none'}
+  function label(){
+    if(mobile()){const w=reel.clientWidth+16;const i=Math.min(N-1,Math.round(Math.abs(reel.scrollLeft)/w));pg.textContent=`${i+1} من ${N}`;prev.disabled=i===0;next.disabled=i===N-1;return}
+    const r=cur*2-1, l=cur*2; // الصفحة اليمنى (المقروءة) واليسرى
+    pg.textContent=cur===0?`الغلاف · ${N} صفحة`:cur===L?'الغلاف الخلفي':`الصفحتان ${r+1}–${l+1} من ${N}`;
+    prev.disabled=cur===0;next.disabled=cur===L;
+  }
+  function go(n){
+    if(mobile()){const w=reel.clientWidth+16;const i=Math.min(N-1,Math.round(Math.abs(reel.scrollLeft)/w));const t=Math.max(0,Math.min(N-1,i+(n>cur?1:-1)));reel.scrollTo({left:-t*w,behavior:'smooth'});return}
+    n=Math.max(0,Math.min(L,n));if(n===cur)return;
+    const leaf=n>cur?leaves[cur]:leaves[n];
+    leaf.style.zIndex=L+5;
+    leaf.classList.toggle('flipped',n>cur);
+    cur=n;label();setTimeout(z,450);
+    book.style.transform=cur===0?'translateX(25%)':cur===L?'translateX(-25%)':'none';
+  }
+  book.style.transition='transform .9s cubic-bezier(.3,.1,.2,1)';
+  book.style.transform='translateX(25%)';
+  // الأسهم: في الكتاب العربي «التالي» يسار
+  next.onclick=()=>mobile()?mobStep(1):go(cur+1);
+  prev.onclick=()=>mobile()?mobStep(-1):go(cur-1);
+  function mobStep(d){const w=reel.clientWidth+16;const i=Math.round(Math.abs(reel.scrollLeft)/w);const t=Math.max(0,Math.min(N-1,i+d));reel.scrollTo({left:-t*w,behavior:'smooth'})}
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){e.preventDefault();next.click()}if(e.key==='ArrowRight'){e.preventDefault();prev.click()}});
+  reel.addEventListener('scroll',()=>{clearTimeout(reel._t);reel._t=setTimeout(label,80)});
+  addEventListener('resize',label);
+  if(matchMedia('(max-width:860px)').matches)document.getElementById('hint').textContent='اسحب الصفحات يميناً ويساراً';
+  z();label();
+})();
+</script>
+</body></html>
