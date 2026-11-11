@@ -53,7 +53,16 @@ async function systemLogin(create) {
 // ---------- وقت الرياض ----------
 const ksa = (d = new Date()) => new Date(d.getTime() + 3 * 3600e3); // نستخدم دوال UTC على هذا التاريخ
 const ymd = d => d.toISOString().slice(0, 10);
-function weekStart(now) { const t = new Date(now); t.setUTCDate(t.getUTCDate() - ((t.getUTCDay() + 2) % 7)); return ymd(t); }
+// موعد الفحص تحدده كل شركة: settings/inspection = { mode: fixed|perVehicle|flexible, day: 0..6, every: 1|2 }
+function inspCfg(s) { s = s || {}; const d = s.day === '' || s.day == null ? 5 : +s.day; return { mode: ['fixed', 'perVehicle', 'flexible'].includes(s.mode) ? s.mode : 'fixed', day: d >= 0 && d <= 6 ? d : 5, every: +s.every === 2 ? 2 : 1 }; }
+const EPOCH = Date.UTC(2026, 0, 4);
+function cycleOf(c, v, today) {
+  const wd = c.mode === 'perVehicle' && v && v.inspDay !== '' && v.inspDay != null && +v.inspDay >= 0 && +v.inspDay <= 6 ? +v.inspDay : c.day;
+  const t = new Date(today + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() - ((t.getUTCDay() - wd + 7) % 7));
+  if (c.every === 2 && ((Math.floor(Math.round((t - EPOCH) / 864e5) / 7) % 2) + 2) % 2) t.setUTCDate(t.getUTCDate() - 7);
+  const e = new Date(t); e.setUTCDate(e.getUTCDate() + 7 * c.every - 1);
+  return { start: ymd(t), end: ymd(e), day: wd, left: daysUntil(ymd(e), today) };
+}
 const daysUntil = (s, today) => s ? Math.round((new Date(s + 'T00:00:00Z') - new Date(today + 'T00:00:00Z')) / 864e5) : null;
 const plateTxt = v => v ? `${v.plateLetters || ''} ${v.plateNumbers || ''}`.trim() : '—';
 const ivKey = x => String(x && (x.loginEmail || x.email) || '').toLowerCase();
@@ -91,7 +100,8 @@ async function load(token) {
     if (iv.role === 'driver' && iv.driverId) (driverKey[iv.driverId] = driverKey[iv.driverId] || []).push(k);
     if (iv.role === 'admin' || iv.role === 'fleet') mgmt.add(k);
   }
-  return { vehicles, drivers, handovers, inspections, maintenance, cfg, driverKey, mgmt: [...mgmt] };
+  const insp = inspCfg(settings.find(s => s.id === 'inspection'));
+  return { vehicles, drivers, handovers, inspections, maintenance, cfg, insp, driverKey, mgmt: [...mgmt] };
 }
 
 function digest(D, today) {
@@ -112,14 +122,28 @@ function digest(D, today) {
   return { lines, crit };
 }
 
-function uninspected(D, ws) {
-  return D.vehicles.filter(v => v.status !== 'out' && v.status !== 'sold' && v.status !== 'maintenance').filter(v => !D.inspections.some(x => x.vehicleId === v.id && String(x.date) >= ws));
+const inService = D => D.vehicles.filter(v => v.status !== 'out' && v.status !== 'sold' && v.status !== 'maintenance');
+const doneIn = (D, v, from, to) => D.inspections.some(x => x.vehicleId === v.id && String(x.date) >= from && (!to || String(x.date) <= to));
+// السيارات غير المفحوصة في دورتها الحالية
+function uninspected(D, today) { return inService(D).filter(v => !doneIn(D, v, cycleOf(D.insp, v, today).start)); }
+// تذكير السائق: يوم الفحص نفسه، وفي الوضع المرن أيضاً قبل نهاية الدورة بيوم
+function dueToday(D, today) {
+  return uninspected(D, today).filter(v => { const c = cycleOf(D.insp, v, today); return c.start === today || (D.insp.mode === 'flexible' && c.left === 1); });
+}
+// تقرير المتأخرين للإدارة: اليوم التالي لموعد الفحص (أو لنهاية الدورة في الوضع المرن)
+function lateToday(D, today) {
+  const y = ymd(new Date(Date.parse(today) - 864e5));
+  return inService(D).filter(v => {
+    const c = cycleOf(D.insp, v, y);
+    if (D.insp.mode === 'flexible') return c.end === y && !doneIn(D, v, c.start, y);
+    return c.start === y && !doneIn(D, v, y);
+  });
 }
 
 // kind: digest | friday | sign | saturday ، أو auto حسب الساعة واليوم
 async function run({ token, kinds, onlyKey }) {
   const D = await load(token);
-  const now = ksa(); const today = ymd(now); const ws = weekStart(now);
+  const now = ksa(); const today = ymd(now);
   const res = {};
   const mg = onlyKey ? [onlyKey] : D.mgmt;
 
@@ -130,9 +154,10 @@ async function run({ token, kinds, onlyKey }) {
       : { title: '✅ ملخص الأسطول اليوم', body: 'لا توجد تنبيهات تحتاج متابعة اليوم.', url: './#dashboard', tag: 'digest' });
   }
   if (kinds.includes('friday')) {
-    const miss = uninspected(D, ws).filter(v => v.status === 'assigned' && v.driverId);
+    const miss = (onlyKey ? uninspected(D, today) : dueToday(D, today)).filter(v => v.status === 'assigned' && v.driverId);
     const keys = []; for (const v of miss) keys.push(...(D.driverKey[v.driverId] || []));
-    res.friday = await sendTo(token, onlyKey ? (keys.length ? [onlyKey] : []) : keys, { title: '🔧 موعد الفحص الأسبوعي', body: 'اليوم الجمعة: افحص سيارتك وصوّر البنود من صفحة الفحص في النظام.', url: './#driver', tag: 'friday' });
+    const flex = D.insp.mode === 'flexible';
+    res.friday = await sendTo(token, onlyKey ? (keys.length ? [onlyKey] : []) : keys, { title: '🔧 موعد الفحص الأسبوعي', body: flex ? 'افحص سيارتك قبل نهاية الدورة وصوّر البنود من صفحة الفحص في النظام.' : 'اليوم موعد فحص سيارتك: افحصها وصوّر البنود من صفحة الفحص في النظام.', url: './#driver', tag: 'friday' });
   }
   if (kinds.includes('sign')) {
     const since = ymd(new Date(Date.parse(today) - 14 * 864e5));
@@ -143,10 +168,10 @@ async function run({ token, kinds, onlyKey }) {
     res.sign = s;
   }
   if (kinds.includes('saturday')) {
-    const miss = uninspected(D, ws);
+    const miss = onlyKey ? uninspected(D, today) : lateToday(D, today);
     if (miss.length || onlyKey) res.saturday = await sendTo(token, mg, miss.length
       ? { title: `🚗 ${miss.length} سيارة لم يُعمل لها الفحص الأسبوعي`, body: miss.slice(0, 8).map(plateTxt).join('، ') + (miss.length > 8 ? '…' : ''), url: './#inspect', tag: 'saturday' }
-      : { title: '✅ الفحص الأسبوعي مكتمل', body: 'جميع السيارات العاملة فُحصت هذا الأسبوع.', url: './#inspect', tag: 'saturday' });
+      : { title: '✅ الفحص الأسبوعي مكتمل', body: 'جميع السيارات العاملة فُحصت في دورتها الحالية.', url: './#inspect', tag: 'saturday' });
   }
   return { cfg: D.cfg, res };
 }
@@ -156,9 +181,9 @@ function dueKinds(cfg, d = ksa()) {
   const h = d.getUTCHours(), wd = d.getUTCDay(); const k = [];
   if (!cfg.enabled) return k;
   if (h === 7 && wd >= 0 && wd <= 4 && cfg.digest) k.push('digest');
-  if (h === 8 && wd === 5 && cfg.friday) k.push('friday');
+  if (h === 8 && cfg.friday) k.push('friday'); // يومياً، ويُرسل فقط لمن موعد فحصه اليوم
   if (h === 9 && cfg.sign) k.push('sign');
-  if (h === 9 && wd === 6 && cfg.saturday) k.push('saturday');
+  if (h === 9 && cfg.saturday) k.push('saturday'); // يومياً، ويُرسل فقط إذا تأخر فحص سيارة أمس
   return k;
 }
 
@@ -175,4 +200,4 @@ async function getCompany(token, cid) {
   if (!r.ok) return null; const j = await r.json(); return { id: cid, ...obj(j.fields || {}) };
 }
 
-module.exports = { systemLogin, run, dueKinds, list, load, setCompany, companiesFor, getCompany, okCid, ROOT, base: () => base() };
+module.exports = { inspCfg, cycleOf, dueToday, lateToday, systemLogin, run, dueKinds, list, load, setCompany, companiesFor, getCompany, okCid, ROOT, base: () => base() };

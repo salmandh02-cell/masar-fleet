@@ -871,7 +871,7 @@ function computeAlerts(){
   {const since=new Date(Date.now()-7*864e5).toISOString().slice(0,10);
    S.inspections.filter(x=>x.issues&&String(x.date)>=since).forEach(x=>{const v=vById(x.vehicleId);if(!v)return;const later=S.maintenance.some(m=>m.vehicleId===v.id&&String(m.date)>=String(x.date));if(later)return;
      out.push({sev:'warn',w:6,title:`ملاحظة في الفحص الأسبوعي – ${plateTxt(v)}`,sub:inspIssues(x).map(([k,l])=>`${l}: ${x.items[k].note||''}`).join(' · '),v:v.id})});
-   if(new Date().getDay()!==5&&S.inspections.length&&myRole()!=='driver'){const miss=inspWeek().filter(x=>!x.done);if(miss.length)out.push({sev:'warn',w:25,title:`${miss.length} ${miss.length>2&&miss.length<11?'سيارات':'سيارة'} لم يُجرَ لها الفحص الأسبوعي (دورة الجمعة)`,sub:miss.slice(0,6).map(x=>plateTxt(x.v)).join('، ')+(miss.length>6?'…':''),go:'inspect'})}}
+   if(S.inspections.length&&myRole()!=='driver'){const miss=inspWeek().filter(x=>x.late||x.soon);if(miss.length)out.push({sev:'warn',w:25,title:`${miss.length} ${miss.length>2&&miss.length<11?'سيارات':'سيارة'} ${INSPCFG().mode==='flexible'?'لم تُفحص وتنتهي دورتها قريباً':'تأخر فحصها الأسبوعي عن موعده'}`,sub:miss.slice(0,6).map(x=>plateTxt(x.v)).join('، ')+(miss.length>6?'…':''),go:'inspect'})}}
   {const FF=fuelFlags();const since=new Date(Date.now()-30*864e5).toISOString().slice(0,10);const fl=S.fuel.filter(f=>FF[f.id]&&String(f.date)>=since);
    if(fl.length)out.push({sev:'warn',w:18,title:`${fl.length} ${fl.length>2&&fl.length<11?'تعبئات وقود مشبوهة':'تعبئة وقود مشبوهة'} خلال 30 يوماً`,sub:[...new Set(fl.map(f=>plateTxt(vById(f.vehicleId))))].slice(0,6).join('، ')+' · راجعها من صفحة الوقود',go:'fuel'})}
   const unpaid=S.violations.filter(x=>x.status==='unpaid');
@@ -1040,7 +1040,7 @@ function vAudit(){
 document.addEventListener('input',e=>{if(e.target.id==='audq'){AUDQ=e.target.value;const p=e.target.selectionStart;render();const n=$('#audq');if(n){n.focus();n.setSelectionRange(p,p)}}});
 
 /* ---------- حساب الشركة في المنصة: الاشتراك والفواتير والدعم الفني ---------- */
-let BILL=null,TICKETS=null;const PLT=()=>window.__plat;
+let BILL=null,TICKETS=null,TKSEQ=0;const PLT=()=>window.__plat;
 const daysTo=d=>d?Math.round((Date.parse(d+'T00:00:00Z')-Date.parse(today()+'T00:00:00Z'))/864e5):null;
 function subInfo(){const c=PLT()&&PLT().company();if(!c)return null;const trial=c.status==='trial';const end=trial?c.trialEnds:c.paidUntil;return {c,trial,end,left:daysTo(end)}}
 function subBanner(r){const s=subInfo();if(!s||!isAdmin()||r==='billing'||s.left==null||s.left>7)return '';
@@ -1072,7 +1072,7 @@ function vBilling(){
 }
 function vSupport(){
   if(!PLT())return `<div class="empty">غير متاح</div>`;
-  if(TICKETS===null){TICKETS=[];PLT().tickets().then(l=>{TICKETS=l;if(route()==='support')render()}).catch(()=>{toast('تعذر تحميل التذاكر')})}
+  if(TICKETS===null){TICKETS=[];const q=++TKSEQ;PLT().tickets().then(l=>{if(q!==TKSEQ)return;TICKETS=l;if(route()==='support')render()}).catch(()=>{if(q===TKSEQ)toast('تعذر تحميل التذاكر')})}
   const TS={open:['مفتوحة','p-warn'],answered:['تم الرد','p-ok'],closed:['مغلقة','p-idle']};
   return `<div class="head"><div><h2>الدعم الفني</h2><p>اطرح مشكلة أو استفساراً، ويصلك رد فريق الدعم هنا وبالبريد</p></div><div class="actions"><button class="btn primary" data-act="tk-new">تذكرة جديدة</button></div></div>
   <section class="panel">${TICKETS.length?`<div class="tw"><table><thead><tr><th>الموضوع</th><th>النوع</th><th>آخر تحديث</th><th>الحالة</th></tr></thead><tbody>${TICKETS.map(x=>{const a=TS[x.status]||[x.status,''];return `<tr class="click" data-act="tk-open" data-id="${esc(x.id)}" style="cursor:pointer"><td><b>${esc(x.subject)}</b>${x.unreadCo?' <span class="pill p-crit">رد جديد</span>':''}<div class="sub">${esc(x.byName||x.by)}</div></td><td>${esc(TK_CAT[x.category]||'')}</td><td class="num">${esc(String(x.lastAt||'').slice(0,16).replace('T',' '))}</td><td><span class="pill ${a[1]}">${a[0]}</span></td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty">لا توجد تذاكر. اضغط «تذكرة جديدة» لمراسلة الدعم الفني.</div>'}</section>`;
@@ -1133,7 +1133,7 @@ const PTIPS={
   branches:['الفروع',['أضف الفرع ومدينته، ثم اربط كل سيارة بفرعها من «تعديل البيانات» في ملف السيارة.']],
   drivers:['السائقون',['اضغط اسم السائق لفتح ملفه: عهده، مخالفاته، حوادثه، وكشف المطالبات والخصومات.','عمود «مستحق للخصم» يوضح المبالغ التي لم تُخصم بعد.']],
   handovers:['التسليم والاستلام',['كل خروج لسيارة من الموقف يكون بزر <b>«تسليم سيارة»</b>، وكل رجوعها بزر <b>«استلام سيارة»</b>.','من «عرض» تشوف المحضر بشكله الرسمي، ومن «PDF» تنزّله للطباعة والتوقيع.']],
-  inspect:['الفحص الأسبوعي',['الفحص يكون <b>كل جمعة</b> لكل سيارة في الخدمة.','السيارات بالأحمر لم تُفحص هذا الأسبوع. أرسل رابط «صفحة السائقين» للسائقين ليفحصوا سياراتهم من جوالاتهم.','أي ملاحظة في الفحص تظهر تنبيهاً، وتقدر تسجّل لها صيانة مباشرة.']],
+  inspect:['الفحص الأسبوعي',['موعد الفحص تحدده الشركة من زر <b>«⚙ موعد الفحص»</b>: يوم ثابت للكل، أو يوم لكل سيارة، أو مرن في أي يوم خلال الدورة، أسبوعياً أو كل أسبوعين.','السيارات بالأحمر تأخر فحصها عن موعدها. أرسل رابط «صفحة السائقين» للسائقين ليفحصوا سياراتهم من جوالاتهم.','أي ملاحظة في الفحص تظهر تنبيهاً، وتقدر تسجّل لها صيانة مباشرة.']],
   maintenance:['الصيانة',['السيارات الموجودة في الورشة تظهر في الأعلى. عند خروجها اضغط <b>«خرجت من الورشة»</b> لتعود متاحة.','سجل تغيير الزيت يحدّث عداد الزيت للسيارة تلقائياً.']],
   fuel:['الوقود',['ارفع كشف واعي من <b>«استيراد Excel»</b> بدل الإدخال اليدوي.','السيارة بلون التحذير استهلاكها أعلى من متوسط الأسطول وتحتاج مراجعة.']],
   violations:['المخالفات',['سجّل المخالفة بتاريخها ووقتها بدقة، فيحدد النظام السائق المسؤول من سجل العهد.','حدّث حالتها عند السداد أو الخصم من السائق.']],
@@ -1207,7 +1207,7 @@ function navBadge(k,alerts){
   if(k==='maintenance'){const n=S.maintenance.filter(m=>m.status==='open').length;return n?`<b class="w">${n}</b>`:''}
   if(k==='violations'){const n=S.violations.filter(x=>x.status==='unpaid').length;return n?`<b class="c">${n}</b>`:''}
   if(k==='accidents'){const n=S.accidents.filter(a=>a.status!=='closed').length;return n?`<b class="c">${n}</b>`:''}
-  if(k==='inspect'&&S.inspections.length){const n=inspWeek().filter(x=>!x.done).length;return n?`<b class="w">${n}</b>`:''}
+  if(k==='inspect'&&S.inspections.length){const n=inspWeek().filter(x=>x.late||x.soon).length;return n?`<b class="w">${n}</b>`:''}
   if(k==='vehicles')return `<b>${S.vehicles.length}</b>`;
   if(k==='inbox'){const n=unreadCount();return n?`<b class="c">${n}</b>`:''}
   return '';
@@ -1321,7 +1321,7 @@ function vSettings(){
   <section class="panel"><div class="panel-h"><h3>الإشعارات على هذا الجهاز</h3></div><div class="panel-b">${pushCard(false)}</div></section>
   <section class="panel"><div class="panel-h"><h3>بيانات الشركة</h3>${isAdmin()&&!readOnly?'<button class="btn sm" data-act="co-edit">تعديل</button>':''}</div><div class="panel-b"><div class="co-hero">${coLogo()?`<div class="co-logo"><img src="${coLogo()}" alt="شعار الشركة"></div>`:`<div class="co-logo" style="color:var(--muted,#6b7a72);font-size:12px">بدون شعار</div>`}<div><b style="font-family:var(--f-display);font-size:17px">${esc(company()||'اسم الشركة غير مسجل')}</b>${custNo()?`<div class="sub">رقم العميل: <b dir="ltr">${esc(custNo())}</b></div>`:''}<div class="sub">الاسم والشعار يظهران أعلى النظام وفي الصفحة الرئيسية، والاسم في رأس المحاضر والتقارير</div></div></div></div></section>
   <section class="panel"><div class="panel-h"><h3>استيراد البيانات من Excel</h3><span>مع معاينة قبل الحفظ</span></div><div class="panel-b actions">${Object.entries(IMP).map(([k,v])=>`<button class="btn" data-act="imp" data-id="${k}" ${readOnly?'disabled':''}>${v.label}</button>`).join('')}</div></section>
-  <section class="panel"><div class="panel-h"><h3>صفحة السائقين للفحص الأسبوعي (كل جمعة)</h3><a class="btn sm" href="#driver">فتح الصفحة</a></div><div class="panel-b sub">افتح الصفحة، ثم انسخ الرابط من شريط العنوان وأرسله للسائقين. أضف السائق من «المستخدمون والصلاحيات» بنوع «مستخدم المركبة» واربطه بملف السائق، ثم أرسل له رابط التفعيل بالواتساب، ويدخل برقم جواله وكلمة مرور يختارها، فيرى سياراته فقط.</div></section>
+  <section class="panel"><div class="panel-h"><h3>صفحة السائقين للفحص الأسبوعي</h3><a class="btn sm" href="#driver">فتح الصفحة</a></div><div class="panel-b sub">افتح الصفحة، ثم انسخ الرابط من شريط العنوان وأرسله للسائقين. أضف السائق من «المستخدمون والصلاحيات» بنوع «مستخدم المركبة» واربطه بملف السائق، ثم أرسل له رابط التفعيل بالواتساب، ويدخل برقم جواله وكلمة مرور يختارها، فيرى سياراته فقط.</div></section>
   ${remPanel()}
   ${hrPanel()}
   ${featPanel()}
@@ -1786,9 +1786,9 @@ async function remEnable(){
 async function remSet(k,v){try{await db.merge('settings','reminders',{[k]:v,updatedAt:new Date().toISOString()})}catch(e){handleWriteErr(e)}}
 async function remTest(k){try{const r=await fnCall({action:'remind-test',kinds:[k]});toast(r[k]?'أُرسل التذكير إلى جهازك ✓':'لا يوجد ما يُرسل لك في هذا التذكير الآن، أو الإشعارات غير مفعلة على جهازك')}catch(e){toast('تعذر الإرسال: '+(e.message||''))}}
 const REMS=[['digest','ملخص الإدارة اليومي','الأحد إلى الخميس 7:00 صباحاً — لمدير النظام ومدير الحركة: الوثائق المنتهية والقريبة، الزيت، الورشة، الرخص، والمحاضر غير الموقعة'],
-  ['friday','تذكير الفحص الأسبوعي','الجمعة 8:00 صباحاً — لكل مستخدم مركبة لم يفحص سيارته هذا الأسبوع'],
+  ['friday','تذكير الفحص الأسبوعي','8:00 صباحاً يوم موعد الفحص (وفي الوضع المرن قبل نهاية الدورة بيوم) — لكل مستخدم مركبة لم يفحص سيارته'],
   ['sign','تذكير توقيع المحاضر','يومياً 9:00 صباحاً — لمستخدم المركبة الذي لديه محضر تسليم أو استلام لم يوقّعه'],
-  ['saturday','السيارات التي لم تُفحص','السبت 9:00 صباحاً — للإدارة: قائمة السيارات العاملة التي لم يُعمل لها الفحص']];
+  ['saturday','السيارات التي تأخر فحصها','9:00 صباحاً في اليوم التالي للموعد — للإدارة: قائمة السيارات التي لم يُعمل لها الفحص']];
 function remPanel(){const R=REM();const adm=isAdmin()&&!readOnly;
   return `<section class="panel"><div class="panel-h"><h3>التذكيرات التلقائية على الجوال</h3>${R.enabled?'<span class="pill p-ok">مفعّلة</span>':'<span class="pill">غير مفعّلة</span>'}</div><div class="panel-b" style="display:grid;gap:10px">
     ${!R.enabled?`<div class="sub">يرسل النظام إشعارات تلقائية للجوال في أوقات ثابتة بتوقيت الرياض، حتى لو لم يفتح أحد النظام. تصل لمن فعّل الإشعارات على جهازه.</div>${adm?'<div><button class="btn primary" data-act="rem-on">تفعيل التذكيرات التلقائية</button></div>':''}`:''}
@@ -2526,10 +2526,26 @@ async function downloadPdf(id){
   }catch(e){document.getElementById('pdf-sheet')?.remove();if(!(e&&e.code==='declined'))toast('تعذر تجهيز ملف PDF، حاول مرة أخرى')}
 }
 
-/* ---------- weekly inspection (Friday cycle) ---------- */
+/* ---------- weekly inspection (company-defined schedule) ---------- */
 const INSP=[['tires','الإطارات','الضغط، التآكل، عدم وجود تشققات أو انتفاخ'],['oil','زيت المحرك','المستوى بين علامتي العصا ولونه طبيعي'],['water','ماء الرديتر','مستوى سائل التبريد في الخزان الاحتياطي'],['lights','الأنوار','الأمامية والخلفية والفرامل والإشارات']];
 const PHOTO_MAX_AGE_MIN=15;
-const weekStart=(d=today())=>{const t=new Date(d+'T12:00:00');t.setDate(t.getDate()-((t.getDay()+2)%7));return `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`};
+// موعد الفحص تحدده كل شركة (settings/inspection): يوم ثابت للكل، أو يوم لكل سيارة، أو مرن خلال الدورة؛ أسبوعي أو كل أسبوعين
+const WDAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const INSPCFG=()=>{const s=SETDOC('inspection');const d=s.day===''||s.day==null?5:+s.day;return {mode:['fixed','perVehicle','flexible'].includes(s.mode)?s.mode:'fixed',day:d>=0&&d<=6?d:5,every:+s.every===2?2:1}};
+const ymdL=t=>`${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`;
+const inspDayOf=(v,c=INSPCFG())=>c.mode==='perVehicle'&&v&&v.inspDay!==''&&v.inspDay!=null&&+v.inspDay>=0&&+v.inspDay<=6?+v.inspDay:c.day;
+function cycleOf(v,d=today()){const c=INSPCFG();const wd=inspDayOf(v,c);const t=new Date(d+'T12:00:00');t.setDate(t.getDate()-((t.getDay()-wd+7)%7));
+  if(c.every===2&&((Math.floor(Math.round((t-new Date('2026-01-04T12:00:00'))/864e5)/7)%2)+2)%2)t.setDate(t.getDate()-7);
+  const e=new Date(t);e.setDate(e.getDate()+7*c.every-1);return {start:ymdL(t),end:ymdL(e),day:wd,left:Math.round((e-new Date(d+'T12:00:00'))/864e5),today:ymdL(t)===d,flex:c.mode==='flexible',every:c.every}}
+const weekStart=(d=today())=>cycleOf(null,d).start;
+// وصف الموعد: للسيارة أو للشركة
+function inspWhen(v,tr=x=>x,tp=(x,o)=>x.replace(/\{(\w+)\}/g,(_,k)=>o[k])){const c=INSPCFG();const cy=cycleOf(v);const dn=tr(WDAYS[cy.day]);
+  if(c.mode==='flexible')return tp(tr('في أي يوم حتى {d}'),{d:fmtD(cy.end)});
+  return c.every===2?tp(tr('كل أسبوعين يوم {d}'),{d:dn}):tp(tr('كل {d}'),{d:dn})}
+function inspRuleTxt(){const c=INSPCFG();const dn=WDAYS[c.day];const per=c.every===2?'كل أسبوعين':'أسبوعية';
+  if(c.mode==='perVehicle')return `لكل سيارة يوم فحص خاص بها (${c.every===2?'كل أسبوعين':'أسبوعياً'})، والافتراضي يوم ${dn}`;
+  if(c.mode==='flexible')return `الفحص مرن: في أي يوم خلال الدورة (دورة ${per} تبدأ يوم ${dn})`;
+  return `موعده ${c.every===2?'كل أسبوعين':'كل'} يوم ${dn}`}
 const inspIssues=x=>INSP.filter(([k])=>x.items&&x.items[k]&&x.items[k].ok===false);
 const ODO_SRC={handovers:'التسليم والاستلام',inspections:'الفحص الأسبوعي',maintenance:'الصيانة'};
 let ODO_IDX=null;
@@ -2545,25 +2561,49 @@ const custodyOf=did=>S.vehicles.filter(v=>v.status==='assigned'&&v.driverId===di
 const myVehicles=()=>{const d=myDriverId();return d?S.vehicles.filter(v=>v.status==='assigned'&&v.driverId===d):[]};
 const inspDue=()=>myRole()==='driver'?myVehicles():S.vehicles.filter(v=>v.status!=='out'&&v.status!=='maintenance');
 function lastInsp(vid){return S.inspections.filter(x=>x.vehicleId===vid).sort(byDate)[0]}
-function inspWeek(){const ws=weekStart();return inspDue().map(v=>{const l=lastInsp(v.id);const done=l&&String(l.date)>=ws;return {v,l,done,issues:done?inspIssues(l):[]}})}
-const isFriday=()=>new Date().getDay()===5;
+function inspWeek(){return inspDue().map(v=>{const cy=cycleOf(v);const l=lastInsp(v.id);const done=!!(l&&String(l.date)>=cy.start);
+  const late=!done&&!cy.flex&&!cy.today,soon=!done&&cy.flex&&cy.left<=1;return {v,l,done,cy,late,soon,issues:done?inspIssues(l):[]}})}
+// هل اليوم موعد فحص لأي سيارة غير مفحوصة؟
+const inspToday=()=>inspWeek().filter(x=>!x.done&&(x.cy.today||x.cy.flex));
+function inspCfgForm(){const c=INSPCFG();const vs=S.vehicles.filter(v=>v.status!=='out'&&v.status!=='sold');
+  const opt=(sel)=>WDAYS.map((n,i)=>`<option value="${i}" ${i===sel?'selected':''}>${n}</option>`).join('');
+  const M=[['fixed','يوم ثابت لكل السيارات','كل السيارات تُفحص في اليوم نفسه.'],['perVehicle','يوم مختلف لكل سيارة','تحدد لكل سيارة يومها، مناسب لتوزيع الفحص على أيام الأسبوع.'],['flexible','مرن خلال الدورة','يفحص السائق في أي يوم خلال الدورة، ويتأخر فقط إذا انتهت الدورة دون فحص.']];
+  modal('موعد الفحص الأسبوعي',`<div class="mb" style="display:grid;gap:14px">
+    <div style="display:grid;gap:8px">${M.map(([k,a,b])=>`<label class="inl" style="align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer"><input type="radio" name="ic-mode" value="${k}" ${c.mode===k?'checked':''}><span><b>${a}</b><div class="sub">${b}</div></span></label>`).join('')}</div>
+    <div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="f"><label id="ic-dl">${c.mode==='flexible'?'تبدأ الدورة يوم':c.mode==='perVehicle'?'اليوم الافتراضي':'يوم الفحص'}</label><select id="ic-day">${opt(c.day)}</select></div>
+      <div class="f"><label>التكرار</label><select id="ic-every"><option value="1" ${c.every===1?'selected':''}>كل أسبوع</option><option value="2" ${c.every===2?'selected':''}>كل أسبوعين</option></select></div>
+    </div>
+    <div id="ic-per" style="${c.mode==='perVehicle'?'':'display:none'}"><div class="h3" style="margin-bottom:6px">يوم الفحص لكل سيارة</div>${vs.length?`<div class="tw" style="max-height:300px;overflow:auto"><table><thead><tr><th>السيارة</th><th>السائق</th><th>اليوم</th></tr></thead><tbody>${vs.map(v=>`<tr><td>${plate(v)}</td><td>${esc(v.status==='assigned'?dName(v.driverId):'—')}</td><td><select data-ivd="${v.id}"><option value="">الافتراضي</option>${WDAYS.map((n,i)=>`<option value="${i}" ${v.inspDay!==''&&v.inspDay!=null&&+v.inspDay===i?'selected':''}>${n}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">لا توجد سيارات.</div>'}</div>
+    <p class="sub" style="margin:0">التذكيرات التلقائية تتبع هذا الموعد: تذكير للسائق صباح يوم الفحص، وقائمة المتأخرين للإدارة في اليوم التالي.</p>
+    <div class="err" id="ic-err" style="color:var(--crit)"></div>
+  </div>`,`<div class="mf"><button class="btn primary" id="ic-save">حفظ</button><button class="btn" data-act="close">إلغاء</button></div>`,true);
+  const sync=()=>{const m=($('input[name=ic-mode]:checked')||{}).value;$('#ic-per').style.display=m==='perVehicle'?'':'none';$('#ic-dl').textContent=m==='flexible'?'تبدأ الدورة يوم':m==='perVehicle'?'اليوم الافتراضي':'يوم الفحص'};
+  document.querySelectorAll('input[name=ic-mode]').forEach(r=>r.onchange=sync);
+  $('#ic-save').onclick=async()=>{const m=$('input[name=ic-mode]:checked').value;$('#ic-save').disabled=true;
+    try{await db.merge('settings','inspection',{mode:m,day:+$('#ic-day').value,every:+$('#ic-every').value,updatedAt:new Date().toISOString()});
+      if(m==='perVehicle')for(const el of document.querySelectorAll('[data-ivd]')){const v=vById(el.dataset.ivd);const nv=el.value===''?null:+el.value;const ov=v&&v.inspDay!==''&&v.inspDay!=null?+v.inspDay:null;if(v&&nv!==ov)await patch('vehicles',v.id,{inspDay:nv})}
+      closeModal();toast('تم حفظ موعد الفحص')}catch(e){$('#ic-save').disabled=false;handleWriteErr(e)}};
+}
 function vInsp(){
   const wk=inspWeek(),done=wk.filter(x=>x.done).length,iss=wk.filter(x=>x.issues.length).length;
   const list=[...S.inspections].sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(b.createdAt||'').localeCompare(String(a.createdAt||''))).slice(0,150);
   const pct=wk.length?Math.round(done/wk.length*100):0;
-  return `<div class="head"><div><h2>الفحص الأسبوعي</h2><p>موعده كل يوم جمعة: يفحص السائق سيارته من جواله ويصوّر كل بند بالكاميرا</p></div><div class="actions"><button class="btn" data-act="csv" data-id="inspections">تصدير Excel</button><a class="btn" href="#driver">صفحة السائقين</a><button class="btn primary" data-act="i-new" ${readOnly?'disabled':''}>+ فحص جديد</button></div></div>
-  ${isFriday()?'<div class="banner" style="background:var(--info-soft);border-color:transparent"><div><b style="color:var(--info)">اليوم الجمعة:</b> موعد الفحص الأسبوعي لكل السيارات العاملة.</div></div>':''}
+  const cfg=INSPCFG();const tdn=inspToday().length;const cy0=cycleOf(null);
+  return `<div class="head"><div><h2>الفحص الأسبوعي</h2><p>${inspRuleTxt()}: يفحص السائق سيارته من جواله ويصوّر كل بند بالكاميرا</p></div><div class="actions">${isAdmin()&&!readOnly?'<button class="btn" data-act="insp-cfg">⚙ موعد الفحص</button>':''}<button class="btn" data-act="csv" data-id="inspections">تصدير Excel</button><a class="btn" href="#driver">صفحة السائقين</a><button class="btn primary" data-act="i-new" ${readOnly?'disabled':''}>+ فحص جديد</button></div></div>
+  ${tdn?`<div class="banner" style="background:var(--info-soft);border-color:transparent"><div><b style="color:var(--info)">${cfg.mode==='flexible'?'الدورة مفتوحة:':'اليوم موعد الفحص:'}</b> ${tdn} ${tdn>2&&tdn<11?'سيارات':'سيارة'} ${cfg.mode==='flexible'?`لم تُفحص بعد، وتنتهي الدورة ${fmtD(cy0.end)}`:'موعد فحصها اليوم'}.</div></div>`:''}
   <section class="panel"><div class="panel-b" style="display:grid;gap:10px">
-    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><b style="font-family:var(--f-display);font-size:17px">دورة هذا الأسبوع (من الجمعة ${fmtD(weekStart())}): ${done} من ${wk.length} سيارة</b><span class="sub">${iss?`<span class="pill p-warn">${iss} فيها ملاحظات</span>`:''} ${wk.length-done?`<span class="pill p-crit">${wk.length-done} لم تُفحص</span>`:''}</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><b style="font-family:var(--f-display);font-size:17px">${cfg.mode==='perVehicle'?'الدورة الحالية لكل سيارة':`الدورة الحالية (${fmtD(cy0.start)} – ${fmtD(cy0.end)})`}: ${done} من ${wk.length} سيارة</b><span class="sub">${iss?`<span class="pill p-warn">${iss} فيها ملاحظات</span>`:''} ${wk.filter(x=>x.late).length?`<span class="pill p-crit">${wk.filter(x=>x.late).length} متأخرة</span>`:''} ${cfg.mode!=='flexible'&&wk.filter(x=>!x.done&&!x.late).length?`<span class="pill">${wk.filter(x=>!x.done&&!x.late).length} لم يحن موعدها</span>`:''}${cfg.mode==='flexible'&&wk.length-done?`<span class="pill p-warn">${wk.length-done} لم تُفحص بعد</span>`:''}</span></div>
     <div class="bar" style="height:12px"><i style="width:${pct}%"></i></div>
-  </div><div class="tw"><table><thead><tr><th>السيارة</th><th>السائق</th><th>حالة هذا الأسبوع</th><th>آخر فحص</th><th></th></tr></thead><tbody>
-  ${wk.sort((a,b)=>(a.done-b.done)||(b.issues.length-a.issues.length)).map(x=>`<tr><td>${plate(x.v)}<div class="sub">${esc(vName(x.v))}${brOf(x.v)?' · '+esc(brOf(x.v).name):''}</div></td><td>${esc(x.v.status==='assigned'?dName(x.v.driverId):'—')}</td>
-    <td>${!x.done?'<span class="pill p-crit">لم يُفحص</span>':x.issues.length?`<span class="pill p-warn">ملاحظات: ${x.issues.map(i=>i[1]).join('، ')}</span>`:'<span class="pill p-ok">تم – سليمة</span>'}</td>
+  </div><div class="tw"><table><thead><tr><th>السيارة</th><th>السائق</th><th>الموعد</th><th>حالة الدورة</th><th>آخر فحص</th><th></th></tr></thead><tbody>
+  ${wk.sort((a,b)=>(a.done-b.done)||(b.late-a.late)||(b.issues.length-a.issues.length)).map(x=>`<tr><td>${plate(x.v)}<div class="sub">${esc(vName(x.v))}${brOf(x.v)?' · '+esc(brOf(x.v).name):''}</div></td><td>${esc(x.v.status==='assigned'?dName(x.v.driverId):'—')}</td>
+    <td class="sub">${inspWhen(x.v)}${x.cy.flex&&!x.done?`<div>متبقي ${x.cy.left+1} يوم</div>`:''}</td>
+    <td>${!x.done?(x.late?'<span class="pill p-crit">متأخر</span>':x.soon?'<span class="pill p-crit">تنتهي دورته قريباً</span>':x.cy.today?'<span class="pill p-warn">موعده اليوم</span>':'<span class="pill">لم يحن موعده</span>'):x.issues.length?`<span class="pill p-warn">ملاحظات: ${x.issues.map(i=>i[1]).join('، ')}</span>`:'<span class="pill p-ok">تم – سليمة</span>'}</td>
     <td class="n">${x.l?`<button class="btn sm ghost" data-act="i-view" data-id="${x.l.id}">${fmtD(x.l.date)}</button>`:'—'}</td><td>${readOnly?'':`<button class="btn sm" data-act="i-new" data-id="${x.v.id}">فحص الآن</button>`}</td></tr>`).join('')}
   </tbody></table></div></section>
   <section class="panel"><div class="panel-h"><h3>سجل الفحوصات</h3><span>${S.inspections.length} فحص</span></div>${list.length?`<div class="tw"><table><thead><tr><th>التاريخ</th><th>السيارة</th><th>السائق</th>${INSP.map(i=>`<th>${i[1]}</th>`).join('')}<th>العداد</th><th>قام بالفحص</th></tr></thead><tbody>
   ${list.map(x=>`<tr class="click" data-act="i-view" data-id="${x.id}"><td class="n">${fmtD(x.date)}</td><td>${plate(vById(x.vehicleId))}</td><td>${esc(dName(x.driverId))}</td>${INSP.map(([k])=>{const it=x.items&&x.items[k];return `<td>${!it?'—':it.ok===false?'<span class="pill p-crit">يحتاج متابعة</span>':'<span class="pill p-ok">سليم</span>'}</td>`}).join('')}<td class="n">${km(x.odometer)}</td><td>${esc(x.by||'—')}</td></tr>`).join('')}
-  </tbody></table></div>`:'<div class="empty">لا توجد فحوصات بعد. أرسل رابط «صفحة السائقين» لهم ليفحصوا سياراتهم كل جمعة.</div>'}</section>`;
+  </tbody></table></div>`:'<div class="empty">لا توجد فحوصات بعد. أرسل رابط «صفحة السائقين» لهم ليفحصوا سياراتهم في موعدها.</div>'}</section>`;
 }
 function vDriver(){
   const role=myRole();const drv=role==='driver';const d=drv?dById(myDriverId()):null;
@@ -2576,8 +2616,8 @@ function vDriver(){
   ${drv?pushCard(true):''}
   ${drv?`<a class="drv-car drv-msg" href="#inbox"><span class="av">💬</span><span><b>${t('الرسائل')}</b><small>${un?t('لديك {n} رسالة جديدة',{n:un}):t('تواصل مع إدارة الأسطول')}</small></span>${un?`<span class="pill p-crit">${t('{n} جديدة',{n:un})}</span>`:''}</a>`:''}
   ${toSign.length?`<div class="sign-box"><div class="h3">✍️ ${t('محاضر بانتظار توقيعك ({n})',{n:toSign.length})}</div>${toSign.map(h=>`<button class="drv-car" data-act="h-sign" data-id="${h.id}">${plate(vById(h.vehicleId))}<span><b>${t(h.type==='out'?'محضر تسليم':'محضر استلام')}</b><small>${fmtDT(h.at)}</small></span><span class="pill p-warn">${t('راجع ووقّع')}</span></button>`).join('')}</div>`:''}
-  ${isFriday()?`<div class="banner" style="background:var(--info-soft);border-color:transparent"><div><b style="color:var(--info)">${t('اليوم الجمعة:')}</b> ${t('موعد الفحص الأسبوعي. افحص سيارتك وصوّر كل بند.')}</div></div>`:`<p class="sub">${t('موعد الفحص كل يوم جمعة.')} ${drv?t('هذه السيارات المسلّمة لك:'):'اختر السيارة:'}</p>`}
-  <div class="drv-list">${wk.map(x=>`<button class="drv-car" data-act="i-new" data-id="${x.v.id}" data-mode="driver">${plate(x.v)}<span><b>${esc(vName(x.v))}</b><small>${drv?'':x.v.status==='assigned'?esc(dName(x.v.driverId)):''}${x.l?` · ${t('آخر فحص {d}',{d:fmtD(x.l.date)})}`:''}</small></span>${x.done?`<span class="pill p-ok">${t('تم هذا الأسبوع')}</span>`:`<span class="pill p-warn">${t('مطلوب')}</span>`}</button>`).join('')||`<div class="empty">${drv?t('لا توجد سيارة مسلّمة لك حالياً.'):'لا توجد سيارات.'}</div>`}</div>
+  ${wk.some(x=>!x.done&&x.cy.today)?`<div class="banner" style="background:var(--info-soft);border-color:transparent"><div><b style="color:var(--info)">${t('اليوم موعد الفحص:')}</b> ${t('موعد الفحص الأسبوعي. افحص سيارتك وصوّر كل بند.')}</div></div>`:''}<p class="sub">${drv?t('هذه السيارات المسلّمة لك:'):'اختر السيارة:'}</p>
+  <div class="drv-list">${wk.map(x=>`<button class="drv-car" data-act="i-new" data-id="${x.v.id}" data-mode="driver">${plate(x.v)}<span><b>${esc(vName(x.v))}</b><small>${drv?'':x.v.status==='assigned'?esc(dName(x.v.driverId))+' · ':''}${t('الموعد:')} ${inspWhen(x.v,t,(k,o)=>t(k,o))}${x.l?` · ${t('آخر فحص {d}',{d:fmtD(x.l.date)})}`:''}</small></span>${x.done?`<span class="pill p-ok">${t('تم هذا الأسبوع')}</span>`:x.late?`<span class="pill p-crit">${t('متأخر')}</span>`:x.cy.today||x.cy.flex?`<span class="pill p-warn">${t('مطلوب')}</span>`:`<span class="pill">${t('لم يحن موعده')}</span>`}</button>`).join('')||`<div class="empty">${drv?t('لا توجد سيارة مسلّمة لك حالياً.'):'لا توجد سيارات.'}</div>`}</div>
   ${signed.length?`<details style="margin-top:6px"><summary class="sub" style="cursor:pointer">${t('محاضري الموقّعة ({n})',{n:signed.length})}</summary><div class="drv-list" style="margin-top:8px">${signed.map(h=>`<button class="drv-car" data-act="ho-view" data-id="${h.id}">${plate(vById(h.vehicleId))}<span><b>${t(h.type==='out'?'محضر تسليم':'محضر استلام')}</b><small>${fmtDT(h.at)}</small></span><span class="pill p-ok">${t('✓ موقّع')}</span></button>`).join('')}</div></details>`:''}
   ${drv?'':'<p class="sub" style="text-align:center"><a href="#inspect">العودة للنظام</a></p>'}</div>`;
 }
@@ -3231,6 +3271,7 @@ document.addEventListener('click',e=>{
     case 'mgmt-pdf':mgmtPdf();break;
     case 'rep-pdf':reportPdf();break;
     case 'i-new':if(W())inspForm(id,b.dataset.mode);break;
+    case 'insp-cfg':if(W()&&isAdmin())inspCfgForm();break;
     case 'i-view':viewInsp(id);break;
     case 'i-del':confirmBox('حذف سجل الفحص؟','حذف',()=>del('inspections',id).then(()=>toast('تم الحذف')));break;
     case 'r-new':if(W())renewForm(null,id,b.dataset.doc);break;

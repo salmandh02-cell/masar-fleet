@@ -325,5 +325,26 @@ await a.screenshot({ path: SHOTS + '/28-home-mobile.png', fullPage: true });
 await a.click('#bnav [data-menu]'); await a.waitForTimeout(400); ok(await a.evaluate(() => document.querySelector('#nav').classList.contains('open')), 'زر «المزيد» يفتح القائمة'); await a.screenshot({ path: SHOTS + '/29-menu-mobile.png' });
 await a.click('#scrim', { position: { x: 15, y: 400 } }); await a.setViewportSize({ width: 1280, height: 900 });
 
+console.log('١٨) موعد الفحص الأسبوعي تحدده الشركة');
+{ const rc = require('/tmp/claude-0/w/fleet-saas/functions/lib/remind-core.js');
+  const f = rc.inspCfg({}); ok(rc.cycleOf(f, null, '2026-11-13').start === '2026-11-13' && rc.cycleOf(f, null, '2026-11-12').start === '2026-11-06', 'الافتراضي: الجمعة أسبوعياً');
+  const b = rc.inspCfg({ mode: 'flexible', day: 0, every: 2 }); const cb = rc.cycleOf(b, null, '2026-11-11'); ok(cb.start === '2026-11-08' && cb.end === '2026-11-21', 'مرن كل أسبوعين: دورة 14 يوماً');
+  const D = { insp: rc.inspCfg({ mode: 'perVehicle', day: 5 }), vehicles: [{ id: 'a', status: 'assigned', inspDay: 1 }, { id: 'b', status: 'assigned' }], inspections: [] };
+  ok(rc.dueToday(D, '2026-11-16').map(v => v.id).join() === 'a' && rc.lateToday(D, '2026-11-17').map(v => v.id).join() === 'a' && rc.dueToday(D, '2026-11-20').map(v => v.id).join() === 'b', 'يوم لكل سيارة: التذكير والتأخير حسب يوم كل سيارة');
+  const D2 = { ...D, insp: rc.inspCfg({ mode: 'flexible', day: 5 }) }; ok(rc.lateToday(D2, '2026-11-19').length === 0 && rc.lateToday(D2, '2026-11-20').length === 2, 'المرن: لا تأخير إلا بعد نهاية الدورة'); }
+await p.goto(B + '#inspect'); await p.waitForSelector('[data-act=insp-cfg]', { timeout: 15000 });
+ok((await p.textContent('#main')).includes('موعده كل يوم الجمعة'), 'الوصف الافتراضي: كل يوم جمعة');
+await p.click('[data-act=insp-cfg]'); await p.waitForSelector('#ic-save');
+await p.check('input[name=ic-mode][value=perVehicle]'); ok(await p.locator('#ic-per').isVisible(), 'جدول أيام السيارات يظهر عند اختيار «يوم لكل سيارة»');
+const ivd = await p.getAttribute('[data-ivd]', 'data-ivd'); await p.selectOption(`[data-ivd="${ivd}"]`, '1'); await p.selectOption('#ic-every', '2');
+await p.screenshot({ path: SHOTS + '/30-insp-cfg.png' });
+await p.click('#ic-save'); await p.waitForTimeout(1500);
+const isd = (await adm(`companies/${pcid}/settings/inspection`)).fields || {}; const ivdoc = (await adm(`companies/${pcid}/vehicles/${ivd}`)).fields || {};
+ok(isd.mode.stringValue === 'perVehicle' && +isd.every.integerValue === 2 && +ivdoc.inspDay.integerValue === 1, 'حُفظ الوضع والتكرار ويوم السيارة');
+ok((await p.textContent('#main')).includes('كل أسبوعين يوم الاثنين'), 'جدول الفحص يعرض موعد السيارة الخاص');
+await p.click('[data-act=insp-cfg]'); await p.waitForSelector('#ic-save'); await p.check('input[name=ic-mode][value=flexible]'); await p.selectOption('#ic-every', '1'); await p.click('#ic-save'); await p.waitForTimeout(1200);
+ok((await p.textContent('#main')).includes('الفحص مرن') && (await p.textContent('#main')).includes('في أي يوم حتى'), 'الوضع المرن يظهر في الصفحة');
+await p.screenshot({ path: SHOTS + '/31-insp-flex.png', fullPage: true });
+
 console.log(`\n${pass} نجح، ${fail} فشل`);
 await browser.close(); srv.close(); process.exit(fail ? 1 : 0);
