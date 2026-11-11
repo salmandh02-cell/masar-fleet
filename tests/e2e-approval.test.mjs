@@ -37,7 +37,7 @@ async function newPage(w = 420) {
     if (u.startsWith('https://www.gstatic.com/firebasejs/')) return route.fulfill({ path: path.join(FBDIR, u.split('/').pop()), contentType: 'text/javascript' });
     if (u.startsWith('https://fonts.')) return route.abort(); if (u.startsWith(B) || u.startsWith('http://127.0.0.1:9099') || u.startsWith('http://127.0.0.1:8080') || u.startsWith('blob:') || u.startsWith('data:') || u.startsWith('about:')) return route.continue();
     return route.abort(); });
-  page.on('pageerror', e => console.log('    [pageerror]', page.url(), e.message, (e.stack||'').split('\n')[1])); page.on('dialog', d => d.accept());
+  page.on('pageerror', e => console.log('    [pageerror]', page.url(), e.message, (e.stack||'').split('\n')[1])); page.on('dialog', d => d.accept()); page.on('console', m => { if (m.type() === 'error' && !/favicon|ERR_|404|fonts/.test(m.text())) console.log('    [console]', m.text().slice(0, 300)); });
   return page;
 }
 async function verifyAll() { const j = await (await fetch(`${AUTH}/emulator/v1/projects/${PRJ}/oobCodes`)).json(); for (const c of j.oobCodes || []) if (c.requestType === 'VERIFY_EMAIL') await fetch(c.oobLink); }
@@ -68,7 +68,8 @@ const a = await newPage(1280);
 await a.goto(B + 'admin.html'); await a.waitForSelector('#l-new', { timeout: 20000 });
 await a.click('#l-new'); await a.fill('#ce', 'salmandh02@gmail.com'); await a.fill('#cp', 'owner123'); await a.click('#cf button.pri');
 await a.waitForSelector('#vb', { timeout: 15000 }); await verifyAll(); await a.click('#vb');
-await a.waitForSelector('#rows tr[data-id]', { timeout: 20000 });
+await a.waitForSelector('#t-home .stat4', { timeout: 20000 }); ok(await a.waitForFunction(() => document.querySelector('#t-home').textContent.includes('طلب تسجيل جديد'), null, { timeout: 10000 }).then(() => true, () => false), 'الرئيسية: الطلب الجديد في «يحتاج قرارك»');
+await a.click('nav [data-t=requests]'); await a.waitForSelector('#rows tr[data-id]', { timeout: 20000 });
 ok((await a.textContent('#reqBadge')).trim() === '1', 'شارة الطلبات = 1');
 ok((await a.textContent('#rows')).includes('1010123456'), 'السجل التجاري ظاهر في القائمة');
 await a.screenshot({ path: SHOTS + '/3-requests.png' });
@@ -135,7 +136,7 @@ for (const [k, v] of Object.entries({ ...fill, crNumber: '1010999999', officialE
 await p2.setInputFiles('#kf input[data-kind=cr]', '/tmp/claude-0/e2e/cr.pdf'); await p2.click('#kb'); await p2.waitForSelector('#pd-r', { timeout: 20000 });
 const m = await newPage(1280);
 await m.goto(B + 'admin.html'); await m.waitForSelector('#l-new'); await m.click('#l-new'); await m.fill('#ce', 'sales@plat.com'); await m.fill('#cp', 'sales123'); await m.click('#cf button.pri');
-await m.waitForSelector('#vb'); await verifyAll(); await m.click('#vb'); await m.waitForSelector('#rows tr[data-id]', { timeout: 15000 });
+await m.waitForSelector('#vb'); await verifyAll(); await m.click('#vb'); await m.waitForSelector('#nav [data-t=requests]', { timeout: 15000 }); await m.click('nav [data-t=requests]'); await m.waitForSelector('#rows tr[data-id]', { timeout: 15000 });
 await m.click('#rows tr[data-id]'); await m.waitForSelector('#sheet [data-f=reject]'); await m.click('#sheet [data-f=reject]');
 await m.fill('#df [name=r]', 'صورة السجل غير واضحة، أعد رفعها'); await m.click('#dlg button[value=ok]');
 await m.waitForFunction(() => document.querySelector('#sheet .top').textContent.includes('مرفوضة'), null, { timeout: 10000 }); ok(true, 'رُفض الطلب');
@@ -184,7 +185,7 @@ const inv2 = (await adm('invoices/' + invId)).fields; ok(inv2.status.stringValue
 console.log('١٠) الدعم الفني');
 await p.goto(B + '#support'); await p.waitForSelector('[data-act=tk-new]', { timeout: 20000 }); await p.click('[data-act=tk-new]');
 await p.fill('#f-subject', 'لا أستطيع إضافة سائق'); await p.fill('#f-body', 'تظهر رسالة خطأ عند الحفظ'); await p.click('#frm [type=submit]');
-await p.waitForSelector('tr[data-act=tk-open]', { timeout: 15000 }); ok(true, 'فتحت الشركة تذكرة');
+await p.waitForSelector('tr[data-act=tk-open]', { timeout: 15000 }).catch(async e => { console.log('    [debug]', (await p.textContent('#main')).slice(0, 400), await p.evaluate(() => location.hash)); throw e; }); ok(true, 'فتحت الشركة تذكرة');
 await p.waitForTimeout(800); ok(CALLS.some(c => c.action === 'ticket' && c.code === 200), 'إشعار الدعم بالتذكرة');
 await a.click('nav [data-t=support]'); await a.click('#tkReload'); await a.waitForSelector('#tkrows tr[data-tk]', { timeout: 10000 });
 ok((await a.textContent('#tkBadge')).trim() === '1', 'شارة التذاكر الجديدة');
@@ -287,6 +288,42 @@ ok((await a.textContent('#t-reports')).includes('استخدام الذكاء ا�
 await a.screenshot({ path: SHOTS + '/23-ai-report.png', fullPage: true });
 const p3 = await (async () => { const t = await p2.evaluate(async () => window.__plat ? await window.__plat.token() : null); if (!t) return 'no-session'; const r = await realFetch(B + '.netlify/functions/ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t }, body: JSON.stringify({ action: 'ask', question: 'x', data: '' }) }); return r.status; })();
 ok(p3 === 403 || p3 === 'no-session', 'شركة غير معتمدة لا تستخدم الذكاء الاصطناعي: ' + p3);
+
+console.log('١٧) لوحة المالك: الرئيسية والتحكم والنشاط وصحة النظام');
+const pcid = await p.evaluate(() => window.__companyId); const pname = (await adm('companies/' + pcid)).fields.name.stringValue;
+await p.evaluate(() => setTimeout(() => { throw new Error('e2e-boom'); }, 0)); await p.waitForTimeout(1500);
+await a.click('nav [data-t=home]'); await a.waitForSelector('#t-home .stat4', { timeout: 20000 }); await a.waitForTimeout(1500);
+ok(await a.locator('#t-home .stat4 button').count() === 4 && (await a.textContent('#t-home')).includes('يحتاج قرارك'), 'الرئيسية: 4 بطاقات وقائمة «يحتاج قرارك»');
+await a.screenshot({ path: SHOTS + '/24-home.png', fullPage: true });
+await a.click('nav [data-t=companies]'); await a.click(`#rows tr[data-id="${pcid}"]`); await a.waitForSelector('#sheet [data-f=ctl]');
+await a.click('#sheet [data-f=ctl]'); await a.uncheck('#df [name=f_inbox]'); await a.uncheck('#df [name=f_ai]'); await a.fill('#df [name=customPrice]', '22'); await a.fill('#df [name=discountPct]', '10');
+await a.screenshot({ path: SHOTS + '/25-control.png' }); await a.click('#dlg button[value=ok]'); await a.waitForTimeout(1200);
+const cdoc = (await adm('companies/' + pcid)).fields;
+ok(cdoc.features.mapValue.fields.inbox.booleanValue === false && cdoc.features.mapValue.fields.fuel.booleanValue === true && +cdoc.customPrice.integerValue === 22 && +cdoc.discountPct.integerValue === 10, 'حُفظ التحكم: إيقاف المحادثات والذكاء، وسعر وخصم خاص');
+ok((await a.textContent('#sheet')).includes('التحكم والحدود') && (await a.textContent('#sheet')).includes('22.00 ريال'), 'ملف الشركة يعرض التحكم');
+await a.click('#sheet [data-f=invoice]'); await a.waitForSelector('#isum');
+ok(await a.inputValue('#df [name=price]') === '22' && (await a.textContent('#ydisc')).includes('خصم خاص 10%'), 'الفاتورة بالسعر الخاص والخصم الدائم');
+await a.click('#dlg button[value=cancel]'); await a.click('#sheet [data-f=close]');
+await p.reload(); await p.waitForTimeout(3500);
+ok(await p.locator('#side a[href="#inbox"]').count() === 0 && await p.locator('#side a[href="#ai"]').count() === 0 && await p.locator('#side a[href="#fuel"]').count() === 1, 'الميزات الموقوفة اختفت من نظام الشركة');
+await p.goto(B + '#inbox'); await p.waitForTimeout(800); ok(!(await p.evaluate(() => location.hash)).includes('inbox'), 'فتح ميزة موقوفة بالرابط يرجع للرئيسية');
+const off = await (async () => { const t = await p.evaluate(async () => window.__fbIdToken()); const r = await realFetch(B + '.netlify/functions/ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t }, body: JSON.stringify({ action: 'ask', question: 'x', data: '' }) }); return [r.status, (await r.json()).error]; })();
+ok(off[0] === 403 && off[1] === 'company-off', 'الخادم يمنع الذكاء الاصطناعي الموقوف للشركة: ' + off.join(' '));
+await a.click('nav [data-t=activity]'); await a.click('#statsNow'); await a.waitForFunction(() => document.querySelector('#statsAt').textContent.includes('آخر حساب'), null, { timeout: 20000 });
+const pst = (await adm('platstats/' + pcid)).fields || {};
+ok(+((pst.users || {}).integerValue || 0) >= 1 && +((pst.vehicles || {}).integerValue || 0) >= 1 && (pst.lastSeen || {}).stringValue, 'إحصاءات النشاط: المستخدمون والسيارات وآخر دخول');
+ok((await a.textContent('#arows')).includes(pname), 'صفحة النشاط والمخاطر تعرض الشركة');
+await a.screenshot({ path: SHOTS + '/26-activity.png' });
+await a.click('nav [data-t=health]'); await a.waitForSelector('#t-health .hgrid', { timeout: 20000 });
+const htx = await a.textContent('#t-health');
+ok(htx.includes('e2e-boom') && htx.includes(pname), 'أعطال متصفح الشركة تصل لصحة النظام');
+ok(htx.includes('قاعدة البيانات') && htx.includes('البريد الإلكتروني') && htx.includes('الذكاء الاصطناعي') && htx.includes('claude-haiku-5-5'), 'بطاقات صحة النظام وحالة الإعدادات');
+await a.screenshot({ path: SHOTS + '/27-health.png', fullPage: true });
+await a.setViewportSize({ width: 390, height: 844 }); await a.click('#bnav [data-t=home]'); await a.waitForTimeout(600);
+ok(await a.locator('#bnav').isVisible() && !(await a.locator('#nav').isVisible() && (await a.evaluate(() => document.querySelector('#nav').getBoundingClientRect().right <= innerWidth && document.querySelector('#nav').getBoundingClientRect().left >= 0))), 'الجوال: شريط سفلي والقائمة مخفية');
+await a.screenshot({ path: SHOTS + '/28-home-mobile.png', fullPage: true });
+await a.click('#bnav [data-menu]'); await a.waitForTimeout(400); ok(await a.evaluate(() => document.querySelector('#nav').classList.contains('open')), 'زر «المزيد» يفتح القائمة'); await a.screenshot({ path: SHOTS + '/29-menu-mobile.png' });
+await a.click('#scrim', { position: { x: 15, y: 400 } }); await a.setViewportSize({ width: 1280, height: 900 });
 
 console.log(`\n${pass} نجح، ${fail} فشل`);
 await browser.close(); srv.close(); process.exit(fail ? 1 : 0);

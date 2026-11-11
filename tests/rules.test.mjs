@@ -258,6 +258,37 @@ console.log('الدور المزدوج ومنع التسليم للنفس');
   await t('user cannot edit another invite', carol.doc('companies/ca-111/invites/iv-d').update({ username: 'x' }), false);
 }
 
+console.log('لوحة المالك: التحكم والإحصاءات والأعطال');
+{
+  const now = new Date().toISOString(); const mgr = U('sm', 'mgr@plat.com');
+  await t('owner adds manager', sup.doc('staff/mgr@plat.com').set({ role: 'manager', active: true, name: 'M' }));
+  await t('manager switches company features and custom price', mgr.doc('companies/ca-111').update({ features: { ai: false, inbox: false }, customPrice: 22, discountPct: 10, maxVehicles: 5, updatedAt: now }));
+  await t('sales edits company features', sales.doc('companies/ca-111').update({ features: { ai: true }, updatedAt: now }));
+  await t('accountant cannot change features', acct.doc('companies/ca-111').update({ features: { fuel: false }, updatedAt: now }), false);
+  await t('company admin cannot enable its own features', alice.doc('companies/ca-111').update({ features: { ai: true, inbox: true }, updatedAt: now }), false);
+  await t('company admin cannot set own price', alice.doc('companies/ca-111').update({ customPrice: 1, updatedAt: now }), false);
+  await t('system reads company last-seen for stats', sysA.collection('companies/ca-111/seen').get());
+  await t('support cannot read company last-seen', supp.collection('companies/ca-111/seen').get(), false);
+  await t('system writes platform stats', sysA.doc('platstats/ca-111').set({ cid: 'ca-111', users: 2, vehicles: 1, at: now }));
+  await t('staff reads platform stats', acct.collection('platstats').get());
+  await t('staff cannot write platform stats', mgr.doc('platstats/ca-111').set({ users: 99 }), false);
+  await t('company cannot read platform stats', alice.doc('platstats/ca-111').get(), false);
+  await t('system writes job health', sysA.doc('platform/health').set({ remindAt: now, remindOk: true }, { merge: true }));
+  await t('manager cannot write job health', mgr.doc('platform/health').set({ remindOk: true }, { merge: true }), false);
+  await t('system cannot write platform settings', sysA.doc('platform/settings').set({ aiEnabled: 'on' }, { merge: true }), false);
+  const er = { cid: 'ca-111', email: 'alice@a.com', msg: 'TypeError: x', src: 'index.html:10', page: '#fuel', ua: 'test', at: now };
+  await t('company user reports a browser error', alice.collection('clienterr').add(er));
+  await t('cannot report an error as someone else', bob.collection('clienterr').add(er), false);
+  await t('error message size is limited', alice.collection('clienterr').add({ ...er, msg: 'x'.repeat(600) }), false);
+  await t('error report rejects extra fields', alice.collection('clienterr').add({ ...er, token: 'x' }), false);
+  await t('anonymous cannot report errors', anon.collection('clienterr').add(er), false);
+  await t('platform staff read browser errors', acct.collection('clienterr').get());
+  await t('company cannot read browser errors', alice.collection('clienterr').get(), false);
+  const eid = (await sup.collection('clienterr').get()).docs[0].id;
+  await t('manager cannot delete errors', mgr.doc('clienterr/' + eid).delete(), false);
+  await t('owner clears errors', sup.doc('clienterr/' + eid).delete());
+}
+
 console.log(`\n${pass} نجح، ${fail} فشل`);
 await env.cleanup();
 process.exit(fail ? 1 : 0);

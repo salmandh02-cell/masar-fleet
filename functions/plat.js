@@ -20,6 +20,27 @@ exports.handler = async (event) => {
       if (me.email !== P.SUPER() || !me.verified) return J(403, { error: 'owner only' });
       const s = await require('./lib/remind-core').systemLogin(true); return J(200, { email: s.email });
     }
+    // أدوات مالك المنصة التقنية: حالة الإعدادات، تحديث الإحصاءات، واختبار البريد والإشعارات والذكاء
+    if (['health', 'stats-now', 'test-mail', 'test-push', 'test-ai'].includes(req.action)) {
+      const s = await P.sys(); let role = '';
+      if (me.email === P.SUPER() && me.verified) role = 'owner';
+      else { const st = await P.get(s, `staff/${encodeURIComponent(me.email)}`).catch(() => null); if (st && st.active) role = st.role; }
+      if (!['owner', 'manager'].includes(role)) return J(403, { error: 'owner only' });
+      const S = require('./lib/plat-stats');
+      if (req.action === 'health') return J(200, { config: S.config(), time: new Date().toISOString() });
+      if (req.action === 'stats-now') return J(200, await S.run(s));
+      if (req.action === 'test-mail') { const r = await P.mail(me.email, 'رسالة اختبار من لوحة المنصة', '<p>وصلت هذه الرسالة من لوحة المنصة، يعني أن إعدادات البريد تعمل ✓</p>'); return J(200, r); }
+      if (req.action === 'test-push') { const subs = (await P.list(s, 'platpush').catch(() => [])).filter(x => String(x.key).toLowerCase() === me.email).map(x => ({ ...x, _path: 'platpush/' + x.id }));
+        return J(200, { devices: subs.length, pushed: subs.length ? await P.pushSubs(s, subs, { title: 'إشعار اختبار', body: 'الإشعارات تعمل على هذا الجهاز ✓', url: 'admin.html#health', tag: 'test' }) : 0 }); }
+      if (req.action === 'test-ai') {
+        if (!process.env.ANTHROPIC_API_KEY) return J(200, { ok: false, error: 'no key' });
+        const A = require('@anthropic-ai/sdk'); const t0 = Date.now();
+        try { const c = new (A.default || A)({ apiKey: process.env.ANTHROPIC_API_KEY, maxRetries: 0, timeout: 20000 });
+          const m = await c.messages.create({ model: S.config().aiModel, max_tokens: 16, thinking: { type: 'disabled' }, messages: [{ role: 'user', content: 'Reply with: ok' }] });
+          return J(200, { ok: true, model: m.model, ms: Date.now() - t0 }); }
+        catch (e) { return J(200, { ok: false, error: String(e.status || '') + ' ' + String(e.message || '').slice(0, 160) }); }
+      }
+    }
     // طلب تسجيل جديد ← فريق المراجعة
     if (req.action === 'signup') {
       if (!okId(req.cid)) return J(400, { error: 'cid' });

@@ -1088,10 +1088,13 @@ async function tkOpen(id){const x=TICKETS.find(t=>t.id===id);if(!x)return;let ms
   const cb=$('#tk-close');if(cb)cb.onclick=async()=>{await PLT().closeTicket(id);closeModal();TICKETS=null;render()};
 }
 /* ---------- الذكاء الاصطناعي: هل تسمح المنصة وباقة الشركة به؟ ---------- */
+// مزايا يوقفها مالك المنصة لشركة معينة (features في وثيقة الشركة)
+const FEAT_OF={ai:'ai',fuel:'fuel',branches:'branches',accidents:'accidents',inbox:'inbox',reports:'reports'};
+function coFeat(k){const f=FEAT_OF[k];if(!f)return true;const c=PLT()&&PLT().company();return !(c&&c.features&&c.features[f]===false)}
 let AI_PUB=null;
 function aiOk(){if(!PLT()||myRole()==='driver')return false;
   if(AI_PUB===null){AI_PUB={};PLT().pub().then(p=>{AI_PUB=p||{};render()});return false}
-  if(AI_PUB.aiEnabled!=='on')return false;const c=PLT().company();if(c.status==='trial')return true;
+  if(AI_PUB.aiEnabled!=='on'||!coFeat('ai'))return false;const c=PLT().company();if(c.status==='trial')return true;
   const pl=(AI_PUB.plans||[]).find(p=>p.id===c.planId);return !pl||!!pl.ai}
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
   if(a==='bill-reload'){BILL=null;render()}
@@ -1221,11 +1224,12 @@ function render(){
   const role=myRole();readOnly=baseRO||role==='viewer';takeVLink();applyScope();I18N.use(role==='driver'?I18N.lang:'ar');{const bt=document.querySelector('.brand h1');if(bt){bt.textContent=t('نظام أسطول الشركة');bt.nextElementSibling.textContent=t('السيارات · السائقون · العهد · الصيانة · المخالفات')}}{const sb=$('#srch-btn');if(sb)sb.hidden=role==='branch'}
   let r=route();if(role==='branch'&&!BR_VIEWS.includes(r)){history.replaceState(null,'','#handovers');r='handovers'}if(role==='driver'&&r!=='driver'&&r!=='inbox'&&r!=='account'){history.replaceState(null,'','#driver');r='driver'}
   if((r==='audit'||r==='billing')&&!isAdmin()){history.replaceState(null,'','#dashboard');r='dashboard'}
+  if(!coFeat(r)){history.replaceState(null,'','#dashboard');r='dashboard'}{const mb=document.querySelector('.top a[href="#inbox"]');if(mb)mb.hidden=!coFeat('inbox')}
   const alerts=computeAlerts();
   {const tp=document.querySelector('.top');if(tp){const h=Math.round(tp.getBoundingClientRect().height);if(h&&document.documentElement.style.getPropertyValue('--toph')!==h+'px')document.documentElement.style.setProperty('--toph',h+'px')}}
   {const mb=$('#mode-btn');if(mb){const cd=canDrive();mb.hidden=!cd;if(cd){const inD=role==='driver';mb.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/></svg>${inD?t('لوحة')+' '+(ROLES[baseRole()]||ROLES.viewer)[0]:t('سيارتي')}`;mb.title=inD?'العودة إلى صلاحيات '+(ROLES[baseRole()]||ROLES.viewer)[0]:'الانتقال إلى وضع مستخدم المركبة'}}}
   {const rc=$('#rolechip');if(rc){rc.textContent=userCap&&ME&&ME.id?`${ME.name||'أنت'} · ${t(ROLES[role][0])}`:'';rc.hidden=!(userCap&&ME&&ME.id)}}
-  $('#side').innerHTML=NAV.map(([g,items])=>[g,items.filter(([k])=>((k!=='audit'&&k!=='billing')||isAdmin())&&(k!=='ai'||aiCanAsk())&&(role!=='branch'||BR_VIEWS.includes(k)))]).filter(([g,items])=>items.length).map(([g,items])=>`<div class="grp">${g?`<span>${g}</span>`:''}${items.filter(([k])=>((k!=='audit'&&k!=='billing')||isAdmin())&&(k!=='ai'||aiCanAsk())&&(role!=='branch'||BR_VIEWS.includes(k))).map(([k,ic])=>`<a href="#${k}" class="${k===r?'on':''}"${k===r?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${NI[ic]}</svg>${VIEWS[k]}${navBadge(k,alerts)}</a>`).join('')}</div>`).join('');
+  $('#side').innerHTML=NAV.map(([g,items])=>[g,items.filter(([k])=>((k!=='audit'&&k!=='billing')||isAdmin())&&(k!=='ai'||aiCanAsk())&&coFeat(k)&&(role!=='branch'||BR_VIEWS.includes(k)))]).filter(([g,items])=>items.length).map(([g,items])=>`<div class="grp">${g?`<span>${g}</span>`:''}${items.filter(([k])=>((k!=='audit'&&k!=='billing')||isAdmin())&&(k!=='ai'||aiCanAsk())&&coFeat(k)&&(role!=='branch'||BR_VIEWS.includes(k))).map(([k,ic])=>`<a href="#${k}" class="${k===r?'on':''}"${k===r?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${NI[ic]}</svg>${VIEWS[k]}${navBadge(k,alerts)}</a>`).join('')}</div>`).join('');
   const allLoaded=!db||COLS.every(c=>loaded[c]);
   let html='';
   const demo=COLS.some(c=>RAW(c).some(x=>x.demo));
@@ -1245,7 +1249,7 @@ function render(){
   if(allLoaded&&db&&!IDS_LOADED){IDS_LOADED=true;loadIds()}
   if(PENDING_V&&(allLoaded||!db))setTimeout(doVLink,80);
   if(TIPS&&PTIPS[r]&&I18N.ui==='ar'){const hd=$('#main .head')||$('#main .drv h2');if(hd)hd.insertAdjacentHTML('afterend',tipbox(PTIPS[r][0],PTIPS[r][1]))}
-  $('#bnav').innerHTML=[...(role==='branch'?[]:[['dashboard','home','الرئيسية']]),['vehicles','car','السيارات'],['handovers','swap','العهد'],['inbox','chat','الرسائل']].map(([k,ic,l])=>`<a href="#${k}" class="${k===r?'on':''}"${k===r?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${NI[ic]}</svg><span>${l}</span>${k==='dashboard'&&alerts.some(a=>a.sev==='crit')?'<i></i>':''}</a>`).join('')+`<button type="button" data-act="menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>المزيد</span></button>`;
+  $('#bnav').innerHTML=[...(role==='branch'?[]:[['dashboard','home','الرئيسية']]),['vehicles','car','السيارات'],['handovers','swap','العهد'],['inbox','chat','الرسائل']].filter(([k])=>coFeat(k)).map(([k,ic,l])=>`<a href="#${k}" class="${k===r?'on':''}"${k===r?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${NI[ic]}</svg><span>${l}</span>${k==='dashboard'&&alerts.some(a=>a.sev==='crit')?'<i></i>':''}</a>`).join('')+`<button type="button" data-act="menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>المزيد</span></button>`;
   if(r==='vehicles')renderVList();
   if(r==='company')bindUsers();
   if(r==='inbox')afterInbox();

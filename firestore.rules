@@ -67,9 +67,9 @@ service cloud.firestore {
         || (open && nw == 'pending' && k.hasOnly(['name', 'phone', 'ownerName', 'profile', 'status', 'submittedAt', 'updatedAt']) && isCoOwner(cid))
         // فريق المنصة حسب الصلاحية
         || (open && nw in ['trial', 'active', 'rejected'] && k.hasOnly(['status', 'trialEnds', 'plan', 'paidUntil', 'approvedAt', 'approvedBy', 'rejectReason', 'customerNo', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'updatedAt']) && platCan('approve'))
-        || (!open && nw in ['trial', 'active', 'suspended'] && k.hasOnly(['status', 'plan', 'paidUntil', 'suspendedAt', 'suspendReason', 'lastNotice', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'updatedAt']) && platCan('status'))
+        || (!open && nw in ['trial', 'active', 'suspended'] && k.hasOnly(['status', 'plan', 'paidUntil', 'suspendedAt', 'suspendReason', 'lastNotice', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'features', 'customPrice', 'discountPct', 'updatedAt']) && platCan('status'))
         || (!open && nw == 'trial' && k.hasOnly(['status', 'trialEnds', 'updatedAt']) && platCan('trial'))
-        || (k.hasOnly(['name', 'phone', 'ownerName', 'profile', 'plan', 'note', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'updatedAt']) && platCan('edit'))
+        || (k.hasOnly(['name', 'phone', 'ownerName', 'profile', 'plan', 'note', 'planId', 'billingCycle', 'maxVehicles', 'maxUsers', 'features', 'customPrice', 'discountPct', 'updatedAt']) && platCan('edit'))
         || (k.hasOnly(['note', 'updatedAt']) && platCan('note'));
     }
 
@@ -127,7 +127,9 @@ service cloud.firestore {
       match /{col}/{id} {
         allow read: if (member(cid) && !(col in ['audit', 'threads', 'ids']))
           // اطلاع فريق المنصة (للدعم الفني): قراءة فقط، دون الهويات والرسائل والسجل
-          || (platCan('data') && col in ['vehicles', 'drivers', 'access', 'maintenance', 'fuel', 'violations', 'handovers', 'inspections', 'branches', 'settings']);
+          || (platCan('data') && col in ['vehicles', 'drivers', 'access', 'maintenance', 'fuel', 'violations', 'handovers', 'inspections', 'branches', 'settings'])
+          // الحساب الآلي يحسب آخر دخول وعدد المستخدمين النشطين لإحصاءات المنصة
+          || (platCan('notify') && col == 'seen');
         allow create: if isStaff(cid) && !(col in ['settings', 'invites', 'access', 'roles', 'audit', 'seen', 'blobs', 'logins', 'threads', 'pushsubs', 'ids'])
           && (isAdmin(cid) || !(col == 'handovers' && 'ack' in request.resource.data))
           && (col != 'handovers' || notSelf(cid, request.resource.data))
@@ -235,7 +237,7 @@ service cloud.firestore {
     match /platform/{id} {
       // public: الأسعار وبيانات التواصل للصفحة التعريفية ومفتاح الدفع العام
       allow read: if isPlat() || id == 'public';
-      allow write: if isSuper() || (id == 'counters' && platCan('invoices')) || (id == 'customers' && platCan('approve'));
+      allow write: if isSuper() || (id == 'counters' && platCan('invoices')) || (id == 'customers' && platCan('approve')) || (id == 'health' && platCan('notify'));
     }
     // مستندات الشركة (السجل التجاري، شهادة الضريبة، العنوان الوطني)
     match /kyc/{id} {
@@ -273,6 +275,23 @@ service cloud.firestore {
     match /aiuse/{id} {
       allow read: if platCan('view') || coBoss(resource.data.cid);
       allow write: if isSuper() || platCan('notify');
+    }
+    // إحصاءات نشاط كل شركة: يحسبها الحساب الآلي، ويقرؤها فريق المنصة
+    match /platstats/{cid} {
+      allow read: if platCan('view');
+      allow write: if isSuper() || platCan('notify');
+    }
+    // أخطاء المتصفح من تطبيقات الشركات: يكتبها المستخدم عن نفسه، ويراها فريق المنصة لمتابعة الأعطال
+    match /clienterr/{id} {
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['cid', 'email', 'msg', 'src', 'page', 'ua', 'at'])
+        && request.resource.data.email == myEmail()
+        && request.resource.data.msg is string && request.resource.data.msg.size() <= 500
+        && request.resource.data.get('src', '') is string && request.resource.data.get('src', '').size() <= 300
+        && request.resource.data.get('cid', '') is string && request.resource.data.get('cid', '').size() <= 40
+        && request.resource.data.get('page', '') is string && request.resource.data.get('page', '').size() <= 100
+        && request.resource.data.get('ua', '') is string && request.resource.data.get('ua', '').size() <= 200;
+      allow read: if platCan('view');
+      allow delete: if isSuper();
     }
     // سجل نشاط فريق المنصة: إضافة فقط
     match /platlog/{id} {

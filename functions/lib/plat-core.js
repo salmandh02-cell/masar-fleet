@@ -117,4 +117,4 @@ async function notifyCompanyUser(tok, cid, email, msg) {
     return await pushSubs(tok, subs, msg);
   } catch (e) { return 0; }
 }
-module.exports = { get, list, patch, upsert, create, whoIs, sys, mail, esc, btn, notifyStaff, notifyCompanyUser, SUPER, APP, SITE };
+module.exports = { get, list, patch, upsert, create, whoIs, sys, mail, esc, btn, pushSubs, notifyStaff, notifyCompanyUser, SUPER, APP, SITE };

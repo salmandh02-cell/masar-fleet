@@ -610,6 +610,12 @@ export async function start() {
       closeTicket: id => F.updateDoc(F.doc(fs, 'tickets', id), { status: 'closed', lastAt: new Date().toISOString(), lastBy: email }),
       pub: () => F.getDoc(F.doc(fs, 'platform', 'public')).then(d => d.exists() ? d.data() : {}).catch(() => ({}))
     };
+    // أعطال المتصفح تُرسل لفريق المنصة (5 كحد أقصى في الجلسة، دون بيانات المستخدم)
+    if (!window.__errHook) { window.__errHook = 1; let n = 0;
+      const rep = (msg, src) => { if (n++ >= 5) return; msg = String(msg || '').slice(0, 500); if (!msg || /ResizeObserver|Script error/.test(msg)) return;
+        F.addDoc(F.collection(fs, 'clienterr'), { cid: String(CID || '').slice(0, 40), email, msg, src: String(src || '').slice(0, 300), page: String(location.hash || '#').slice(0, 100), ua: navigator.userAgent.slice(0, 200), at: new Date().toISOString() }).catch(() => {}); };
+      window.addEventListener('error', e => rep(e.message, `${(e.filename || '').split('/').pop()}:${e.lineno || ''}`));
+      window.addEventListener('unhandledrejection', e => { const r = e.reason || {}; if (r.code && /permission-denied|unavailable|failed-precondition/.test(r.code)) return; rep(r.message || r, (r.stack || '').split('\n')[1] || ''); }); }
     window.__companyId = CID; try { localStorage.setItem('fleet-was-in', '1'); } catch (e) {} window.__company = { id: CID, ...COMPANY }; window.OWNER_EMAIL = String(COMPANY.ownerEmail || '').toLowerCase();
     window.__companySetSys = async sysEmail => { await F.updateDoc(F.doc(fs, 'companies', CID), { sysEmail, updatedAt: new Date().toISOString() }); };
     swPost({ type: 'token', token: await u.getIdToken(), project: FIREBASE_CONFIG.projectId, cid: CID });

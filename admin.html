@@ -7,94 +7,190 @@
 <title>لوحة تحكم المنصة</title>
 <link rel="icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script>try{var _t=localStorage.getItem("fleet-theme");if(_t&&_t!=="auto")document.documentElement.dataset.theme=_t}catch(e){}</script>
 <style>
-:root{--acc:#0E5A44;--ink:#15201B;--muted:#5A6862;--line:#D6DDD9;--bg:#EEF1EF;--surface:#fff;--surface-2:#F6F8F7;--ok:#0E7A4F;--warn:#B54708;--bad:#B42318;--info:#175CD3}
+/* نفس هوية النظام («سكون») وثيماته */
+:root{--bg:#F4F5F2;--surface:#FFFFFF;--surface-2:#F6F7F4;--ink:#16302A;--muted:#6F7B75;--line:#E1E5E0;
+  --accent:#173B33;--accent-ink:#FFFFFF;--accent-soft:#E7EDE9;--brass:#A88653;
+  --ok:#23824A;--ok-soft:#E1F3E7;--warn:#A66A0E;--warn-soft:#FBEFD9;--crit:#B42318;--crit-soft:#FBE4E1;--info:#2B5C9E;--info-soft:#E2ECF8;--idle:#6B7280;--idle-soft:#ECEEF1;--violet:#6941C6;--violet-soft:#F1EBFD;
+  --f-display:"Alexandria","Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;--f-body:"IBM Plex Sans Arabic","Readex Pro",system-ui,sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme]){--bg:#0F1412;--surface:#161D1A;--surface-2:#1B2420;--ink:#E5ECE8;--muted:#97A59E;--line:#2A3531;--accent:#3DBB8C;--accent-ink:#06261B;--accent-soft:#163A2D;--ok:#5BC27D;--ok-soft:#173424;--warn:#E4A646;--warn-soft:#3A2C13;--crit:#F2675C;--crit-soft:#3E1C19;--info:#7FAEF0;--info-soft:#1A2A40;--idle:#A3AAB5;--idle-soft:#252B31;--violet:#B69CF5;--violet-soft:#2A2140;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1412;--surface:#161D1A;--surface-2:#1B2420;--ink:#E5ECE8;--muted:#97A59E;--line:#2A3531;--accent:#3DBB8C;--accent-ink:#06261B;--accent-soft:#163A2D;--ok:#5BC27D;--ok-soft:#173424;--warn:#E4A646;--warn-soft:#3A2C13;--crit:#F2675C;--crit-soft:#3E1C19;--info:#7FAEF0;--info-soft:#1A2A40;--idle:#A3AAB5;--idle-soft:#252B31;--violet:#B69CF5;--violet-soft:#2A2140;color-scheme:dark}
+:root[data-theme="navy"]{--bg:#EDF1F7;--surface:#FFFFFF;--surface-2:#F5F7FB;--ink:#141C2E;--muted:#5B6578;--line:#D6DDEA;--accent:#1F4FBF;--accent-ink:#FFFFFF;--accent-soft:#E0E8FA}
+:root[data-theme="sand"]{--bg:#F3EEE5;--surface:#FFFDF8;--surface-2:#F8F3EA;--ink:#25211A;--muted:#6E665A;--line:#E2D8C6;--accent:#8A6420;--accent-ink:#FFFFFF;--accent-soft:#F1E5CC}
+:root[data-theme="graphite"]{--bg:#F0F1F3;--surface:#FFFFFF;--surface-2:#F6F7F9;--ink:#1B1E23;--muted:#626873;--line:#D9DCE1;--accent:#3E4A5C;--accent-ink:#FFFFFF;--accent-soft:#E3E6EB}
+:root[data-theme="night"]{--bg:#0E1320;--surface:#151C2C;--surface-2:#1A2236;--ink:#E4E9F2;--muted:#98A2B6;--line:#28324A;--accent:#6D9BFF;--accent-ink:#071026;--accent-soft:#1B2A4A;--ok:#5BC27D;--ok-soft:#173424;--warn:#E4A646;--warn-soft:#3A2C13;--crit:#F2675C;--crit-soft:#3E1C19;--info:#5CC8D8;--info-soft:#14313A;--idle:#A3AAB5;--idle-soft:#252B31;--violet:#B69CF5;--violet-soft:#2A2140;color-scheme:dark}
+:root{--acc:var(--accent);--bad:var(--crit)}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "IBM Plex Sans Arabic",system-ui,sans-serif}
-header{background:var(--acc);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-header h1{margin:0;font:600 19px "Readex Pro",sans-serif}
-header small{opacity:.8}
-header .who{display:flex;gap:10px;align-items:center;font-size:14px;flex-wrap:wrap}
-nav{background:var(--surface);border-bottom:1px solid var(--line);display:flex;gap:4px;padding:0 12px;overflow-x:auto}
-nav button{font:600 14px "IBM Plex Sans Arabic",sans-serif;background:none;border:0;border-bottom:3px solid transparent;padding:12px 14px;color:var(--muted);cursor:pointer;white-space:nowrap}
-nav button.on{color:var(--acc);border-bottom-color:var(--acc)}
-nav .badge{background:var(--bad);color:#fff;border-radius:10px;padding:0 7px;font-size:12px;margin-inline-start:4px}
-main{max-width:1240px;margin:0 auto;padding:18px 16px 40px;display:grid;gap:16px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+html,body{background:var(--bg)}
+body{margin:0;color:var(--ink);font:15px/1.6 var(--f-body)}
+svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
+/* الشريط العلوي */
+.top{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:10px 20px;min-height:62px}
+.brand-mark{width:38px;height:38px;border-radius:11px;overflow:hidden;background:var(--accent);flex:none}.brand-mark img{width:100%;height:100%;display:block}
+.brand h1{margin:0;font:500 17px var(--f-display)}.brand small{color:var(--muted);font-size:12.5px}
+.spacer{flex:1}
+.who{display:flex;gap:8px;align-items:center;font-size:13.5px;flex-wrap:wrap}
+.who .me{display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2)}
+.who .av{width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:500 13px var(--f-display)}
+.who .me b{font-weight:500;display:block;line-height:1.2}.who .me small{color:var(--muted);font-size:11.5px;display:block;line-height:1.2}
+.ib{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-grid;place-items:center;cursor:pointer;text-decoration:none}
+.ib:hover{background:var(--surface-2)}
+.menu-btn{display:none}
+/* الهيكل: قائمة جانبية + المحتوى */
+.shell{display:grid;grid-template-columns:236px minmax(0,1fr);gap:20px;max-width:1440px;margin:0 auto;padding:18px 20px 40px}
+.side{position:sticky;top:80px;align-self:start;display:grid;gap:14px;max-height:calc(100dvh - 96px);overflow:auto;padding-bottom:12px}
+.side .grp{display:grid;gap:2px}.side .grp>span{font-size:12px;color:var(--muted);padding:0 12px 4px}
+.side button{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:10px;color:var(--ink);opacity:.82;cursor:pointer;position:relative;font-size:14.5px}
+.side button:hover{background:var(--surface);opacity:1}
+.side button.on{background:var(--surface);opacity:1;font-weight:600;box-shadow:0 0 0 1px var(--line)}
+.side button.on::before{content:"";position:absolute;inset-inline-start:-1px;top:9px;bottom:9px;width:3px;border-radius:2px;background:var(--brass)}
+.side button:focus-visible{outline:2px solid var(--accent)}
+.side .badge,.bnav .badge{margin-inline-start:auto;background:var(--crit);color:#fff;border-radius:10px;padding:0 7px;font-size:11.5px;font-weight:600;line-height:18px}
+.side .badge.w{background:var(--warn)}
+.scrim{display:none}
+main{display:grid;gap:16px;min-width:0;align-content:start}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.head h2{margin:0;font:500 26px var(--f-display)}.head p{margin:2px 0 0;color:var(--muted);font-size:14px}
+/* بطاقات وأرقام */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
-.kpi b{display:block;font:700 24px "Readex Pro",sans-serif}
+.kpi b{display:block;font:500 24px var(--f-display);font-variant-numeric:tabular-nums}
 .kpi span{color:var(--muted);font-size:13px}
-.kpi.hot{border-color:#F4C7C3;background:#FFFBFA}.kpi.hot b{color:var(--bad)}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.panel h3{margin:0;font:600 16px "Readex Pro",sans-serif}
+.kpi.hot{border-color:color-mix(in srgb,var(--crit) 35%,var(--line));background:var(--crit-soft)}.kpi.hot b{color:var(--crit)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.panel h3{margin:0;font:500 16px var(--f-display)}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 20px 8px;flex-wrap:wrap}.ph small{color:var(--muted)}
 .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
-.bar input,.bar select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);color:inherit}
+.bar input,.bar select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:inherit}
 .bar input[type=search]{flex:1;min-width:200px}
 .tw{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:820px}
-th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:middle}
-th{font-weight:600;font-size:13px;color:var(--muted);background:var(--surface-2)}
+th,td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-weight:500;font-size:12.5px;color:var(--muted);background:var(--surface-2)}
 td small{display:block;color:var(--muted);font-size:12px}
-tr.click{cursor:pointer}tr.click:hover td{background:#F8FBF9}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--surface-2)}
 .pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
-.p-active,.p-paid{background:#DCFAE6;color:var(--ok)}.p-trial{background:#D1E9FF;color:var(--info)}.p-suspended,.p-rejected,.p-cancelled{background:#FEE4E2;color:var(--bad)}.p-expired,.p-unpaid{background:#FEF0C7;color:var(--warn)}.p-pending{background:#F4EBFF;color:#6941C6}.p-off{background:#EAECF0;color:#475467}
-.btn{font:600 13px "IBM Plex Sans Arabic",sans-serif;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-block}
-.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
-.btn.bad{color:var(--bad);border-color:#F4C7C3}
-.btn.lt{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.p-active,.p-paid,.p-ok{background:var(--ok-soft);color:var(--ok)}.p-trial,.p-info{background:var(--info-soft);color:var(--info)}.p-suspended,.p-rejected,.p-cancelled,.p-crit{background:var(--crit-soft);color:var(--crit)}.p-expired,.p-unpaid,.p-warn{background:var(--warn-soft);color:var(--warn)}.p-pending{background:var(--violet-soft);color:var(--violet)}.p-off{background:var(--idle-soft);color:var(--idle)}
+.btn{font:500 13.5px var(--f-body);padding:8px 14px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--surface-2)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.bad{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 35%,var(--line))}
+.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:9px}
 .btn:disabled{opacity:.5}
 .acts{display:flex;gap:6px;flex-wrap:wrap}
 .empty{padding:30px;text-align:center;color:var(--muted)}
-.auth{max-width:400px;margin:60px auto;background:var(--surface);border-radius:16px;padding:24px;display:grid;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.12)}
-.auth h2{margin:0;font:600 19px "Readex Pro",sans-serif}
+/* الرئيسية */
+.hello small{color:var(--muted);font-size:13.5px}
+.stat4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.stat4 button{all:unset;box-sizing:border-box;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:grid;gap:2px;cursor:pointer;position:relative}
+.stat4 button:hover{border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
+.stat4 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stat4 .l{display:flex;align-items:center;gap:8px;font-weight:500}.stat4 .l::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c)}
+.stat4 b{font:500 36px/1.2 var(--f-display);font-variant-numeric:tabular-nums}
+.stat4 small{color:var(--muted);font-size:12.5px}
+.dec{display:grid}
+.dec-it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:13px 20px;border-top:1px solid var(--line)}
+.dec-it:first-child{border-top:0}
+.dec-it .dot{width:10px;height:10px;border-radius:50%;background:var(--c,var(--info));grid-row:1/3}
+.dec-it b{font-weight:500}.dec-it small{color:var(--muted);font-size:12.5px;grid-column:2}
+.dec-it .btn{grid-row:1/3;grid-column:3}
+.dec-ok{padding:26px 20px;text-align:center;color:var(--muted)}.dec-ok b{display:block;color:var(--ok);font:500 17px var(--f-display);margin-bottom:2px}
+.g2c{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.mini-list{display:grid}.mini-list>div{display:flex;justify-content:space-between;gap:10px;padding:10px 20px;border-top:1px solid var(--line);font-size:14px}.mini-list>div:first-child{border-top:0}.mini-list small{color:var(--muted)}
+.mini-list .click{cursor:pointer}.mini-list .click:hover{background:var(--surface-2)}
+/* صحة النظام */
+.hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.hc{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:grid;gap:8px;align-content:start}
+.hc h4{margin:0;display:flex;align-items:center;gap:8px;font:500 15px var(--f-display)}
+.hc h4 .st{margin-inline-start:auto}
+.hc p{margin:0;font-size:13.5px;color:var(--muted)}
+.hc .row{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;border-top:1px dashed var(--line);padding-top:6px}
+.hc .row span:first-child{color:var(--muted)}
+.banner{display:flex;align-items:center;gap:14px;border-radius:16px;padding:16px 20px;border:1px solid var(--line);background:var(--surface)}
+.banner.ok{background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 30%,var(--line))}.banner.warn{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 30%,var(--line))}.banner.crit{background:var(--crit-soft);border-color:color-mix(in srgb,var(--crit) 30%,var(--line))}
+.banner b{font:500 17px var(--f-display);display:block}.banner small{color:var(--muted)}
+.banner .big{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--surface);font-size:22px;flex:none}
+code,.mono{font-family:var(--f-mono);font-size:12.5px}
+/* الدخول */
+.auth{max-width:400px;margin:60px auto;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;display:grid;gap:12px}
+.auth h2{margin:0;font:500 20px var(--f-display)}
 .auth label{display:grid;gap:5px;font-size:13px;color:var(--muted)}
-.auth input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.auth input{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface-2);color:var(--ink)}
 .auth .row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.lnk{background:none;border:0;color:var(--acc);font:inherit;font-size:14px;cursor:pointer;padding:2px}
-.err{color:var(--bad);font-size:14px;min-height:1em}.ok{color:var(--ok);font-size:14px}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#15201B;color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.2s;pointer-events:none;z-index:100}
+.lnk{background:none;border:0;color:var(--accent);font:inherit;font-size:14px;cursor:pointer;padding:2px}
+.err{color:var(--crit);font-size:14px;min-height:1em}.ok{color:var(--ok);font-size:14px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#15201B;color:#fff;padding:10px 18px;border-radius:11px;font-size:14px;opacity:0;transition:.2s;pointer-events:none;z-index:100}
 #toast.on{opacity:1}
-dialog{border:0;border-radius:14px;padding:0;width:min(480px,94vw)}
+dialog{border:1px solid var(--line);border-radius:16px;padding:0;width:min(480px,94vw);background:var(--surface);color:var(--ink)}
 dialog::backdrop{background:rgba(16,24,20,.45)}
 dialog form{padding:20px;display:grid;gap:12px}
-dialog h3{margin:0;font:600 17px "Readex Pro",sans-serif}
+dialog h3{margin:0;font:500 18px var(--f-display)}
 dialog label{display:grid;gap:5px;font-size:13px;color:var(--muted)}
-dialog input,dialog select,dialog textarea{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:inherit}
+dialog input,dialog select,dialog textarea{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:inherit}
 dialog .acts{justify-content:flex-start}
 dialog .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 dialog .sum{background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:14px;display:grid;gap:2px}
+.chk{display:flex!important;align-items:center;gap:8px;color:var(--ink)!important;font-size:14px!important}.chk input{width:auto}
+.feats{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 #file{position:fixed;inset:0;background:rgba(16,24,20,.45);z-index:40;display:flex;justify-content:flex-start}
 #file .sheet{background:var(--bg);width:min(980px,100%);height:100%;overflow:auto;box-shadow:0 0 40px rgba(0,0,0,.25)}
-#file .top{position:sticky;top:0;z-index:2;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
-#file .top h2{margin:0;font:600 19px "Readex Pro",sans-serif}
+#file .top{position:sticky;top:0;z-index:2;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;min-height:0}
+#file .top h2{margin:0;font:500 19px var(--f-display)}
 #file .body{padding:16px 18px 40px;display:grid;gap:14px}
 .sec{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-.sec h4{margin:0 0 10px;font:600 15px "Readex Pro",sans-serif;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sec h4{margin:0 0 10px;font:500 15px var(--f-display);display:flex;justify-content:space-between;align-items:center;gap:8px}
 dl.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px 18px;margin:0}
 dl.kv div{border-bottom:1px dashed var(--line);padding-bottom:6px}
 dl.kv dt{font-size:12px;color:var(--muted)}dl.kv dd{margin:0;font-weight:500;word-break:break-word}
 .mini{min-width:0}.mini th,.mini td{padding:7px 9px;font-size:14px}
-.note{border-inline-start:3px solid var(--acc);padding:4px 10px;margin:6px 0}
+.note{border-inline-start:3px solid var(--accent);padding:4px 10px;margin:6px 0}
 .note small{color:var(--muted);display:block;font-size:12px}
 .tabs2{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-.tabs2 button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:4px 12px;cursor:pointer}
-.tabs2 button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.tabs2 button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:16px;padding:4px 12px;cursor:pointer}
+.tabs2 button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .roles{display:grid;gap:6px;font-size:13px;color:var(--muted);padding:12px 14px}
 .roles b{color:var(--ink)}
 .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;padding:14px}
 .form-grid label{display:grid;gap:5px;font-size:13px;color:var(--muted)}
-.form-grid input,.form-grid textarea{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:9px}
-@media (max-width:640px){header{padding:10px 14px}main{padding:14px 12px 30px}dialog .g2{grid-template-columns:1fr}}
+.form-grid input,.form-grid textarea{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+.th-list{display:grid;gap:6px}.th-list label{display:flex!important;align-items:center;gap:10px;color:var(--ink)!important;font-size:14px!important;border:1px solid var(--line);border-radius:12px;padding:8px 12px;cursor:pointer}.th-list i{width:22px;height:22px;border-radius:7px;flex:none;border:1px solid var(--line)}
+.bnav{display:none}
+@media (max-width:1100px){.stat4{grid-template-columns:1fr 1fr}.g2c{grid-template-columns:1fr}}
+@media (max-width:960px){
+  .menu-btn{display:inline-grid}
+  .shell{grid-template-columns:minmax(0,1fr);padding:14px 12px 90px}
+  .side{position:fixed;top:0;bottom:0;inset-inline-start:0;width:min(300px,84vw);max-height:none;z-index:60;background:var(--surface);padding:18px 12px;transform:translateX(110%);transition:transform .2s;box-shadow:0 20px 60px rgba(10,25,20,.28)}
+  .side.open{transform:none}
+  .side button.on{background:var(--accent-soft);box-shadow:none}
+  .scrim.on{display:block;position:fixed;inset:0;background:rgba(10,25,20,.5);z-index:59}
+  .who .me div,.who .hide-m{display:none}
+  .bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px))}
+  .bnav button{all:unset;display:grid;justify-items:center;gap:2px;padding:6px 2px;color:var(--muted);font-size:11.5px;font-family:var(--f-display);cursor:pointer;position:relative;border-radius:10px;min-height:50px;align-content:center}
+  .bnav button.on{color:var(--accent);background:var(--accent-soft);font-weight:600}
+  .bnav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+  .bnav .badge{position:absolute;top:2px;inset-inline-end:18%;margin:0}
+}
+@media (max-width:640px){.top{padding:8px 12px;gap:8px}.brand small{display:none}.brand h1{font-size:15px}.head h2{font-size:22px}.stat4 b{font-size:28px}.stat4 button{padding:14px 16px}.stat4 small{display:none}dialog .g2,.feats{grid-template-columns:1fr}.dec-it{grid-template-columns:auto minmax(0,1fr);padding:12px 14px}.dec-it .btn{grid-row:auto;grid-column:2;justify-self:start}}
 </style>
 </head>
 <body>
-<header><div><h1>لوحة تحكم المنصة</h1><small>الشركات المشتركة والاشتراكات والفواتير</small></div><div class="who" id="who"></div></header>
+<header class="top">
+  <button class="ib menu-btn" id="menuBtn" aria-label="القائمة" hidden><svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <div class="brand-mark"><img src="icon-192.png" alt=""></div>
+  <div class="brand"><h1>لوحة تحكم المنصة</h1><small>الشركات والاشتراكات والفواتير وصحة النظام</small></div>
+  <div class="spacer"></div>
+  <div class="who" id="who"></div>
+</header>
 <div id="authBox" class="auth" hidden></div>
 <div id="app" hidden>
-  <nav id="nav"></nav>
+ <div class="shell">
+  <nav id="nav" class="side" aria-label="أقسام اللوحة"></nav><div class="scrim" id="scrim"></div>
   <main>
+    <div class="head" id="head"><div><h2 id="ttl"></h2><p id="sub"></p></div><div class="acts" id="headActs"></div></div>
+    <section id="t-home" hidden style="display:grid;gap:16px"></section>
     <section class="kpis" id="kpis"></section>
     <section class="panel" id="t-companies" hidden>
       <div class="bar">
@@ -135,7 +231,14 @@ dl.kv dt{font-size:12px;color:var(--muted)}dl.kv dd{margin:0;font-weight:500;wor
         <div style="padding:14px"><button class="btn pri">حفظ الإعدادات</button></div></form>
       <div id="bkBox" style="padding:0 14px 14px"></div>
     </section>
+    <section class="panel" id="t-activity" hidden>
+      <div class="bar"><input id="aq" type="search" placeholder="بحث باسم الشركة"><select id="afs"><option value="all">كل الشركات</option><option value="risk">مهددة بعدم التجديد</option><option value="idle">بلا نشاط 14 يوماً</option><option value="over">تجاوزت حد السيارات</option></select><button class="btn" id="statsNow" hidden>تحديث الإحصاءات الآن</button><small id="statsAt" style="color:var(--muted)"></small></div>
+      <div class="tw"><table><thead><tr><th>الشركة</th><th>الحالة والباقة</th><th>السيارات</th><th>المستخدمون</th><th>نشطون (7 أيام)</th><th>آخر نشاط</th><th>التقييم</th></tr></thead><tbody id="arows"></tbody></table></div>
+    </section>
+    <section id="t-health" hidden style="display:grid;gap:16px"></section>
   </main>
+ </div>
+ <div class="bnav" id="bnav"></div>
 </div>
 <div id="file" hidden><div class="sheet" id="sheet"></div></div>
 <dialog id="dlg"><form method="dialog" id="df"></form></dialog>
@@ -202,7 +305,7 @@ const stOf = c => c.status === 'trial' && c.trialEnds && c.trialEnds < today() ?
 const istOf = i => i.status === 'unpaid' && i.dueDate && i.dueDate < today() ? 'overdue' : i.status;
 const pill = (m, k) => { const [l, c] = m[k] || [k, '']; return `<span class="pill ${c}">${esc(l)}</span>`; };
 const isOpen = c => ['pending', 'rejected'].includes(c.status);
-let COS = [], INVS = [], STAFF = [], SET = {}, TAB = (location.hash.slice(1) || 'requests'), TKS = [];
+let COS = [], INVS = [], STAFF = [], SET = {}, TAB = (location.hash.slice(1) || 'home'), TKS = [];
 
 /* ---------- الدخول ---------- */
 function authCard(html) { const b = $('#authBox'); b.innerHTML = html; b.hidden = false; $('#app').hidden = true; }
@@ -261,33 +364,68 @@ async function boot(u) {
     ME.role = st.role; ME.name = st.name || ME.name;
   }
   $('#authBox').hidden = true; $('#app').hidden = false;
-  $('#who').innerHTML = `<span>${ME.name ? esc(ME.name) + ' · ' : ''}${ME.super ? 'مالك المنصة' : esc((ROLES[ME.role] || [ME.role])[0])}</span><span dir="ltr" style="opacity:.8">${esc(email)}</span><button class="btn lt" id="pushOn" hidden>🔔 تفعيل الإشعارات</button><a class="btn lt" href="./">النظام</a><button class="btn lt" id="out">خروج</button>`;
-  $('#out').onclick = () => A.signOut(auth);
+  const roleL = ME.super ? 'مالك المنصة' : esc((ROLES[ME.role] || [ME.role])[0]);
+  $('#who').innerHTML = `<button class="btn sm hide-m" id="pushOn" hidden>🔔 تفعيل الإشعارات</button>
+    <button class="ib" id="themeBtn" aria-label="المظهر" title="المظهر"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.9-.7-1.3-.7-2.1 0-.9.7-1.5 1.6-1.5H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7.2" r="1"/><circle cx="14.5" cy="7.2" r="1"/></svg></button>
+    <a class="ib hide-m" href="./" title="نظام الشركة" aria-label="نظام الشركة"><svg class="i" viewBox="0 0 24 24"><path d="M3 13l2-5a2 2 0 0 1 2-1.4h10A2 2 0 0 1 19 8l2 5v4H3z"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg></a>
+    <div class="me"><span class="av">${esc((ME.name || email).trim().slice(0, 1).toUpperCase())}</span><div><b>${esc(ME.name || roleL)}</b><small dir="ltr">${esc(email)}</small></div></div>
+    <button class="ib" id="out" title="خروج" aria-label="خروج"><svg class="i" viewBox="0 0 24 24"><path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h10"/></svg></button>`;
+  $('#out').onclick = () => A.signOut(auth); $('#themeBtn').onclick = themeDialog; $('#menuBtn').hidden = false;
   setupPush();
   $('#newInv').hidden = !can('invoices');
   buildNav(); loadAll();
 }
 
 /* ---------- التنقل ---------- */
+const IC = { home: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>', inbox: '<path d="M4 13l2-8h12l2 8v6H4z"/><path d="M4 13h5l1 2h4l1-2h5"/>', building: '<path d="M4 21V5l8-2v18M12 7l8 3v11M2 21h20M7 8h2M7 12h2M7 16h2M15 13h2M15 17h2"/>',
+  pulse: '<path d="M3 12h4l2-6 4 12 2-6h6"/>', card: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>', chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><circle cx="12" cy="17" r=".6"/>', heart: '<path d="M12 20s-8-4.7-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6.3-8 11-8 11z"/><path d="M6 12h3l1.5-2 2 4 1.5-2H18"/>',
+  log: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 15h7M9 7h4"/>', users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.3-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .6 3.2 2.4 3.6 5.2"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>', menu: '<path d="M4 7h16M4 12h16M4 17h16"/>' };
+const svg = k => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[k] || ''}</svg>`;
+const canHealth = () => ME.super || ME.role === 'manager';
+const TABS = {
+  home: ['الرئيسية', 'home', 'ملخص المنصة اليوم وما يحتاج قرارك'], requests: ['طلبات التسجيل', 'inbox', 'شركات سجّلت وتنتظر التحقق والاعتماد'], companies: ['الشركات', 'building', 'كل الشركات المشتركة: الحالة والباقة والتحكم'],
+  activity: ['النشاط والمخاطر', 'pulse', 'استخدام كل شركة للنظام، والشركات المهددة بعدم التجديد'], invoices: ['الفواتير', 'card', 'الفواتير والتحصيل وإيصالات التحويل'], reports: ['التقارير', 'chart', 'الإيراد المتكرر والتحصيل واستخدام الذكاء الاصطناعي'],
+  support: ['تذاكر الدعم', 'help', 'طلبات الدعم الفني من الشركات'], health: ['صحة النظام', 'heart', 'حالة الخدمات والمهام المجدولة والأعطال'], log: ['سجل النشاط', 'log', 'كل إجراء قام به فريق المنصة'],
+  team: ['فريق المنصة', 'users', 'موظفو شركة النظام وصلاحياتهم'], settings: ['الإعدادات', 'gear', 'بيانات البائع والأسعار والباقات والنسخ الاحتياطي'] };
+const BADGE = { requests: 'reqBadge', support: 'tkBadge', invoices: 'rcBadge', home: 'decBadge', health: 'hBadge' };
+function navGroups() {
+  const g = [[null, ['home']], ['العملاء', ['requests', 'companies', 'activity']], ['المالية', ['invoices', ...(ME.super || can('invoices') ? ['reports'] : [])]], ['الدعم', ['support']],
+    ['المنصة', [...(canHealth() ? ['health'] : []), ...(can('log') ? ['log'] : []), ...(ME.super ? ['team', 'settings'] : [])]]];
+  return g.filter(([, it]) => it.length);
+}
 function buildNav() {
-  const tabs = [['requests', 'طلبات التسجيل'], ['companies', 'الشركات'], ['invoices', 'الفواتير'], ['support', 'الدعم الفني']];
-  if (ME.super || can('invoices')) tabs.push(['reports', 'التقارير']);
-  if (can('log')) tabs.push(['log', 'سجل النشاط']);
-  if (ME.super) tabs.push(['team', 'فريق المنصة'], ['settings', 'الإعدادات']);
-  if (!tabs.some(t => t[0] === TAB)) TAB = 'requests';
-  $('#nav').innerHTML = tabs.map(([k, l]) => `<button data-t="${k}">${l}${k === 'requests' ? '<span class="badge" id="reqBadge" hidden></span>' : k === 'support' ? '<span class="badge" id="tkBadge" hidden></span>' : k === 'invoices' ? '<span class="badge" id="rcBadge" hidden></span>' : ''}</button>`).join('');
-  $('#nav').onclick = e => { const b = e.target.closest('[data-t]'); if (b) show(b.dataset.t); };
+  const groups = navGroups(); const all = groups.flatMap(([, it]) => it);
+  if (!all.includes(TAB)) TAB = 'home';
+  $('#nav').innerHTML = groups.map(([g, it]) => `<div class="grp">${g ? `<span>${g}</span>` : ''}${it.map(k => `<button data-t="${k}">${svg(TABS[k][1])}<span>${TABS[k][0]}</span>${BADGE[k] ? `<b class="badge" id="${BADGE[k]}" hidden></b>` : ''}</button>`).join('')}</div>`).join('');
+  $('#bnav').innerHTML = [['home'], ['requests'], ['companies'], ['invoices']].map(([k]) => `<button data-t="${k}">${svg(TABS[k][1])}<span>${k === 'requests' ? 'الطلبات' : TABS[k][0]}</span>${BADGE[k] ? `<b class="badge" id="b-${BADGE[k]}" hidden></b>` : ''}</button>`).join('') + `<button data-menu="1">${svg('menu')}<span>المزيد</span></button>`;
+  const go = e => { const b = e.target.closest('[data-t]'); if (b) { show(b.dataset.t); menu(false); window.scrollTo(0, 0); } else if (e.target.closest('[data-menu]')) menu(true); };
+  $('#nav').onclick = go; $('#bnav').onclick = go; $('#menuBtn').onclick = () => menu(true); $('#scrim').onclick = () => menu(false);
   show(TAB);
 }
+window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (h !== TAB && TABS[h] && document.querySelector(`#nav [data-t="${h}"]`)) show(h); });
+function menu(on) { $('#nav').classList.toggle('open', on); $('#scrim').classList.toggle('on', on); }
+// الشارات تظهر في القائمة الجانبية وشريط الجوال معاً
+function badge(id, n, warn) { [id, 'b-' + id].forEach(x => { const b = document.getElementById(x); if (b) { b.textContent = n; b.hidden = !n; b.classList.toggle('w', !!warn); } }); }
 function show(t) {
-  TAB = t; document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  TAB = t; document.querySelectorAll('#nav [data-t],#bnav [data-t]').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  const [ttl, , sub] = TABS[t] || ['', '', '']; $('#ttl').textContent = ttl; $('#sub').textContent = sub; $('#head').hidden = t === 'home';
+  $('#t-home').hidden = t !== 'home'; $('#t-activity').hidden = t !== 'activity'; $('#t-health').hidden = t !== 'health';
   $('#t-companies').hidden = !['requests', 'companies'].includes(t); $('#t-invoices').hidden = t !== 'invoices'; $('#t-team').hidden = t !== 'team'; $('#t-settings').hidden = t !== 'settings';
-  $('#t-support').hidden = t !== 'support'; $('#t-reports').hidden = t !== 'reports'; $('#t-log').hidden = t !== 'log'; $('#kpis').hidden = ['team', 'settings', 'log', 'reports'].includes(t);
+  $('#t-support').hidden = t !== 'support'; $('#t-reports').hidden = t !== 'reports'; $('#t-log').hidden = t !== 'log'; $('#kpis').hidden = !['requests', 'companies', 'invoices'].includes(t);
   history.replaceState(null, '', '#' + t);
   if (t === 'support') renderTk(); if (t === 'reports') renderReports(); if (t === 'log') loadLog();
   if (t === 'requests') $('#fs').value = 'reqs'; else if (t === 'companies' && $('#fs').value === 'reqs') $('#fs').value = 'all';
   if (t === 'team') loadStaff(); if (t === 'settings') renderSettings();
+  if (t === 'home') { HOME_LOG = null; renderHome(); } if (t === 'activity') renderActivity(); if (t === 'health') loadHealth();
   render(); renderInv();
+}
+const THEMES = [['auto', 'تلقائي (حسب الجهاز)', '#F4F5F2'], ['light', 'سكون (الفاتح)', '#173B33'], ['navy', 'الأزرق التنفيذي', '#1F4FBF'], ['sand', 'الرملي الفاخر', '#8A6420'], ['graphite', 'الرمادي الهادئ', '#3E4A5C'], ['dark', 'الداكن الأخضر', '#0F1412'], ['night', 'الليلي الأزرق', '#0E1320']];
+function themeDialog() {
+  let cur = 'auto'; try { cur = localStorage.getItem('fleet-theme') || 'auto'; } catch (e) {}
+  const f = dialog(`<h3>المظهر</h3><div class="th-list">${THEMES.map(([k, l, c]) => `<label><input type="radio" name="th" value="${k}" ${k === cur ? 'checked' : ''}><i style="background:${c}"></i>${l}</label>`).join('')}</div><small style="color:var(--muted)">نفس المظهر يُطبَّق في نظام الشركة على هذا الجهاز.</small>`, () => {}, 'تم');
+  f.onchange = () => { const v = f.th.value; try { localStorage.setItem('fleet-theme', v); } catch (e) {} if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v; };
 }
 
 /* ---------- التحميل ---------- */
@@ -312,10 +450,10 @@ async function loadAll() {
     COS = s.docs.map(d => ({ id: d.id, ...d.data(), vehicles: null })).sort((a, b) => String(b.submittedAt || b.createdAt).localeCompare(String(a.submittedAt || a.createdAt)));
   } catch (e) { console.error(e); $('#rows').innerHTML = `<tr><td colspan="8" class="empty">تعذر تحميل الشركات: ${esc(e.code || e.message)}</td></tr>`; return; }
   try { const s = await F.getDocs(F.collection(fs, 'invoices')); INVS = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.seq || 0) - (a.seq || 0)); } catch (e) { INVS = []; }
-  render(); renderInv();
+  render(); renderInv(); loadStats(); if (canHealth()) loadHealthLite();
   if (ME.super) backfillCustomerNo();
   await Promise.all(COS.filter(c => !isOpen(c)).map(async c => { try { c.vehicles = (await F.getCountFromServer(F.collection(fs, 'companies', c.id, 'vehicles'))).data().count; } catch (e) { c.vehicles = '؟'; } }));
-  render();
+  render(); if (TAB === 'home') renderHome();
 }
 
 /* ---------- الشركات ---------- */
@@ -325,8 +463,8 @@ function kpis() {
   const unpaid = INVS.filter(i => i.status === 'unpaid').reduce((t, i) => t + (+i.total || 0), 0);
   const m = today().slice(0, 7); const got = INVS.filter(i => i.status === 'paid' && String(i.paidAt || '').slice(0, 7) === m).reduce((t, i) => t + (+i.total || 0), 0);
   const req = n('pending');
-  const b = $('#reqBadge'); if (b) { b.textContent = req; b.hidden = !req; }
-  const rc = INVS.filter(i => i.status === 'unpaid' && i.receiptId).length; const rb = $('#rcBadge'); if (rb) { rb.textContent = rc; rb.hidden = !rc; }
+  badge('reqBadge', req);
+  const rc = INVS.filter(i => i.status === 'unpaid' && i.receiptId).length; badge('rcBadge', rc, true);
   $('#kpis').innerHTML = [['بانتظار الاعتماد', req, req ? 'hot' : ''], ['مفعّلة', n('active')], ['تجربة', n('trial')], ['منتهية', n('expired')], ['موقوفة', n('suspended')], ['إجمالي السيارات', veh],
     ['فواتير غير مدفوعة (ريال)', money(unpaid)], ['المحصّل هذا الشهر', money(got)]].map(([l, v, c]) => `<div class="kpi ${c || ''}"><b>${v}</b><span>${l}</span></div>`).join('');
 }
@@ -385,6 +523,7 @@ function openFile(id, keep) {
       <div><dt>حدود الباقة</dt><dd>${+c.maxVehicles ? `${c.vehicles ?? '…'} من ${c.maxVehicles} سيارة${+c.vehicles > +c.maxVehicles ? ' <span class="pill p-suspended">تجاوز</span>' : ''}` : 'سيارات غير محدودة'}${+c.maxUsers ? ` · ${c.maxUsers} مستخدم إداري` : ''}</dd></div><div><dt>نهاية التجربة</dt><dd>${fmt(c.trialEnds)}</dd></div>
       <div><dt>مدفوع حتى</dt><dd>${fmt(c.paidUntil)}</dd></div>
       <div style="grid-column:1/-1"><dt>ملاحظة داخلية</dt><dd>${esc(c.note || '—')}</dd></div></dl></div>
+    ${!open ? ctlSec(c) : ''}
     <div class="sec"><h4>المستندات</h4><div id="fDocs" class="empty" style="padding:8px">جارٍ التحميل…</div></div>
     <div class="sec"><h4>الفواتير <span>${can('invoices') && !open ? '<button class="btn" data-f="invoice">فاتورة جديدة</button>' : ''}</span></h4>
       ${myInv.length ? `<div class="tw"><table class="mini"><thead><tr><th>الرقم</th><th>التاريخ</th><th>الفترة</th><th>الإجمالي</th><th>الحالة</th><th></th></tr></thead><tbody>${myInv.map(i => `<tr><td dir="ltr" style="text-align:right">${esc(i.number)}</td><td>${fmt(i.issueDate)}</td><td>${fmt(i.periodFrom)} ← ${fmt(i.periodTo)}</td><td>${money(i.total)}</td><td>${pill(IST, istOf(i))}</td><td><button class="btn" data-print="${esc(i.id)}">طباعة</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty" style="padding:8px">لا توجد فواتير</div>'}</div>
@@ -447,8 +586,11 @@ $('#file').onclick = e => {
   if (a === 'activate') dialog(`<h3>تفعيل اشتراك ${esc(c.name)}</h3>
       ${PLANS().length ? planSel(c.planId, c.billingCycle) : `<label>الباقة<input name="plan" value="${esc(c.plan && c.plan !== 'trial' ? c.plan : 'شهري')}" required></label>`}
       <label>الاشتراك مدفوع حتى<input name="paidUntil" type="date" value="${esc(c.paidUntil && c.paidUntil > today() ? c.paidUntil : addDays(today(), 30))}" required></label>`,
-    fd => saveCo(c.id, { status: 'active', ...(fd.get('planId') ? planFields(fd.get('planId'), fd.get('cycle')) : { plan: fd.get('plan') }), paidUntil: fd.get('paidUntil') }, 'تم تفعيل الاشتراك ✓'));
-  if (a === 'suspend' && confirm(`إيقاف «${c.name}»؟\nلن يستطيع أي مستخدم في الشركة الدخول، والبيانات تبقى محفوظة ويمكن إعادة التفعيل في أي وقت.`)) saveCo(c.id, { status: 'suspended', suspendedAt: nowIso() }, 'تم إيقاف الشركة');
+    fd => saveCo(c.id, { status: 'active', ...(fd.get('planId') ? planFields(fd.get('planId'), fd.get('cycle')) : { plan: fd.get('plan') }), paidUntil: fd.get('paidUntil'), suspendReason: '' }, 'تم تفعيل الاشتراك ✓'));
+  if (a === 'ctl') ctlDialog(c);
+  if (a === 'suspend') dialog(`<h3>إيقاف ${esc(c.name)}</h3><p style="margin:0;font-size:14px">لن يستطيع أي مستخدم في الشركة الدخول، والبيانات تبقى محفوظة ويمكن إعادة التفعيل في أي وقت.</p>
+      <label>السبب (يظهر للشركة)<select name="r"><option>عدم السداد</option><option>بطلب من العميل</option><option>مخالفة شروط الاستخدام</option><option>مراجعة البيانات</option></select></label><label>تفاصيل (اختياري)<input name="d" maxlength="120"></label>`,
+    fd => saveCo(c.id, { status: 'suspended', suspendedAt: nowIso(), suspendReason: [fd.get('r'), String(fd.get('d') || '').trim()].filter(Boolean).join(': ') }, 'تم إيقاف الشركة'), 'إيقاف');
   if (a === 'extend') dialog(`<h3>تمديد التجربة – ${esc(c.name)}</h3><label>تنتهي التجربة في<input name="trialEnds" type="date" value="${esc(addDays(c.trialEnds, 14))}" required></label>`,
     fd => saveCo(c.id, { status: 'trial', trialEnds: fd.get('trialEnds') }, 'تم تمديد التجربة ✓'));
   if (a === 'invoice') newInvoice(c);
@@ -511,7 +653,7 @@ function newInvoice(c0) {
     ${planSel(c.planId, c.billingCycle)}
     <div class="g2"><label>من<input name="from" type="date" value="${from}" required></label><label>عدد الأشهر<input name="months" type="number" min="1" max="36" value="${c.billingCycle === 'yearly' ? 12 : 1}" required></label></div>
     <div class="g2"><label>إلى<input name="to" type="date" value="${addMonths(from, 1)}" required></label><label>تاريخ الاستحقاق<input name="due" type="date" value="${addDays(today(), 7)}" required></label></div>
-    <div class="g2"><label>عدد السيارات<input name="qty" type="number" min="1" value="${+c.vehicles || +(c.profile || {}).fleetSize || 1}" required></label><label>سعر السيارة شهرياً<input name="price" type="number" min="0" step="0.01" value="${esc((planOf(c.planId) || {}).pricePerVehicle ?? SET.pricePerVehicle ?? 0)}" required></label></div>
+    <div class="g2"><label>عدد السيارات<input name="qty" type="number" min="1" value="${+c.vehicles || +(c.profile || {}).fleetSize || 1}" required></label><label>سعر السيارة شهرياً${+c.customPrice ? ' (سعر خاص)' : ''}<input name="price" type="number" min="0" step="0.01" value="${esc(+c.customPrice || ((planOf(c.planId) || {}).pricePerVehicle ?? SET.pricePerVehicle ?? 0))}" required></label></div>
     <div class="g2"><label>خصم (ريال)<input name="disc" type="number" min="0" step="0.01" value="0"><small id="ydisc" style="color:var(--muted)"></small></label><label>الوصف<input name="desc" value="اشتراك نظام إدارة الأسطول"></label></div>
     <div class="sum" id="isum"></div>`, async fd => {
       const x = COS.find(y => y.id === fd.get('cid')); const t = calc(fd);
@@ -529,17 +671,225 @@ function newInvoice(c0) {
   const upd = () => { const t = calc(new FormData(f));
     $('#isum').innerHTML = `<div>${t.qty} سيارة × ${money(t.price)} × ${t.months} شهر${t.disc ? ` − خصم ${money(t.disc)}` : ''}${t.min && t.qty * t.price * t.months < t.min ? ` <small>(طُبّق الحد الأدنى ${money(t.min)})</small>` : ''}</div><div>قبل الضريبة: <b>${money(t.sub)}</b> · الضريبة ${t.rate}%: <b>${money(t.vat)}</b></div><div style="font-size:16px">الإجمالي: <b>${money(t.total)} ريال</b></div>`; };
   // الدفع السنوي: 12 شهراً مع خصم المنصة السنوي
-  const cycleDisc = () => { if (!f.cycle) return; const y = f.cycle.value === 'yearly'; const t = calc(new FormData(f)); const d = y ? Math.round((t.qty * t.price * t.months + t.minApplied) * (+SET.yearlyDiscount || 0)) / 100 : 0;
-    f.disc.value = d; $('#ydisc').textContent = y && d ? `خصم سنوي ${SET.yearlyDiscount}%` : ''; };
+  // الخصم: السنوي (من إعدادات المنصة) + الخصم الدائم للشركة إن وُجد
+  const cycleDisc = () => { const y = !!f.cycle && f.cycle.value === 'yearly'; const x = COS.find(z => z.id === f.cid.value) || {}; const pct = (y ? +SET.yearlyDiscount || 0 : 0) + (+x.discountPct || 0);
+    const t = calc(new FormData(f)); const d = pct ? Math.round((t.qty * t.price * t.months + t.minApplied) * pct) / 100 : 0;
+    f.disc.value = d; $('#ydisc').textContent = d ? [y && +SET.yearlyDiscount ? `خصم سنوي ${SET.yearlyDiscount}%` : '', +x.discountPct ? `خصم خاص ${x.discountPct}%` : ''].filter(Boolean).join(' + ') : ''; };
   f.oninput = e => { if (['from', 'months'].includes(e.target.name)) f.to.value = addMonths(f.from.value, +f.months.value || 1);
-    if (e.target.name === 'planId') { const pl = planOf(f.planId.value); if (pl) f.price.value = pl.pricePerVehicle; cycleDisc(); }
+    if (e.target.name === 'planId') { const pl = planOf(f.planId.value); const x = COS.find(z => z.id === f.cid.value) || {}; if (pl) f.price.value = +x.customPrice || pl.pricePerVehicle; cycleDisc(); }
     if (e.target.name === 'cycle') { f.months.value = f.cycle.value === 'yearly' ? 12 : 1; f.to.value = addMonths(f.from.value, +f.months.value); cycleDisc(); }
     if (['qty', 'price', 'months'].includes(e.target.name)) cycleDisc();
-    if (e.target.name === 'cid') { const x = COS.find(y => y.id === f.cid.value); if (f.planId && x.planId) { f.planId.value = x.planId; f.cycle.value = x.billingCycle || 'monthly'; const pl = planOf(x.planId); if (pl) f.price.value = pl.pricePerVehicle; f.months.value = f.cycle.value === 'yearly' ? 12 : 1; } f.qty.value = +x.vehicles || +(x.profile || {}).fleetSize || 1; f.from.value = x.paidUntil && x.paidUntil >= today() ? addDays(x.paidUntil, 1) : today(); f.to.value = addMonths(f.from.value, +f.months.value || 1); }
+    if (e.target.name === 'cid') { const x = COS.find(y => y.id === f.cid.value); if (f.planId && x.planId) { f.planId.value = x.planId; f.cycle.value = x.billingCycle || 'monthly'; const pl = planOf(x.planId); if (pl) f.price.value = +x.customPrice || pl.pricePerVehicle; f.months.value = f.cycle.value === 'yearly' ? 12 : 1; } if (+x.customPrice) f.price.value = x.customPrice; f.qty.value = +x.vehicles || +(x.profile || {}).fleetSize || 1; cycleDisc(); f.from.value = x.paidUntil && x.paidUntil >= today() ? addDays(x.paidUntil, 1) : today(); f.to.value = addMonths(f.from.value, +f.months.value || 1); }
     upd(); };
   f.onchange = f.oninput; cycleDisc(); upd();
 }
 function printInv(i) { if (i && !printInvoice(i, SET)) toast('اسمح بالنوافذ المنبثقة للطباعة'); }
+
+/* ---------- إحصاءات النشاط (يحسبها الخادم في platstats) ---------- */
+let STATS = {}, STATS_AT = '';
+async function loadStats() {
+  try { const q = await F.getDocs(F.collection(fs, 'platstats')); STATS = {}; q.docs.forEach(d => STATS[d.id] = d.data()); STATS_AT = Object.values(STATS).map(x => x.at || '').sort().pop() || ''; } catch (e) { STATS = {}; }
+  if (TAB === 'activity') renderActivity(); if (TAB === 'home') renderHome(); else decBadge();
+}
+const daysAgo = iso => iso ? Math.floor((Date.now() - Date.parse(iso)) / 864e5) : null;
+const ago = iso => { const d = daysAgo(iso); if (d == null) return 'لم يدخل بعد'; if (d <= 0) { const h = Math.floor((Date.now() - Date.parse(iso)) / 36e5); return h < 1 ? 'قبل دقائق' : `قبل ${h} ساعة`; } return d === 1 ? 'أمس' : `قبل ${d} يوم`; };
+const planName = c => c.plan && c.plan !== 'trial' ? c.plan : (planOf(c.planId) || {}).name || (c.status === 'trial' ? 'تجربة' : '—');
+const daysLeft = d => d ? Math.round((Date.parse(d + 'T00:00:00Z') - Date.parse(today() + 'T00:00:00Z')) / 864e5) : null;
+// مؤشرات عدم التجديد: لا نشاط، مستخدم واحد، بلا سيارات، قرب الانتهاء بنشاط ضعيف، فواتير متأخرة
+function riskOf(c) {
+  const st = STATS[c.id] || {}; const s = stOf(c); const why = [];
+  if (!['trial', 'active', 'expired'].includes(s)) return { lvl: 0, why };
+  const since = daysAgo(c.approvedAt) ?? 0;
+  const idle = st.lastSeen ? daysAgo(st.lastSeen) : (st.at ? since : null);
+  if (idle != null && idle >= 14) why.push(st.lastSeen ? `بلا نشاط منذ ${idle} يوم` : 'لم يستخدم النظام منذ الاعتماد');
+  if (st.users != null && st.users <= 1 && since >= 7) why.push('مستخدم واحد فقط');
+  if (st.vehicles === 0 && since >= 3) why.push('لم يُضف سيارات');
+  const left = daysLeft(c.status === 'trial' ? c.trialEnds : c.paidUntil);
+  if (left != null && left >= 0 && left <= 7 && ((idle != null && idle >= 7) || (st.vehicles != null && st.vehicles < 3))) why.push(`ينتهي خلال ${left} يوم بنشاط ضعيف`);
+  if (s === 'expired') why.push('انتهى ولم يُجدَّد');
+  if (INVS.some(i => i.cid === c.id && istOf(i) === 'overdue')) why.push('فاتورة متأخرة');
+  return { lvl: why.length >= 2 ? 2 : why.length, why };
+}
+const riskPill = r => r.lvl ? `<span class="pill ${r.lvl > 1 ? 'p-crit' : 'p-warn'}">${r.lvl > 1 ? 'خطر عالٍ' : 'يحتاج متابعة'}</span><small>${esc(r.why.join(' · '))}</small>` : '<span class="pill p-ok">جيد</span>';
+function renderActivity() {
+  $('#statsNow').hidden = !canHealth();
+  $('#statsAt').textContent = STATS_AT ? `آخر حساب: ${ago(STATS_AT)}` : 'تُحسب الإحصاءات تلقائياً كل صباح.';
+  const q = $('#aq').value.trim().toLowerCase(), f = $('#afs').value;
+  const list = COS.filter(c => !isOpen(c)).map(c => ({ c, st: STATS[c.id] || {}, r: riskOf(c) }))
+    .filter(({ c, st, r }) => (!q || hay(c).includes(q)) && (f === 'all' || (f === 'risk' && r.lvl) || (f === 'idle' && st.at && (!st.lastSeen || daysAgo(st.lastSeen) >= 14)) || (f === 'over' && st.over)))
+    .sort((a, b) => b.r.lvl - a.r.lvl || String(b.st.lastSeen || '').localeCompare(String(a.st.lastSeen || '')));
+  $('#arows').innerHTML = list.length ? list.map(({ c, st, r }) => `<tr class="click" data-id="${esc(c.id)}"><td><b>${esc(c.name)}</b>${c.customerNo ? `<small>رقم العميل ${esc(c.customerNo)}</small>` : ''}</td>
+    <td>${pill(ST, stOf(c))}<small>${esc(planName(c))}</small></td>
+    <td>${esc(st.vehicles ?? c.vehicles ?? '—')}${+c.maxVehicles ? `<small>من ${esc(c.maxVehicles)}${st.over ? ' · <b style="color:var(--crit)">تجاوز</b>' : ''}</small>` : ''}</td>
+    <td>${esc(st.users ?? '—')}</td><td>${esc(st.active7 ?? '—')}</td><td>${st.at ? esc(ago(st.lastSeen)) : '—'}</td><td>${riskPill(r)}</td></tr>`).join('')
+    : `<tr><td colspan="7" class="empty">${COS.some(c => !isOpen(c)) ? 'لا توجد نتائج' : 'لا توجد شركات معتمدة بعد'}</td></tr>`;
+}
+$('#aq').oninput = renderActivity; $('#afs').onchange = renderActivity;
+$('#arows').onclick = e => { const r = e.target.closest('tr[data-id]'); if (r) openFile(r.dataset.id); };
+$('#statsNow').onclick = async () => { const b = $('#statsNow'); b.disabled = true; b.textContent = 'جارٍ الحساب…';
+  try { const r = await plat({ action: 'stats-now' }); toast(`تم تحديث ${r.companies} شركة ✓`); plog('تحديث إحصاءات النشاط', '', `${r.companies} شركة`); await loadStats(); }
+  catch (e) { toast('تعذر التحديث: ' + e.message); } b.disabled = false; b.textContent = 'تحديث الإحصاءات الآن'; };
+
+/* ---------- صحة النظام ---------- */
+let HL = null;
+const FNS = [['plat', 'دالة المنصة (الإشعارات والدفع)'], ['ai', 'الذكاء الاصطناعي'], ['push', 'إشعارات الشركات'], ['backup', 'النسخ الاحتياطي']];
+async function loadHealthLite() {
+  const r = HL || (HL = {});
+  try { const [h, b] = await Promise.all([F.getDoc(F.doc(fs, 'platform', 'health')), F.getDoc(F.doc(fs, 'platform', 'backup'))]); r.doc = h.exists() ? h.data() : {}; r.backup = b.exists() ? b.data() : {}; } catch (e) { r.doc = r.doc || {}; r.backup = r.backup || {}; }
+  try { const q = await F.getDocs(F.query(F.collection(fs, 'clienterr'), F.orderBy('at', 'desc'), F.limit(200))); r.errs = q.docs.map(d => ({ id: d.id, ...d.data() })); } catch (e) { r.errs = r.errs || []; }
+  if (!r.cfg) { try { r.cfg = (await plat({ action: 'health' })).config; r.cfgErr = ''; } catch (e) { r.cfg = null; r.cfgErr = e.message; } }
+  decBadge(); if (TAB === 'home') renderHome();
+}
+async function loadHealth() {
+  $('#t-health').innerHTML = '<div class="empty">جارٍ فحص الخدمات…</div>';
+  const t0 = performance.now(); HL = HL || {}; HL.cfg = null; await loadHealthLite(); HL.dbMs = Math.round(performance.now() - t0);
+  HL.fns = {}; await Promise.all(FNS.map(async ([n]) => { try { HL.fns[n] = (await fetch('/.netlify/functions/' + n, { method: 'POST', body: '{}' })).status; } catch (e) { HL.fns[n] = 0; } }));
+  if (TAB === 'health') renderHealth(); decBadge();
+}
+const hrs = iso => iso ? (Date.now() - Date.parse(iso)) / 36e5 : Infinity;
+const fnOk = st => st && st !== 404 && st < 500;
+function healthIssues() {
+  if (!HL) return []; const out = []; const h = HL.doc || {}; const b = HL.backup || {}; const c = HL.cfg;
+  if (!h.remindAt) out.push(['info', 'لم تُسجَّل دورة للمهام المجدولة بعد', 'تبدأ تلقائياً الساعة 7 صباحاً']);
+  else if (hrs(h.remindAt) > 26) out.push(['crit', 'المهام المجدولة متوقفة', `آخر تشغيل ${ago(h.remindAt)}: التذكيرات والإيقاف التلقائي لا تعمل`]);
+  else if (h.remindOk === false) out.push(['warn', 'آخر تشغيل للمهام المجدولة به أخطاء', h.remindErr || '']);
+  if (b.ok === false && b.error) out.push(['crit', 'فشلت آخر نسخة احتياطية', b.error]);
+  else if (c && c.backup && hrs(b.lastAt) > 36) out.push(['crit', 'النسخة الاحتياطية متأخرة', b.lastAt ? `آخر نسخة ${ago(b.lastAt)}` : 'لم تُؤخذ نسخة بعد']);
+  const e24 = (HL.errs || []).filter(e => hrs(e.at) < 24).length; if (e24 >= 5) out.push(['warn', `${e24} خطأ في متصفحات الشركات خلال 24 ساعة`, 'راجع سجل الأخطاء في صحة النظام']);
+  if (c) { if (!c.mail) out.push(['warn', 'البريد غير مُعدّ', 'لا تصل رسائل الاعتماد والتنبيهات للشركات']); if (!c.backup) out.push(['warn', 'النسخ الاحتياطي غير مُعدّ', 'بيانات الشركات بلا نسخة احتياطية']); }
+  else if (HL.cfgErr) out.push(['crit', 'دالة المنصة لا تستجيب', HL.cfgErr]);
+  Object.entries(HL.fns || {}).forEach(([n, st]) => { if (!fnOk(st)) out.push(['crit', `الدالة «${(FNS.find(x => x[0] === n) || [, n])[1]}» لا تستجيب`, st ? `الرمز ${st}` : 'تعذر الاتصال']); });
+  return out;
+}
+function renderHealth() {
+  const box = $('#t-health'); const h = HL.doc || {}; const b = HL.backup || {}; const c = HL.cfg || {}; const iss = healthIssues();
+  const crit = iss.filter(x => x[0] === 'crit').length, warn = iss.filter(x => x[0] === 'warn').length;
+  const yes = (v, a = 'مُعدّ', n = 'غير مُعدّ') => `<span class="pill ${v ? 'p-ok' : 'p-warn'}">${v ? a : n}</span>`;
+  const row = (l, v) => `<div class="row"><span>${l}</span><span>${v}</span></div>`;
+  const when = iso => iso ? `${esc(ago(iso))} <small class="mono" style="color:var(--muted)">${esc(String(iso).slice(0, 16).replace('T', ' '))}</small>` : '—';
+  const card = (icon, title, st, body, btn = '') => `<div class="hc"><h4>${svg(icon)}${title}<span class="st">${st}</span></h4>${body}${btn}</div>`;
+  const groups = {}; (HL.errs || []).forEach(e => { const k = e.msg; const g = groups[k] || (groups[k] = { msg: k, n: 0, cos: new Set(), at: '', page: e.page, src: e.src }); g.n++; if (e.cid) g.cos.add(e.cid); if (String(e.at) > g.at) { g.at = e.at; g.page = e.page; g.src = e.src; } });
+  const gl = Object.values(groups).sort((a, b) => b.at.localeCompare(a.at));
+  box.innerHTML = `<div class="banner ${crit ? 'crit' : warn ? 'warn' : 'ok'}"><span class="big">${crit ? '⛔' : warn ? '⚠️' : '✓'}</span><div><b>${crit ? `${crit} مشكلة تحتاج تدخلاً` : warn ? `النظام يعمل، مع ${warn} ملاحظة` : 'كل الخدمات تعمل'}</b><small>آخر فحص الآن · زمن الاستجابة لقاعدة البيانات ${HL.dbMs || '—'} ms</small></div><span class="spacer"></span><button class="btn" id="hRe">إعادة الفحص</button></div>
+    ${iss.length ? `<div class="panel"><div class="dec">${iss.map(([sev, t, s]) => `<div class="dec-it" style="--c:var(--${sev})"><span class="dot"></span><b>${esc(t)}</b><small>${esc(s)}</small></div>`).join('')}</div></div>` : ''}
+    <div class="hgrid">
+      ${card('building', 'قاعدة البيانات', '<span class="pill p-ok">تعمل</span>', row('المشروع', `<span class="mono">${esc(FIREBASE_CONFIG.projectId)}</span>`) + row('زمن الاستجابة', `${HL.dbMs || '—'} ms`) + row('الشركات', COS.length))}
+      ${card('pulse', 'دوال الخادم', Object.values(HL.fns || {}).every(fnOk) ? '<span class="pill p-ok">تعمل</span>' : '<span class="pill p-crit">عطل</span>', FNS.map(([n, l]) => row(l, !HL.fns ? '—' : fnOk(HL.fns[n]) ? '<span class="pill p-ok">تستجيب</span>' : `<span class="pill p-crit">${HL.fns[n] || 'لا اتصال'}</span>`)).join(''))}
+      ${card('log', 'المهام المجدولة', !h.remindAt ? '<span class="pill p-off">لم تبدأ</span>' : hrs(h.remindAt) > 26 ? '<span class="pill p-crit">متوقفة</span>' : h.remindOk === false ? '<span class="pill p-warn">بها أخطاء</span>' : '<span class="pill p-ok">تعمل</span>',
+        row('التذكيرات (كل صباح)', when(h.remindAt)) + row('الإيقاف التلقائي والتنبيهات', when(h.dailyAt)) + (h.dailyNote ? `<p>${esc(h.dailyNote)}</p>` : '') + row('إحصاءات النشاط', when(h.statsAt)) + (h.remindErr ? `<p style="color:var(--crit)">${esc(h.remindErr)}</p>` : ''))}
+      ${card('card', 'النسخ الاحتياطي', !c.backup ? yes(false) : b.ok === false ? '<span class="pill p-crit">فشل</span>' : hrs(b.lastAt) > 36 ? '<span class="pill p-warn">متأخر</span>' : '<span class="pill p-ok">يعمل</span>',
+        row('آخر نسخة ناجحة', when(b.lastAt)) + (b.ok === false && b.error ? `<p style="color:var(--crit)">${esc(b.error)}</p>` : '') + (!c.backup ? '<p>يحتاج حساب خدمة Google Cloud وحاوية تخزين في متغيرات Netlify.</p>' : ''), ME.super ? '<button class="btn sm" data-h="settings">الإعدادات والنسخ اليدوي</button>' : '')}
+      ${card('inbox', 'البريد الإلكتروني', yes(c.mail), row('حساب الإرسال', c.mailUser ? `<span class="mono" dir="ltr">${esc(c.mailUser)}</span>` : '—') + '<p>رسائل الاعتماد وتنبيهات انتهاء الاشتراك والفواتير.</p>', c.mail ? '<button class="btn sm" data-h="test-mail">إرسال رسالة اختبار لبريدي</button>' : '')}
+      ${card('help', 'إشعارات الجوال', yes(c.push), '<p>إشعارات الطلبات والإيصالات والتذاكر لفريق المنصة، وإشعارات الشركات.</p>', c.push ? '<button class="btn sm" data-h="test-push">إشعار اختبار لأجهزتي</button>' : '')}
+      ${card('card', 'الدفع الإلكتروني (ميسر)', c.payments && SET.moyasarPk ? yes(true) : yes(false), row('المفتاح السري (Netlify)', yes(c.payments, 'موجود', 'ناقص')) + row('المفتاح العام (الإعدادات)', yes(!!SET.moyasarPk, 'موجود', 'ناقص')))}
+      ${card('chart', 'الذكاء الاصطناعي', c.ai && SET.aiEnabled === 'on' ? '<span class="pill p-ok">مفعّل</span>' : c.ai ? '<span class="pill p-off">موقوف في الإعدادات</span>' : yes(false),
+        row('المفتاح (Netlify)', yes(c.ai, 'موجود', 'ناقص')) + row('النموذج', `<span class="mono">${esc(c.aiModel || '—')}</span>`) + row('التفعيل للشركات', SET.aiEnabled === 'on' ? 'مفعّل' : 'موقوف') + '<div id="aiTest"></div>', c.ai ? '<button class="btn sm" data-h="test-ai">اختبار الاتصال</button>' : '')}
+      ${card('gear', 'النشر والبيئة', '', row('الموقع', `<span class="mono" dir="ltr">${esc(c.site || location.host)}</span>`) + row('رقم النشر', `<span class="mono">${esc(c.deploy || '—')}</span>`) + row('بيئة الخادم', `<span class="mono">${esc(c.node || '—')}</span>`) + '<p>قواعد الأمان تُحدَّث يدوياً من Firebase عند كل تغيير.</p>')}
+    </div>
+    <div class="panel"><div class="ph"><h3>أعطال المتصفح في أنظمة الشركات</h3><span class="acts"><small>آخر 200 خطأ</small>${ME.super && gl.length ? '<button class="btn sm bad" data-h="clear-errs">مسح السجل</button>' : ''}</span></div>
+      <div class="tw"><table><thead><tr><th>الخطأ</th><th>المرات</th><th>الشركات</th><th>آخر ظهور</th><th>الصفحة والمصدر</th></tr></thead><tbody>${gl.length ? gl.slice(0, 50).map(g => `<tr><td style="max-width:420px"><span class="mono" style="word-break:break-word">${esc(g.msg)}</span></td><td>${g.n}</td><td>${[...g.cos].map(id => esc((COS.find(x => x.id === id) || {}).name || id)).join('، ')}</td><td>${esc(ago(g.at))}</td><td><small class="mono" dir="ltr" style="text-align:right">${esc(g.page || '')} ${esc(g.src || '')}</small></td></tr>`).join('') : '<tr><td colspan="5" class="empty">لا توجد أعطال مسجلة ✓</td></tr>'}</tbody></table></div></div>`;
+  $('#hRe').onclick = loadHealth;
+  box.onclick = async e => { const t = e.target.closest('[data-h]'); if (!t) return; const a = t.dataset.h;
+    if (a === 'settings') return show('settings');
+    t.disabled = true;
+    try {
+      if (a === 'test-mail') { const r = await plat({ action: 'test-mail' }); toast(r.sent ? 'أُرسلت رسالة الاختبار لبريدك ✓' : 'لم تُرسل: ' + (r.error || r.skipped || '')); }
+      if (a === 'test-push') { const r = await plat({ action: 'test-push' }); toast(r.pushed ? `وصل الإشعار إلى ${r.pushed} جهاز ✓` : r.devices ? 'تعذر الإرسال لأجهزتك' : 'فعّل الإشعارات على هذا الجهاز أولاً من زر 🔔'); }
+      if (a === 'test-ai') { const r = await plat({ action: 'test-ai' }); $('#aiTest').innerHTML = r.ok ? `<p style="color:var(--ok)">✓ يعمل · ${esc(r.model)} · ${r.ms} ms</p>` : `<p style="color:var(--crit)">✗ ${esc(r.error)}</p>`; }
+      if (a === 'clear-errs' && confirm('مسح سجل أعطال المتصفح؟')) { await Promise.all((HL.errs || []).map(x => F.deleteDoc(F.doc(fs, 'clienterr', x.id)).catch(() => {}))); plog('مسح سجل أعطال المتصفح', '', `${(HL.errs || []).length} سجل`); HL.errs = []; renderHealth(); decBadge(); }
+    } catch (x) { toast('تعذر التنفيذ: ' + x.message); }
+    t.disabled = false; };
+}
+
+/* ---------- الرئيسية ---------- */
+// الإيراد الشهري المتكرر: آخر فاتورة مدفوعة لكل شركة مفعّلة مقسومة على أشهرها (قبل الضريبة)
+function mrrNow() {
+  const paid = INVS.filter(i => i.status === 'paid');
+  return COS.filter(c => c.status === 'active' && stOf(c) === 'active').reduce((s, c) => { const l = paid.filter(i => i.cid === c.id).sort((a, b) => (b.seq || 0) - (a.seq || 0))[0]; return s + (l ? (+l.subtotal || 0) / (+l.months || 1) : 0); }, 0);
+}
+function decisions() {
+  const out = []; const goInv = i => () => { show('invoices'); $('#ifs').value = 'all'; $('#iq').value = i.number; renderInv(); };
+  COS.filter(c => c.status === 'pending').forEach(c => out.push({ sev: 'crit', w: 1, t: `طلب تسجيل جديد: ${c.name}`, s: `${(c.profile || {}).city || ''}${(c.profile || {}).fleetSize ? ` · ~${c.profile.fleetSize} سيارة` : ''} · ${ago(c.submittedAt || c.createdAt).replace('لم يدخل بعد', '')}`, b: 'مراجعة', go: () => openFile(c.id) }));
+  INVS.filter(i => i.status === 'unpaid' && i.receiptId).forEach(i => out.push({ sev: 'warn', w: 2, t: `إيصال تحويل بانتظار التحقق: ${i.companyName}`, s: `${i.number} · ${money(i.total)} ريال`, b: 'التحقق', go: goInv(i) }));
+  INVS.filter(i => istOf(i) === 'overdue' && !i.receiptId).forEach(i => out.push({ sev: 'warn', w: 3, t: `فاتورة متأخرة: ${i.companyName}`, s: `${i.number} · متأخرة ${-daysLeft(i.dueDate)} يوم · ${money(i.total)} ريال`, b: 'الفاتورة', go: goInv(i) }));
+  TKS.filter(x => x.status !== 'closed' && x.unreadPlat).forEach(x => out.push({ sev: 'warn', w: 4, t: `تذكرة بانتظار الرد: ${x.subject}`, s: x.companyName, b: 'الرد', go: () => { show('support'); setTimeout(() => { const r = document.querySelector(`#tkrows [data-tk="${CSS.escape(x.id)}"]`); if (r) r.click(); }, 60); } }));
+  COS.forEach(c => { const s = stOf(c); const st = STATS[c.id] || {};
+    if (s === 'expired') out.push({ sev: 'warn', w: 5, t: `انتهت ${c.status === 'trial' ? 'تجربة' : 'اشتراك'} ${c.name}`, s: 'لم يُجدَّد، ويُوقف تلقائياً حسب الإعدادات', b: 'الملف', go: () => openFile(c.id) });
+    else if (['trial', 'active'].includes(c.status)) { const d = daysLeft(c.status === 'trial' ? c.trialEnds : c.paidUntil);
+      if (d != null && d >= 0 && d <= 7) out.push({ sev: 'info', w: 6, t: `${c.status === 'trial' ? 'التجربة' : 'الاشتراك'} ينتهي ${d === 0 ? 'اليوم' : `خلال ${d} يوم`}: ${c.name}`, s: c.status === 'trial' ? 'فرصة تحويل لاشتراك مدفوع' : 'أصدر فاتورة التجديد', b: c.status === 'trial' || !can('invoices') ? 'الملف' : 'فاتورة', go: () => c.status === 'trial' || !can('invoices') ? openFile(c.id) : newInvoice(c) }); }
+    if (st.over || (+c.maxVehicles && +c.vehicles > +c.maxVehicles)) out.push({ sev: 'warn', w: 7, t: `تجاوزت حد السيارات: ${c.name}`, s: `${st.vehicles ?? c.vehicles} من ${c.maxVehicles} سيارة: رقِّ الباقة أو ارفع الحد`, b: 'التحكم', go: () => openFile(c.id) });
+    const r = riskOf(c); if (r.lvl > 1 && s !== 'expired') out.push({ sev: 'info', w: 8, t: `مهددة بعدم التجديد: ${c.name}`, s: r.why.join(' · '), b: 'الملف', go: () => openFile(c.id) });
+  });
+  if (canHealth()) healthIssues().forEach(([sev, t, s]) => out.push({ sev, w: 0, t, s, b: 'صحة النظام', go: () => show('health') }));
+  const R = { crit: 0, warn: 1, info: 2 }; return out.sort((a, b) => R[a.sev] - R[b.sev] || a.w - b.w);
+}
+let DEC = [], DEC_ALL = false, HOME_LOG = null;
+function decBadge() { DEC = decisions(); badge('decBadge', DEC.filter(d => d.sev !== 'info').length); badge('hBadge', canHealth() ? healthIssues().filter(x => x[0] === 'crit').length : 0); }
+function renderHome() {
+  decBadge(); const box = $('#t-home'); const hr = new Date().getHours();
+  const first = String(ME.name || '').trim().split(/\s+/)[0];
+  const act = COS.filter(c => c.status === 'active' && stOf(c) === 'active').length, tri = COS.filter(c => stOf(c) === 'trial').length;
+  const need = DEC.filter(d => d.sev !== 'info').length; const iss = canHealth() ? healthIssues() : []; const hc = iss.filter(x => x[0] === 'crit').length;
+  const openTk = TKS.filter(t => t.status !== 'closed').length;
+  const cards = [
+    ['var(--accent)', 'الإيراد الشهري المتكرر', money(mrrNow()), 'ريال قبل الضريبة', ME.super || can('invoices') ? 'reports' : 'companies'],
+    ['var(--ok)', 'شركات عاملة', act + tri, `${act} مدفوعة · ${tri} تجربة`, 'companies'],
+    [need ? 'var(--crit)' : 'var(--ok)', 'يحتاج قرارك', need, need ? 'طلبات وفواتير وتنبيهات' : 'لا شيء عاجل', 'dec'],
+    canHealth() ? [hc ? 'var(--crit)' : iss.length ? 'var(--warn)' : 'var(--ok)', 'صحة النظام', hc ? `${hc} عطل` : HL && HL.cfg ? 'سليمة' : '…', iss.length ? `${iss.length} ملاحظة` : 'كل الخدمات تعمل', 'health']
+      : ['var(--info)', 'تذاكر مفتوحة', openTk, 'طلبات الدعم الفني', 'support']];
+  const list = DEC_ALL ? DEC : DEC.slice(0, 8);
+  const recent = [...COS].sort((a, b) => String(b.submittedAt || b.createdAt).localeCompare(String(a.submittedAt || a.createdAt))).slice(0, 6);
+  box.innerHTML = `<div class="head"><div class="hello"><small>${new Date().toLocaleDateString('ar-SA-u-nu-latn-ca-gregory', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</small><h2>${hr < 12 ? 'صباح الخير' : 'مساء الخير'}${first ? '، ' + esc(first) : ''}</h2><p>هذا وضع المنصة اليوم.</p></div>
+      <div class="acts">${can('invoices') ? '<button class="btn" data-home="inv">فاتورة جديدة</button>' : ''}<button class="btn" data-home="reload">تحديث</button></div></div>
+    <div class="stat4">${cards.map(([c, l, v, sm, go]) => `<button style="--c:${c}" data-home="${go}"><span class="l">${l}</span><b>${esc(v)}</b><small>${esc(sm)}</small></button>`).join('')}</div>
+    <div class="panel" id="decList"><div class="ph"><h3>يحتاج قرارك</h3><small>${DEC.length ? `${DEC.length} بند` : ''}</small></div>
+      ${DEC.length ? `<div class="dec">${list.map((d, i) => `<div class="dec-it" style="--c:var(--${d.sev})"><span class="dot"></span><b>${esc(d.t)}</b><small>${esc(d.s)}</small><button class="btn sm" data-dec="${i}">${esc(d.b)}</button></div>`).join('')}</div>${DEC.length > 8 ? `<div style="padding:10px 20px;border-top:1px solid var(--line)"><button class="lnk" data-home="all">${DEC_ALL ? 'عرض أقل' : `عرض الكل (${DEC.length})`}</button></div>` : ''}`
+        : '<div class="dec-ok"><b>لا شيء يحتاج قرارك الآن ✓</b>الطلبات والفواتير والاشتراكات كلها تحت السيطرة.</div>'}</div>
+    <div class="g2c">
+      <div class="panel"><div class="ph"><h3>أحدث الشركات</h3><button class="lnk" data-home="companies">عرض الكل</button></div><div class="mini-list">${recent.length ? recent.map(c => `<div class="click" data-co="${esc(c.id)}"><span><b style="font-weight:500">${esc(c.name)}</b> <small>${esc((c.profile || {}).city || '')}</small></span><span>${pill(ST, stOf(c))}</span></div>`).join('') : '<div><small>لا توجد شركات بعد</small></div>'}</div></div>
+      <div class="panel"><div class="ph"><h3>${can('log') ? 'آخر نشاط الفريق' : 'التذاكر المفتوحة'}</h3><button class="lnk" data-home="${can('log') ? 'log' : 'support'}">عرض الكل</button></div><div class="mini-list" id="homeSide">${can('log') ? (HOME_LOG ? (HOME_LOG.length ? HOME_LOG.map(x => `<div><span>${esc(x.action)} <small>${esc(x.target || '')}</small></span><small>${esc(x.byName || x.by)} · ${esc(ago(x.at))}</small></div>`).join('') : '<div><small>لا يوجد نشاط بعد</small></div>') : '<div><small>…</small></div>')
+        : (TKS.filter(t => t.status !== 'closed').slice(0, 6).map(t => `<div><span>${esc(t.subject)} <small>${esc(t.companyName)}</small></span>${pill(TKS_ST, t.status)}</div>`).join('') || '<div><small>لا توجد تذاكر مفتوحة</small></div>')}</div></div>
+    </div>`;
+  if (can('log') && HOME_LOG === null) { HOME_LOG = []; F.getDocs(F.query(F.collection(fs, 'platlog'), F.orderBy('at', 'desc'), F.limit(6))).then(q => { HOME_LOG = q.docs.map(d => d.data()); if (TAB === 'home') renderHome(); }).catch(() => {}); }
+  box.onclick = e => { const d = e.target.closest('[data-dec]'); if (d) return list[+d.dataset.dec].go();
+    const co = e.target.closest('[data-co]'); if (co) return openFile(co.dataset.co);
+    const h = e.target.closest('[data-home]'); if (!h) return; const k = h.dataset.home;
+    if (k === 'dec') return $('#decList').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (k === 'all') { DEC_ALL = !DEC_ALL; return renderHome(); }
+    if (k === 'inv') return newInvoice(null);
+    if (k === 'reload') { HOME_LOG = null; if (HL) HL.cfg = null; return loadAll(); }
+    show(k); window.scrollTo(0, 0); };
+}
+
+/* ---------- التحكم في الشركة ---------- */
+const FEATS = [['ai', 'الذكاء الاصطناعي'], ['fuel', 'الوقود وكشف الهدر'], ['branches', 'الفروع ومشرفو الفروع'], ['accidents', 'الحوادث والمطالبات'], ['inbox', 'المحادثات الداخلية'], ['reports', 'التقارير']];
+function ctlSec(c) {
+  const f = c.features || {}; const st = STATS[c.id] || {}; const ctl = can('status') || can('edit');
+  return `<div class="sec"><h4>التحكم والحدود ${ctl ? '<button class="btn sm" data-f="ctl">تعديل التحكم</button>' : ''}</h4><dl class="kv">
+    <div><dt>حد السيارات</dt><dd>${+c.maxVehicles ? `${esc(st.vehicles ?? c.vehicles ?? '…')} من ${esc(c.maxVehicles)}${st.over ? ' <span class="pill p-crit">تجاوز</span>' : ''}` : 'بلا حد'}</dd></div>
+    <div><dt>حد المستخدمين الإداريين</dt><dd>${+c.maxUsers ? esc(c.maxUsers) : 'بلا حد'}</dd></div>
+    <div><dt>سعر خاص للسيارة</dt><dd>${+c.customPrice ? money(c.customPrice) + ' ريال' : 'حسب الباقة'}</dd></div>
+    <div><dt>خصم دائم</dt><dd>${+c.discountPct ? esc(c.discountPct) + '%' : '—'}</dd></div>
+    <div style="grid-column:1/-1"><dt>المزايا المتاحة</dt><dd><div class="acts" style="margin-top:4px">${FEATS.map(([k, l]) => `<span class="pill ${f[k] === false ? 'p-off' : 'p-ok'}">${f[k] === false ? '⏸ ' : ''}${l}</span>`).join('')}</div></dd></div></dl></div>
+    <div class="sec"><h4>النشاط <small style="color:var(--muted);font-weight:400">${st.at ? 'حُسب ' + esc(ago(st.at)) : 'يُحسب كل صباح'}</small></h4><dl class="kv">
+    <div><dt>آخر نشاط</dt><dd>${st.at ? esc(ago(st.lastSeen)) : '—'}</dd></div><div><dt>مستخدمون سجّلوا الدخول</dt><dd>${esc(st.users ?? '—')}</dd></div>
+    <div><dt>نشطون آخر 7 أيام</dt><dd>${esc(st.active7 ?? '—')}</dd></div><div><dt>التقييم</dt><dd>${riskPill(riskOf(c))}</dd></div></dl></div>`;
+}
+function ctlDialog(c) {
+  const f0 = c.features || {};
+  const f = dialog(`<h3>التحكم في ${esc(c.name)}</h3>
+    ${PLANS().length ? planSel(c.planId, c.billingCycle) : ''}
+    <div class="g2"><label>حد السيارات (0 = بلا حد)<input name="maxVehicles" type="number" min="0" value="${+c.maxVehicles || 0}"></label><label>حد المستخدمين الإداريين (0 = بلا حد)<input name="maxUsers" type="number" min="0" value="${+c.maxUsers || 0}"></label></div>
+    <div class="g2"><label>سعر خاص للسيارة شهرياً (فارغ = سعر الباقة)<input name="customPrice" type="number" min="0" step="0.01" value="${+c.customPrice || ''}"></label><label>خصم دائم على الفواتير %<input name="discountPct" type="number" min="0" max="90" value="${+c.discountPct || ''}"></label></div>
+    <b style="font-size:14px">المزايا المتاحة للشركة</b><div class="feats">${FEATS.map(([k, l]) => `<label class="chk"><input type="checkbox" name="f_${k}" ${f0[k] === false ? '' : 'checked'}> ${l}</label>`).join('')}</div>
+    <small style="color:var(--muted)">الميزة الموقوفة تختفي من نظام الشركة فوراً وبياناتها تبقى محفوظة، والذكاء الاصطناعي يُمنع من الخادم أيضاً.</small>`,
+    fd => { const pf = fd.get('planId') ? planFields(fd.get('planId'), fd.get('cycle')) : {};
+      const data = { ...pf, maxVehicles: Math.max(0, +fd.get('maxVehicles') || 0), maxUsers: Math.max(0, +fd.get('maxUsers') || 0), features: Object.fromEntries(FEATS.map(([k]) => [k, !!fd.get('f_' + k)])),
+        customPrice: Math.max(0, +fd.get('customPrice') || 0), discountPct: Math.max(0, Math.min(90, +fd.get('discountPct') || 0)) };
+      saveCo(c.id, data, 'تم حفظ التحكم ✓'); });
+  $('#dlg').style.width = 'min(640px,94vw)';
+  if (f.planId) f.planId.onchange = () => { const pl = planOf(f.planId.value); if (pl) { f.maxVehicles.value = +pl.maxVehicles || 0; f.maxUsers.value = +pl.maxUsers || 0; f.f_ai.checked = !!pl.ai; } };
+}
 
 /* ---------- فريق المنصة ---------- */
 async function loadStaff() {
@@ -597,8 +947,8 @@ const TK_CAT = { tech: 'مشكلة تقنية', billing: 'الفواتير وا�
 const TKS_ST = { open: ['بانتظار الرد', 'p-unpaid'], answered: ['تم الرد', 'p-active'], closed: ['مغلقة', 'p-off'] };
 async function loadTk() {
   try { const s = await F.getDocs(F.collection(fs, 'tickets')); TKS = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(b.lastAt).localeCompare(String(a.lastAt))); } catch (e) { TKS = []; }
-  const n = TKS.filter(t => t.status !== 'closed' && t.unreadPlat).length; const b = $('#tkBadge'); if (b) { b.textContent = n; b.hidden = !n; }
-  if (TAB === 'support') renderTk();
+  const n = TKS.filter(t => t.status !== 'closed' && t.unreadPlat).length; badge('tkBadge', n);
+  if (TAB === 'support') renderTk(); if (TAB === 'home') renderHome(); else decBadge();
 }
 function renderTk() {
   const q = $('#tq').value.trim().toLowerCase(), f = $('#tfs').value;
@@ -612,7 +962,7 @@ $('#tkrows').onclick = async e => { const r = e.target.closest('[data-tk]'); if 
   let msgs = []; try { const s = await F.getDocs(F.collection(fs, 'tickets', t.id, 'msgs')); msgs = s.docs.map(d => d.data()).sort((a, b) => String(a.at).localeCompare(String(b.at))); } catch (x) {}
   const all = [{ side: 'co', byName: t.byName || t.by, text: t.body, at: t.createdAt }, ...msgs];
   const f = dialog(`<h3>${esc(t.subject)}</h3><small style="color:var(--muted)">${esc(t.companyName)} · ${esc(TK_CAT[t.category] || '')}</small>
-    <div style="display:grid;gap:8px;max-height:46vh;overflow:auto">${all.map(m => `<div style="border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:${m.side === 'plat' ? '#F0F7F4' : '#fff'}"><small style="color:var(--muted)">${m.side === 'plat' ? '🛟 ' : ''}${esc(m.byName || m.by)} · ${esc(String(m.at || '').slice(0, 16).replace('T', ' '))}</small><div style="white-space:pre-wrap">${esc(m.text)}</div></div>`).join('')}</div>
+    <div style="display:grid;gap:8px;max-height:46vh;overflow:auto">${all.map(m => `<div style="border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:${m.side === 'plat' ? 'var(--accent-soft)' : 'var(--surface)'}"><small style="color:var(--muted)">${m.side === 'plat' ? '🛟 ' : ''}${esc(m.byName || m.by)} · ${esc(String(m.at || '').slice(0, 16).replace('T', ' '))}</small><div style="white-space:pre-wrap">${esc(m.text)}</div></div>`).join('')}</div>
     ${can('note') ? `<label>الرد<textarea name="text" rows="3"></textarea></label><label>الحالة بعد الرد<select name="st"><option value="answered">تم الرد</option><option value="closed">إغلاق التذكرة</option><option value="open">إبقاؤها مفتوحة</option></select></label>` : ''}`,
     async fd => { if (!can('note')) return; const text = String(fd.get('text') || '').trim(); const st = fd.get('st'); const now = nowIso();
       try { if (text) await F.addDoc(F.collection(fs, 'tickets', t.id, 'msgs'), { by: ME.email, byName: ME.name || 'فريق الدعم', text, at: now, side: 'plat' });
@@ -648,8 +998,8 @@ function renderReports() {
   if (AIU === null) { AIU = []; F.getDocs(F.query(F.collection(fs, 'aiuse'), F.where('day', '>=', mon + '-01'))).then(q => { AIU = q.docs.map(d => d.data()); if (TAB === 'reports') renderReports(); }).catch(() => {}); }
   const aiBy = {}; AIU.forEach(u => { const x = aiBy[u.cid] || (aiBy[u.cid] = { n: 0, scan: 0, ask: 0, ti: 0, to: 0 }); x.n += +u.n || 0; x.scan += +u.scan || 0; x.ask += +u.ask || 0; x.ti += +u.tokensIn || 0; x.to += +u.tokensOut || 0; });
   const aiRows = Object.entries(aiBy).sort((a, b) => b[1].n - a[1].n);
-  // تقدير التكلفة بأسعار Claude Opus 5.5 ($4 / $20 لكل مليون رمز) وسعر صرف 3.75
-  const aiCost = x => (x.ti * 4 + x.to * 20) / 1e6 * 3.75;
+  // تقدير التكلفة بأسعار Claude Haiku 5.5 ($0.10 / $0.50 لكل مليون رمز) وسعر صرف 3.75
+  const aiCost = x => (x.ti * 0.10 + x.to * 0.50) / 1e6 * 3.75;
   box.insertAdjacentHTML('beforeend', `<div class="panel"><div class="bar"><h3 style="flex:1">استخدام الذكاء الاصطناعي هذا الشهر</h3><small style="color:var(--muted)">التكلفة تقديرية بالريال</small></div><div class="tw"><table><thead><tr><th>الشركة</th><th>الطلبات</th><th>قراءة مستندات</th><th>أسئلة المساعد</th><th>التكلفة التقديرية</th></tr></thead><tbody>${aiRows.length ? aiRows.map(([cid, x]) => `<tr class="click" data-id="${esc(cid)}"><td>${esc((COS.find(c => c.id === cid) || {}).name || cid)}</td><td>${x.n}</td><td>${x.scan}</td><td>${x.ask}</td><td>${money(aiCost(x))}</td></tr>`).join('') + `<tr><td><b>الإجمالي</b></td><td><b>${aiRows.reduce((s, [, x]) => s + x.n, 0)}</b></td><td></td><td></td><td><b>${money(aiRows.reduce((s, [, x]) => s + aiCost(x), 0))}</b></td></tr>` : `<tr><td colspan="5" class="empty">لا يوجد استخدام هذا الشهر</td></tr>`}</tbody></table></div></div>`);
   box.querySelectorAll('tr[data-id]').forEach(r => r.onclick = () => openFile(r.dataset.id));
 }

@@ -34,6 +34,7 @@ exports.handler = async (event) => {
     // تفعيل المنصة والباقة والحد اليومي
     const s = await P.sys(); const set = (await P.get(s, 'platform/settings').catch(() => null)) || {};
     if (set.aiEnabled !== 'on' && set.aiEnabled !== true) return J(403, { error: 'ai-off', message: 'الذكاء الاصطناعي غير مفعّل في المنصة' });
+    if ((co.features || {}).ai === false) return J(403, { error: 'company-off', message: 'الذكاء الاصطناعي موقوف لحسابكم من إدارة المنصة' });
     const plan = (set.plans || []).find(p => p.id === co.planId);
     if (co.status === 'active' && plan && !plan.ai) return J(403, { error: 'plan', message: 'الذكاء الاصطناعي غير متاح في باقتك الحالية. اطلب ترقية الباقة.' });
     const day = new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 10); const uid = `${cid}_${day}`;
