@@ -46,7 +46,7 @@ function htmlBody(st, period) {
   <thead><tr style="background:#0E5A44;color:#fff"><th>م</th><th>السائق</th><th>الرقم الوظيفي</th><th>القسم</th><th>البنود</th><th>المبلغ (ر.س)</th></tr></thead>
   <tbody>${tr}</tbody><tfoot><tr style="background:#F1F6F3"><td colspan="5"><b>الإجمالي</b></td><td style="text-align:left"><b>${money(st.total)}</b></td></tr></tfoot></table>` : '<p><b>لا توجد خصومات مستحقة هذا الشهر.</b></p>'}
   <p>التفاصيل بنداً بنداً في ملف Excel المرفق.</p>
-  <p style="color:#5A6862;font-size:12px">رسالة تلقائية من نظام أسطول الشركة</p></div>`;
+  <p style="color:#5A6862;font-size:12px">رسالة تلقائية من منصة مسار</p></div>`;
 }
 
 async function send(token, opts = {}) {
@@ -57,7 +57,7 @@ async function send(token, opts = {}) {
   const period = new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 10);
   const tx = nodemailer.createTransport({ host: process.env.SMTP_HOST || 'smtp.gmail.com', port: +(process.env.SMTP_PORT || 465), secure: (process.env.SMTP_PORT || '465') === '465', auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } });
   await tx.sendMail({
-    from: `"${st.company || 'نظام أسطول الشركة'}" <${process.env.SMTP_USER}>`, to, cc: opts.cc || st.hr.cc || undefined,
+    from: `"${st.company || 'مسار'}" <${process.env.SMTP_USER}>`, to, cc: opts.cc || st.hr.cc || undefined,
     subject: `كشف خصومات السائقين – ${period}`, html: htmlBody(st, period),
     attachments: [{ filename: `كشف الخصومات ${period}.xlsx`, content: xlsxBuffer(st, period) }]
   });

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>لوحة تحكم المنصة</title>
+<title>مسار | لوحة تحكم المنصة</title>
 <link rel="icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@ body{margin:0;color:var(--ink);font:15px/1.6 var(--f-body)}
 svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
 /* الشريط العلوي */
 .top{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:10px 20px;min-height:62px}
-.brand-mark{width:38px;height:38px;border-radius:11px;overflow:hidden;background:var(--accent);flex:none}.brand-mark img{width:100%;height:100%;display:block}
+.brand-mark{width:40px;height:40px;border-radius:11px;overflow:hidden;background:#fff;border:1px solid var(--line);flex:none;padding:3px}.brand-mark img{width:100%;height:100%;display:block;object-fit:contain}
 .brand h1{margin:0;font:500 17px var(--f-display)}.brand small{color:var(--muted);font-size:12.5px}
 .spacer{flex:1}
 .who{display:flex;gap:8px;align-items:center;font-size:13.5px;flex-wrap:wrap}
@@ -179,8 +179,8 @@ dl.kv dt{font-size:12px;color:var(--muted)}dl.kv dd{margin:0;font-weight:500;wor
 <body>
 <header class="top">
   <button class="ib menu-btn" id="menuBtn" aria-label="القائمة" hidden><svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-  <div class="brand-mark"><img src="icon-192.png" alt=""></div>
-  <div class="brand"><h1>لوحة تحكم المنصة</h1><small>الشركات والاشتراكات والفواتير وصحة النظام</small></div>
+  <div class="brand-mark"><img src="masar-mark.png" alt="مسار"></div>
+  <div class="brand"><h1>مسار</h1><small>لوحة تحكم المنصة</small></div>
   <div class="spacer"></div>
   <div class="who" id="who"></div>
 </header>

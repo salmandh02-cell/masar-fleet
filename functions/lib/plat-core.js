@@ -4,7 +4,7 @@ const { systemLogin } = require('./remind-core');
 const ROOT = () => `${process.env.FIRESTORE_EMULATOR_HOST ? 'http://' + process.env.FIRESTORE_EMULATOR_HOST : 'https://firestore.googleapis.com'}/v1/projects/${process.env.FB_PROJECT}/databases/(default)/documents`;
 const IDT = `${process.env.FIREBASE_AUTH_EMULATOR_HOST ? 'http://' + process.env.FIREBASE_AUTH_EMULATOR_HOST + '/' : 'https://'}identitytoolkit.googleapis.com/v1/accounts`;
 const SUPER = () => String(process.env.SUPER_EMAIL || 'salmandh02@gmail.com').toLowerCase();
-const APP = () => process.env.APP_NAME || 'نظام أسطول الشركات';
+const APP = () => process.env.APP_NAME || 'مسار';
 const SITE = () => process.env.SITE_URL || process.env.URL || '';
 
 // ---------- تحويل قيم Firestore ----------

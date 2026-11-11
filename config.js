@@ -13,7 +13,7 @@ export const FIREBASE_CONFIG = {
 export const SUPER_ADMIN_EMAIL = "salmandh02@gmail.com";
 
 // اسم المنصة كما يظهر في شاشة الدخول والتسجيل
-export const APP_NAME = "نظام أسطول الشركات";
+export const APP_NAME = "مسار";
 
 // مدة التجربة المجانية للشركات الجديدة (بالأيام)
 export const TRIAL_DAYS = 14;

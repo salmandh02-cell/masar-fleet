@@ -58,6 +58,8 @@ const AUTH_CSS = `
 #auth.land .lp-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;min-width:0}
 #auth.land .lp-brand b{font:700 18px var(--f-display,"Readex Pro",sans-serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #auth.land .lp-brand .mk{border-color:#C9A227;color:#C9A227}
+#auth .mk:has(img){background:#fff;border:0;padding:3px;width:40px;height:40px;border-radius:11px;display:inline-grid;place-items:center;flex:none}#auth .mk img{width:100%;height:100%;object-fit:contain;display:block}
+#auth.land .lp-brand .nm{display:grid;line-height:1.15;min-width:0}#auth.land .lp-brand .nm small{font-size:11.5px;opacity:.75;font-weight:400}
 #auth.land .lp-top nav{display:flex;align-items:center;gap:16px}
 #auth.land .lp-top nav>a{color:rgba(255,255,255,.8);text-decoration:none;font-size:15px}
 #auth.land .lp-top nav>a:hover{color:#fff}
@@ -155,7 +157,7 @@ const IC = {
 const ic = n => `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
 function landingHTML() {
   const ar = !window.I18N || window.I18N.ui === 'ar';
-  const name = esc(APP_NAME || T('نظام أسطول الشركة'));
+  const name = esc(APP_NAME || T('مسار'));
   const BA = [
     ['السيارات في جداول Excel وأوراق متفرقة، ولكل موظف نسخته الخاصة', 'ملف إلكتروني لكل سيارة بوثائقها وصورها وسجلها الكامل'],
     ['تنتهي الاستمارة أو التأمين أو رخصة السائق دون أن ينتبه أحد', 'تنبيه على الجوال قبل الانتهاء بأيام، مرتّب حسب الأولوية'],
@@ -173,7 +175,7 @@ function landingHTML() {
     ['chart', 'تقارير جاهزة', 'تكلفة كل سيارة وكل فرع بالريال، وملخص للإدارة العليا.'],
     ['spark', 'الذكاء الاصطناعي', 'صوّر الفاتورة أو المخالفة فتُعبّأ الحقول تلقائياً، واسأل المساعد عن بيانات أسطولك.']];
   const top = `<header class="lp-top"><div class="lp-w">
-    <a class="lp-brand" href="#" data-go="login"><span class="mk">KSA</span><b>${name}</b></a>
+    <a class="lp-brand" href="#" data-go="login"><span class="mk"><img src="masar-mark.png" alt=""></span><span class="nm"><b>${name}</b><small>${T('لإدارة الأساطيل')}</small></span></a>
     <nav>${ar ? `<a class="lp-hide" href="#lp-ba">${T('قبل وبعد')}</a><a class="lp-hide" href="#lp-offer">${T('ماذا نقدم')}</a><a class="lp-hide" href="welcome.html#pricing">${T('الأسعار')}</a>` : ''}
       ${window.I18N ? window.I18N.picker() : ''}
       <button class="lp-btn" data-go="login">${T('تسجيل الدخول')}</button>${ar ? `<button class="lp-btn gold" data-go="co">${T('سجّل شركتك')}</button>` : ''}</nav></div></header>`;
@@ -212,7 +214,7 @@ function card(inner) {
   const r = authRoot();
   const land = !(AUTH_REF && AUTH_REF.currentUser);
   const ui = window.I18N ? window.I18N.ui : 'ar';
-  const box = `<div class="card" role="dialog" aria-label="${T('تسجيل الدخول')}">${land ? (window.I18N ? `<div class="lp-mpick">${window.I18N.picker()}</div>` : '') : (window.I18N ? window.I18N.picker() : '') + `<div class="lg"><span class="mk">KSA</span><div><b>${esc(APP_NAME || T('نظام أسطول الشركة'))}</b><small>${T('إدارة السيارات والسائقين والتكاليف')}</small></div></div>`}${inner}</div>`;
+  const box = `<div class="card" role="dialog" aria-label="${T('تسجيل الدخول')}">${land ? (window.I18N ? `<div class="lp-mpick">${window.I18N.picker()}</div>` : '') : (window.I18N ? window.I18N.picker() : '') + `<div class="lg"><span class="mk"><img src="masar-mark.png" alt=""></span><div><b>${esc(APP_NAME || T('مسار'))}</b><small>${T('إدارة السيارات والسائقين والتكاليف')}</small></div></div>`}${inner}</div>`;
   if (land) {
     if (r.dataset.mode !== 'land' || r.dataset.lang !== ui) { r.innerHTML = landingHTML(); r.dataset.mode = 'land'; r.dataset.lang = ui; r.classList.add('land'); }
     r.querySelector('#auth-slot').innerHTML = box;

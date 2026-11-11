@@ -18,7 +18,7 @@ exports.handler = async (event) => {
   const to = [...new Set((req.to || []).map(String))].slice(0, 300);
   if (!to.length) return { statusCode: 400, body: 'no recipients' };
   webpush.setVapidDetails(process.env.VAPID_SUBJECT || process.env.URL, process.env.VAPID_PUBLIC, process.env.VAPID_PRIVATE);
-  const payload = JSON.stringify({ title: String(req.title || 'نظام الأسطول').slice(0, 80), body: String(req.body || '').slice(0, 180), url: String(req.url || './'), tag: req.tag ? String(req.tag).slice(0, 60) : undefined });
+  const payload = JSON.stringify({ title: String(req.title || 'مسار').slice(0, 80), body: String(req.body || '').slice(0, 180), url: String(req.url || './'), tag: req.tag ? String(req.tag).slice(0, 60) : undefined });
   const subs = [];
   for (let i = 0; i < to.length; i += 30) {
     const chunk = to.slice(i, i + 30);

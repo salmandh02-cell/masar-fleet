@@ -13,7 +13,7 @@
 <script src="i18n.js"></script>
 <script>window.__appReady=new Promise(r=>window.__appReadyResolve=r);</script>
 <script type="module">import('./fb.js');</script>
-<title>نظام أسطول الشركة</title>
+<title>مسار | إدارة الأسطول</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600&family=Readex+Pro:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
@@ -689,8 +689,8 @@ main{padding-bottom:max(72px,env(safe-area-inset-bottom,0px))}
   <header class="top"><div class="top-in">
     <div class="brand">
       <button class="menu-btn" id="menu-btn" data-act="menu" aria-label="فتح القائمة" aria-controls="side"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <div class="brand-mark" id="brand-mark"><img src="icon-192.png" alt="" style="width:100%;height:100%;border-radius:inherit;display:block"></div><div class="brand-logo" id="brand-logo" hidden><img alt="شعار الشركة"></div><script>try{const b=JSON.parse(localStorage.getItem('fleet-brand')||'{}');if(b&&/^data:image\/(png|jpeg|webp);base64,/.test(b.logo||'')){const l=document.getElementById('brand-logo');l.firstChild.src=b.logo;l.hidden=false;document.getElementById('brand-mark').hidden=true}if(b&&b.name){const sm=document.querySelector('.brand small');if(sm)sm.textContent=b.name}}catch(e){}</script>
-      <div><h1>نظام أسطول الشركة</h1><small>السيارات · السائقون · العهد · الصيانة · المخالفات</small></div>
+      <div class="brand-mark" id="brand-mark"><img src="masar-mark.png" alt="مسار" style="width:100%;height:100%;border-radius:inherit;display:block;object-fit:contain;padding:4px;background:#fff"></div><div class="brand-logo" id="brand-logo" hidden><img alt="شعار الشركة"></div><script>try{const b=JSON.parse(localStorage.getItem('fleet-brand')||'{}');if(b&&/^data:image\/(png|jpeg|webp);base64,/.test(b.logo||'')){const l=document.getElementById('brand-logo');l.firstChild.src=b.logo;l.hidden=false;document.getElementById('brand-mark').hidden=true}if(b&&b.name){const sm=document.querySelector('.brand small');if(sm)sm.textContent=b.name}}catch(e){}</script>
+      <div><h1>مسار</h1><small>السيارات · السائقون · العهد · الصيانة · المخالفات</small></div>
       <div class="spacer"></div>
       <button class="srch-btn" id="srch-btn" data-act="search" aria-label="بحث في النظام"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><span>بحث باللوحة أو الاسم أو الرقم…</span><kbd>Ctrl K</kbd></button><button class="mode-btn" id="mode-btn" data-act="mode" hidden></button><button class="msg-btn" data-act="theme" aria-label="المظهر" title="المظهر"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.9-.7-1.3-.7-2.1 0-.9.7-1.5 1.6-1.5H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7.2" r="1"/><circle cx="14.5" cy="7.2" r="1"/></svg></button><a class="msg-btn" href="#inbox" aria-label="الرسائل" title="الرسائل"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><b id="msgbadge" hidden></b></a><a class="rolechip" id="rolechip" href="#account" title="حسابي" hidden></a><button class="logout" data-act="logout" aria-label="تسجيل الخروج" title="تسجيل الخروج"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h10"/></svg></button><div class="sync off" id="sync"><i></i><span>جارٍ الاتصال…</span></div>
     </div>
@@ -968,7 +968,7 @@ async function markRead(tid){const t=THREADS.find(x=>x.id===tid);if(!t||!isUnrea
 async function sendTo(toKey,text,ref,extra){const me=myKey();const tid=tidOf(me,toKey);const at=new Date().toISOString();const p=personOf(toKey)||{name:''};
   await db.merge('threads',tid,{participants:[me,toKey].sort(),names:{[ek(me)]:ME.name||'',[ek(toKey)]:p.name||''},last:{text:String(text).slice(0,140),at,from:me,ref:ref?ref.label:null},readAt:{[ek(me)]:at},updatedAt:at});
   await db.addTo(`threads/${tid}/messages`,{from:me,name:ME.name||'',text:String(text),at,ref:ref||null,...(extra||{})});
-  if(!(extra&&extra.noPush))notify([toKey],`${extra&&extra.broadcast?'📢':'💬'} ${ME.name||'نظام الأسطول'}`,String(text).slice(0,160),'./#inbox','msg-'+me);return tid}
+  if(!(extra&&extra.noPush))notify([toKey],`${extra&&extra.broadcast?'📢':'💬'} ${ME.name||'مسار'}`,String(text).slice(0,160),'./#inbox','msg-'+me);return tid}
 const refLabel=(col,id)=>{if(col==='vehicles'){const v=vById(id);return v?`السيارة ${plateTxt(v)}`:'سيارة'}
   if(col==='handovers'){const h=S.handovers.find(x=>x.id===id);return h?`${h.type==='out'?'محضر تسليم':'محضر استلام'} ${plateTxt(vById(h.vehicleId))} · ${fmtD(String(h.at).slice(0,10))}`:'محضر'}
   if(col==='inspections'){const x=S.inspections.find(y=>y.id===id);return x?`فحص ${plateTxt(vById(x.vehicleId))} · ${fmtD(x.date)}`:'فحص'}
@@ -1221,7 +1221,7 @@ document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='ai-q'&&e.key
 window.addEventListener('hashchange',()=>{$('#side').classList.remove('open');render();window.scrollTo(0,0)});
 
 function render(){
-  const role=myRole();readOnly=baseRO||role==='viewer';takeVLink();applyScope();I18N.use(role==='driver'?I18N.lang:'ar');{const bt=document.querySelector('.brand h1');if(bt){bt.textContent=t('نظام أسطول الشركة');bt.nextElementSibling.textContent=t('السيارات · السائقون · العهد · الصيانة · المخالفات')}}{const sb=$('#srch-btn');if(sb)sb.hidden=role==='branch'}
+  const role=myRole();readOnly=baseRO||role==='viewer';takeVLink();applyScope();I18N.use(role==='driver'?I18N.lang:'ar');{const bt=document.querySelector('.brand h1');if(bt){bt.textContent=t('مسار');bt.nextElementSibling.textContent=t('السيارات · السائقون · العهد · الصيانة · المخالفات')}}{const sb=$('#srch-btn');if(sb)sb.hidden=role==='branch'}
   let r=route();if(role==='branch'&&!BR_VIEWS.includes(r)){history.replaceState(null,'','#handovers');r='handovers'}if(role==='driver'&&r!=='driver'&&r!=='inbox'&&r!=='account'){history.replaceState(null,'','#driver');r='driver'}
   if((r==='audit'||r==='billing')&&!isAdmin()){history.replaceState(null,'','#dashboard');r='dashboard'}
   if(!coFeat(r)){history.replaceState(null,'','#dashboard');r='dashboard'}{const mb=document.querySelector('.top a[href="#inbox"]');if(mb)mb.hidden=!coFeat('inbox')}
@@ -1361,7 +1361,7 @@ function shareHelp(iv){
   if(!iv.loginEmail){
     modal('إرسال الدعوة إلى '+iv.name,`<div class="mb"><p style="margin:0">هذا المستخدم مضاف بالإيميل <b class="num">${esc(iv.email)}</b>. يفتح الرابط ويضغط «التسجيل بالإيميل».</p><div class="f"><input id="inv-link" readonly dir="ltr" value="${esc(base)}"></div></div>`,`<div class="mf"><button class="btn" data-act="copy-link">نسخ الرابط</button><button class="btn" data-act="close">تم</button></div>`);return}
   const link=`${base}?join=${encodeURIComponent(iv.phone)}&c=${iv.code}`;
-  const msg=`السلام عليكم ${iv.name}، تمت إضافتك في نظام أسطول الشركة.\nافتح الرابط واختر كلمة مرور لتفعيل حسابك:\n${link}\n\nرقم الجوال: ${iv.phone}\nرمز التفعيل: ${iv.code}\n\nبعدها تدخل دائماً برقم جوالك وكلمة المرور.`;
+  const msg=`السلام عليكم ${iv.name}، تمت إضافتك في منصة مسار لإدارة الأسطول.\nافتح الرابط واختر كلمة مرور لتفعيل حسابك:\n${link}\n\nرقم الجوال: ${iv.phone}\nرمز التفعيل: ${iv.code}\n\nبعدها تدخل دائماً برقم جوالك وكلمة المرور.`;
   modal('إرسال الدعوة إلى '+iv.name,`<div class="mb">
     ${ivActive(iv)?'<div class="banner" style="margin:0"><div>هذا المستخدم فعّل حسابه. إذا نسي كلمة المرور اضغط «رمز جديد» من قائمة المستخدمين.</div></div>':''}
     <div style="display:flex;gap:14px;flex-wrap:wrap"><div><span class="sub">رقم الجوال</span><div class="num" style="font-size:20px;font-weight:600">${esc(iv.phone)}</div></div><div><span class="sub">رمز التفعيل</span><div class="num" style="font-size:20px;font-weight:600;letter-spacing:.15em">${esc(iv.code)}</div></div></div>
@@ -2497,7 +2497,7 @@ function sheetHTML(h){
   <table class="sg"><tr>${sigCell(out?'السائق المستلم':'السائق المُسلِّم',h.ack?{...h.ack,name:d.name||h.ack.name,phone:h.ack.phone||d.phone}:null,d.name,d.phone,h.driverId?'drv:'+h.driverId:'')}
     ${sigCell(out?'مُصدر المحضر (المسلِّم)':'مُصدر المحضر (المستلم)',h.issuer||null,h.by||'','')}
     <td><b>اعتماد مسؤول الأسطول</b><span>الاسم:</span><span>التوقيع:</span><span>الختم:</span></td></tr></table>
-  <div class="pf">صدر من نظام أسطول الشركة · ${fmtDT(nowDT())}</div>`;
+  <div class="pf">صدر من منصة مسار · ${fmtDT(nowDT())}</div>`;
 }
 async function downloadPdf(id){
   const h=S.handovers.find(x=>x.id===id);if(!h)return;
@@ -2518,7 +2518,7 @@ async function downloadPdf(id){
     const ph=h.photos||[];const v0=vById(h.vehicleId);
     for(let i=0;i<ph.length;i+=6){
       await addSheet(`<div class="ph"><div>${logoImg()}<div class="co">${esc(company()||'إدارة أسطول الشركة')}</div></div><div class="pt">صور السيارة<small>ملحق ${h.type==='out'?'محضر التسليم':'محضر الاستلام'}</small></div><div class="pn">اللوحة<b>${esc(plateTxt(v0))}</b>التاريخ<b>${fmtDT(h.at)}</b></div></div>
-        <div class="pgrid">${ph.slice(i,i+6).map(id=>`<img src="_blob/${id}" alt="">`).join('')}</div><div class="pf">صفحة ${Math.floor(i/6)+2} · صدر من نظام أسطول الشركة</div>`);
+        <div class="pgrid">${ph.slice(i,i+6).map(id=>`<img src="_blob/${id}" alt="">`).join('')}</div><div class="pf">صفحة ${Math.floor(i/6)+2} · صدر من منصة مسار</div>`);
     }
     const v=vById(h.vehicleId);
     await dl.save({filename:`محضر ${h.type==='out'?'تسليم':'استلام'} ${plateTxt(v).replace(/\s+/g,'')} ${String(h.at).slice(0,10)}.pdf`,data:pdf.output('arraybuffer')});
@@ -2709,7 +2709,7 @@ function receiptPdf(accId){
     ${r.notes?`<tr><th>ملاحظات</th><td>${esc(r.notes)}</td></tr>`:''}
   </tbody></table>
   <table class="sg"><tr><td><b>المستلم</b><span>الاسم: ${esc(r.receiver)}</span><span>التوقيع:</span></td><td><b>المحاسب</b><span>الاسم:</span><span>التوقيع:</span></td><td><b>المدير المالي</b><span>الاسم:</span><span>التوقيع والختم:</span></td></tr></table>
-  <div class="pf">صدر من نظام أسطول الشركة · مرتبط بمطالبة التأمين رقم ${esc(claimOf(a).claimNo||'—')}</div>`;
+  <div class="pf">صدر من منصة مسار · مرتبط بمطالبة التأمين رقم ${esc(claimOf(a).claimNo||'—')}</div>`;
   pdfFromSheets([html],`سند قبض ${String(r.no).replace('/','-')}.pdf`);
 }
 
@@ -2764,7 +2764,7 @@ function mgmtSheets(){
     <tr><th>مطالبات تأمين قائمة (${pendClaims.length})</th><td>${pendClaims.length?pendClaims.map(a=>{const c=claimOf(a);return `${esc(plateTxt(vById(a.vehicleId)))}: ${CLST[c.stage][0]} ${money(c.approvedAmount||c.claimAmount)}`}).join(' · '):'لا يوجد'}</td></tr>
     <tr><th>الفحص الأسبوعي</th><td>${insP.length} فحص خلال الفترة · ${insP.filter(x=>x.issues).length} فيها ملاحظات</td></tr>
   </tbody></table>
-  <div class="pf">صفحة 1 · صدر من نظام أسطول الشركة</div>`;
+  <div class="pf">صفحة 1 · صدر من منصة مسار</div>`;
   const brs={};cur.forEach(r=>{const b=brOf(r.v);const k=b?b.id:'none';brs[k]=brs[k]||{n:b?`${b.name} – ${b.city}`:'بدون فرع',c:0,d:0,t:0};brs[k].c++;brs[k].d+=r.dist;brs[k].t+=r.total});
   const drv={};viol.forEach(x=>{if(!x.driverId)return;drv[x.driverId]=drv[x.driverId]||{v:0,a:0,c:0};drv[x.driverId].v++;drv[x.driverId].a+=+x.amount||0});
   S.charges.filter(c=>inP(c.date)&&c.driverId).forEach(c=>{drv[c.driverId]=drv[c.driverId]||{v:0,a:0,c:0};drv[c.driverId].c+=+c.amount||0});
@@ -2779,7 +2779,7 @@ function mgmtSheets(){
   <table class="kvt tb"><thead><tr><th>السائق</th><th>المخالفات</th><th>قيمة المخالفات</th><th>مطالبات أخرى</th></tr></thead><tbody>
   ${dl5.map(([id,x])=>`<tr><td>${esc(dName(id))}</td><td>${x.v}</td><td>${money(x.a)}</td><td>${money(x.c)}</td></tr>`).join('')||'<tr><td colspan="4">لا توجد مخالفات أو مطالبات في هذه الفترة</td></tr>'}
   </tbody></table>
-  <div class="pf">صفحة 2 · صدر من نظام أسطول الشركة</div>`;
+  <div class="pf">صفحة 2 · صدر من منصة مسار</div>`;
   return [p1,p2];
 }
 function reportPdf(){
@@ -2797,8 +2797,8 @@ function reportPdf(){
   const tbl=rs=>`<table class="kvt tb rt"><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rs.length?rs.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${cols.length}">لا توجد بيانات في هذه الفترة</td></tr>`}</tbody></table>`;
   const pages=[];const first=16,next=24;let i=0,n=1;
   const total=Math.max(1,1+Math.ceil(Math.max(0,rows.length-first)/next));
-  pages.push(`${head}<div class="sec2">الملخص</div><div class="kp" style="grid-template-columns:repeat(${Math.min(6,kpis.length)},1fr)">${kpis.map(([l,v])=>`<div><span>${esc(l)}</span><b>${esc(v)}</b></div>`).join('')}</div><div class="sec2">التفاصيل (${rows.length})</div>${tbl(rows.slice(0,first))}<div class="pf">صفحة ${n} من ${total} · صدر من نظام أسطول الشركة</div>`);
-  i=first;while(i<rows.length){n++;pages.push(`${head}${tbl(rows.slice(i,i+next))}<div class="pf">صفحة ${n} من ${total} · صدر من نظام أسطول الشركة</div>`);i+=next}
+  pages.push(`${head}<div class="sec2">الملخص</div><div class="kp" style="grid-template-columns:repeat(${Math.min(6,kpis.length)},1fr)">${kpis.map(([l,v])=>`<div><span>${esc(l)}</span><b>${esc(v)}</b></div>`).join('')}</div><div class="sec2">التفاصيل (${rows.length})</div>${tbl(rows.slice(0,first))}<div class="pf">صفحة ${n} من ${total} · صدر من منصة مسار</div>`);
+  i=first;while(i<rows.length){n++;pages.push(`${head}${tbl(rows.slice(i,i+next))}<div class="pf">صفحة ${n} من ${total} · صدر من منصة مسار</div>`);i+=next}
   pdfFromSheets(pages,`تقرير ${t[1]} ${pk}.pdf`,true);
 }
 function mgmtPdf(){pdfFromSheets(mgmtSheets(),`تقرير ملخص الأسطول ${periodKey()}.pdf`)}
