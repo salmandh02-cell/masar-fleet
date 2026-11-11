@@ -67,7 +67,12 @@ function build() {
   for (const [i, doc] of [[0, 'istimara'], [3, 'insurance'], [5, 'fahas'], [8, 'insurance'], [11, 'istimara'], [14, 'fahas']]) renewals.push({ id: 'rn' + i, vehicleId: vehicles[i].id, doc, date: day(-ri(5, 150)), cost: doc === 'insurance' ? ri(1800, 4200) : doc === 'fahas' ? 73 : 150, newExp: vehicles[i][{ istimara: 'istimaraExp', insurance: 'insuranceExp', fahas: 'fahasExp' }[doc]], provider: doc === 'insurance' ? pick(['التعاونية', 'ولاء', 'ميدغلف']) : doc === 'fahas' ? 'الفحص الفني الدوري' : 'أبشر أعمال', ref: String(ri(100000, 999999)), notes: '', demo: false, updatedAt: now });
   accidents.push({ id: 'ac1', claim: { stage: 'review', claimNo: 'CLM-' + ri(100000, 999999) }, vehicleId: vehicles[19].id, date: dt(-6, 14), driverId: drivers[6].id, location: 'طريق الملك فهد – الرياض', najmNo: 'NJ' + ri(10000000, 99999999), fault: 0, status: 'claim', injuries: false, description: 'اصطدام من الخلف عند الإشارة', estCost: 4300, repairCost: 0, claimNo: '', insurancePaid: 0, driverCharge: 0, photos: [], demo: false, updatedAt: now });
   accidents.push({ id: 'ac2', claim: { stage: 'paid', claimNo: 'CLM-' + ri(100000, 999999), paidAmount: 2600 }, vehicleId: vehicles[7].id, date: dt(-75, 10), driverId: vehicles[7].driverId, location: 'جدة – شارع التحلية', najmNo: 'NJ' + ri(10000000, 99999999), fault: 25, status: 'closed', injuries: false, description: 'احتكاك جانبي أثناء الاصطفاف', estCost: 3100, repairCost: 2900, claimNo: '', insurancePaid: 2600, driverCharge: 0, photos: [], demo: false, updatedAt: now });
-  Object.assign(out, { branches, drivers, vehicles, fuel, maintenance: maint, handovers, violations, charges, renewals, accidents });
+  // الفحص الأسبوعي: كل جمعة لآخر 8 أسابيع؛ ثلاث سيارات لم تُفحص في الدورة الحالية، وبعض البنود بملاحظات
+  const inspections = []; const fri = -((new Date(Date.now() + 3 * 3600e3).getUTCDay() + 2) % 7);
+  vehicles.filter(v => v.status !== 'out').forEach((v, vi) => { for (let w = 0; w < 8; w++) { if (w === 0 && [3, 9, 16].includes(vi)) continue; const off = fri - 7 * w + (rnd() < .3 ? 1 : 0); if (off > 0) continue;
+    const it = {}; for (const k of ['tires', 'oil', 'water', 'lights']) it[k] = { ok: !(w === 0 && ((vi === 5 && k === 'tires') || (vi === 12 && k === 'lights'))) };
+    inspections.push({ id: `in-${v.id}-${w}`, vehicleId: v.id, driverId: v.driverId, date: day(off), odometer: v.odometer - w * ri(350, 600), items: it, by: v.driverId ? drivers.find(d => d.id === v.driverId).name : 'مشرف الأسطول', demo: false, updatedAt: now }); } });
+  Object.assign(out, { branches, drivers, vehicles, fuel, maintenance: maint, handovers, violations, charges, renewals, accidents, inspections });
   return out;
 }
 

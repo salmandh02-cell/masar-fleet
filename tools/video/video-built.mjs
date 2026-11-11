@@ -1,0 +1,14 @@
+import pw from '/opt/node-tools/node_modules/playwright/index.js'; const { chromium } = pw;
+import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
+const SITE='/tmp/claude-0/e2e/site', OUT='/tmp/claude-0/e2e/video2';
+fs.copyFileSync('/tmp/claude-0/e2e/howbuilt.html', SITE+'/howbuilt.html');
+fs.rmSync(OUT,{recursive:true,force:true});fs.mkdirSync(OUT,{recursive:true});
+const types={'.html':'text/html','.png':'image/png'};
+const srv=http.createServer((q,r)=>{const f=path.join(SITE,decodeURIComponent(q.url.split('?')[0]));if(!fs.existsSync(f)){r.writeHead(404);return r.end()}r.writeHead(200,{'Content-Type':types[path.extname(f)]||'application/octet-stream'});fs.createReadStream(f).pipe(r)}).listen(8003);
+const b=await chromium.launch();const ctx=await b.newContext({viewport:{width:1280,height:720},recordVideo:{dir:OUT,size:{width:1280,height:720}}});
+const p=await ctx.newPage();const T0=Date.now();
+await p.goto('http://127.0.0.1:8003/howbuilt.html',{waitUntil:'networkidle'});await p.waitForTimeout(1200);
+const total=await p.evaluate(()=>window.__total);const START=(Date.now()-T0)/1000;
+await p.evaluate(()=>play());await p.waitForTimeout(total+600);
+const END=(Date.now()-T0)/1000;await ctx.close();await b.close();srv.close();
+const vid=fs.readdirSync(OUT).find(f=>f.endsWith('.webm'));fs.writeFileSync(OUT+'/cut.json',JSON.stringify({file:OUT+'/'+vid,start:START,end:END}));console.log('done',START,END);

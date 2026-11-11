@@ -744,6 +744,7 @@ tbody tr{transition:background .12s}tbody tr:hover{background:color-mix(in srgb,
 .p-acc{background:var(--gold-soft);color:var(--gold-ink)}
 input:not([type=checkbox]):not([type=radio]),select,textarea{border-radius:12px}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 22%,transparent)}
+a.btn:not(.primary):not(.ghost){color:var(--ink)}
 /* الجوال */
 .bnav{background:color-mix(in srgb,var(--surface) 92%,transparent)!important;backdrop-filter:blur(14px);border-top:1px solid var(--line)}
 .bnav a.on,.bnav button.on{color:var(--accent)!important}
@@ -2612,7 +2613,7 @@ const weekStart=(d=today())=>cycleOf(null,d).start;
 // وصف الموعد: للسيارة أو للشركة
 function inspWhen(v,tr=x=>x,tp=(x,o)=>x.replace(/\{(\w+)\}/g,(_,k)=>o[k])){const c=INSPCFG();const cy=cycleOf(v);const dn=tr(WDAYS[cy.day]);
   if(c.mode==='flexible')return tp(tr('في أي يوم حتى {d}'),{d:fmtD(cy.end)});
-  return c.every===2?tp(tr('كل أسبوعين يوم {d}'),{d:dn}):tp(tr('كل {d}'),{d:dn})}
+  return c.every===2?tp(tr('كل أسبوعين يوم {d}'),{d:dn}):tp(tr('كل يوم {d}'),{d:dn})}
 function inspRuleTxt(){const c=INSPCFG();const dn=WDAYS[c.day];const per=c.every===2?'كل أسبوعين':'أسبوعية';
   if(c.mode==='perVehicle')return `لكل سيارة يوم فحص خاص بها (${c.every===2?'كل أسبوعين':'أسبوعياً'})، والافتراضي يوم ${dn}`;
   if(c.mode==='flexible')return `الفحص مرن: في أي يوم خلال الدورة (دورة ${per} تبدأ يوم ${dn})`;
