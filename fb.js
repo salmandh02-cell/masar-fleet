@@ -77,6 +77,11 @@ const AUTH_CSS = `
 #auth.land .lp-chips li{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(6px);border-radius:12px;padding:8px 14px;font-size:15px}
 #auth.land .lp-chips svg{color:#C9A227;width:20px;height:20px}
 #auth.land #auth-slot .card{width:100%;color:#15201B}
+#auth.land #auth-slot .card{min-height:0;border-radius:22px;padding:40px 44px;position:relative;overflow:hidden;box-shadow:0 30px 70px -30px rgba(0,0,0,.6),0 0 0 1px rgba(201,162,79,.35)}
+#auth.land #auth-slot .card::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,#94722F,#E2C27A,#94722F)}
+#auth button.pri{background:linear-gradient(135deg,#145244,#0E3B30 55%,#08251E)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 8px 20px -10px rgba(8,37,30,.7)}
+#auth.land .lp-top{background:linear-gradient(115deg,#08251E,#0E3B30 55%,#145244)!important;box-shadow:0 1px 0 rgba(201,162,79,.5)}
+@media (max-width:860px){#auth.land #auth-slot .card{padding:28px 22px;border-radius:18px}}
 #auth.land .lp-mpick{display:none}
 #auth.land .lp-sec{padding:76px 0}#auth.land .lp-sec.alt{background:#fff}
 #auth.land .lp-t{font:700 32px var(--f-display,"Readex Pro",sans-serif);text-align:center;margin:0 0 8px}
