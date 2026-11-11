@@ -223,6 +223,41 @@ await t('other company cannot read AI usage', bob.doc('aiuse/ca-111_2026-11-06')
 await t('company cannot reset own AI usage', alice.doc('aiuse/ca-111_2026-11-06').update({ n: 0 }), false);
 await t('accountant reads AI usage', acct.doc('aiuse/ca-111_2026-11-06').get());
 
+console.log('الدور المزدوج ومنع التسليم للنفس');
+{ const now = new Date().toISOString();
+  const carol = U('uc', 'carol@a.com'), dave = U('udv', 'dave@a.com');
+  for (const [em, d, also, iv] of [['carol@a.com', 'd2', true, 'iv-c'], ['dave@a.com', 'd3', false, 'iv-d']]) {
+    await alice.doc(`members/${em}`).set({ companyId: 'ca-111', at: now });
+    await alice.doc(`companies/ca-111/invites/${iv}`).set({ name: em, role: 'fleet', email: em, driverId: d, alsoDriver: also });
+    await alice.doc(`companies/ca-111/access/${em}`).set({ role: 'fleet', alsoDriver: also, driverId: d, branchId: null, name: em, phone: null, inviteId: iv, updatedAt: now });
+  }
+  const H = (by, uid, drvId) => ({ vehicleId: 'v1', driverId: drvId, type: 'out', at: now, issuer: { uid, name: 'x', at: now } });
+  await t('fleet user cannot issue a handover to himself', carol.doc('companies/ca-111/handovers/hs1').set(H(carol, 'uc', 'd2')), false);
+  await t('fleet user issues a handover to another driver', carol.doc('companies/ca-111/handovers/hs2').set(H(carol, 'uc', 'd1')));
+  await t('admin issues a handover to the fleet user', alice.doc('companies/ca-111/handovers/hs3').set(H(alice, 'ua', 'd2')));
+  await t('fleet user with vehicle role signs his handover', carol.doc('companies/ca-111/handovers/hs3').update({ ack: { uid: 'uc', at: now } }));
+  await alice.doc('companies/ca-111/handovers/hs4').set(H(alice, 'ua', 'd3'));
+  await t('fleet user without vehicle role cannot sign', dave.doc('companies/ca-111/handovers/hs4').update({ ack: { uid: 'udv', at: now } }), false);
+  await t('admin cannot sign a handover he issued', alice.doc('companies/ca-111/handovers/hs4').update({ ack: { uid: 'ua', at: now } }), false);
+  await t('fleet user with vehicle role records weekly inspection', carol.doc('companies/ca-111/inspections/i1').set({ vehicleId: 'v1', at: now }));
+  await t('fleet staff records inspections through the staff rule', dave.doc('companies/ca-111/inspections/i2').set({ vehicleId: 'v1', at: now }));
+
+  console.log('الدخول بالإيميل واسم المستخدم');
+  const K = c => c + ':' + 'a'.repeat(63) + c.charCodeAt(0) % 10;
+  const uk = 'u:' + 'c'.repeat(64), ek = 'e:' + 'd'.repeat(64);
+  await t('user saves own username key', carol.doc(`logins/${uk}`).set({ email: 'carol@a.com', at: now, companyId: 'ca-111' }));
+  await t('anyone reads a login key before sign-in', anon.doc(`logins/${uk}`).get());
+  await t('other company cannot take over the username', bob.doc(`logins/${uk}`).set({ email: 'bob@b.com', at: now, companyId: 'cb-111' }), false);
+  await t('cannot point a key at someone else', bob.doc(`logins/${ek}`).set({ email: 'alice@a.com', at: now, companyId: 'cb-111' }), false);
+  await t('admin saves email key for own user', alice.doc(`logins/${ek}`).set({ email: 'dave@a.com', at: now, companyId: 'ca-111' }));
+  await t('admin cannot save key for another company user', alice.doc('logins/e:' + 'f'.repeat(64)).set({ email: 'bob@b.com', at: now, companyId: 'ca-111' }), false);
+  await t('bad key format rejected', carol.doc('logins/u:abc').set({ email: 'carol@a.com', at: now, companyId: 'ca-111' }), false);
+  await t('user deletes own key', carol.doc(`logins/${uk}`).delete());
+  await t('user edits own email and username in invite', carol.doc('companies/ca-111/invites/iv-c').update({ contactEmail: 'c@x.com', username: 'carol', uKey: uk, updatedAt: now }));
+  await t('user cannot change own role', carol.doc('companies/ca-111/invites/iv-c').update({ role: 'admin' }), false);
+  await t('user cannot edit another invite', carol.doc('companies/ca-111/invites/iv-d').update({ username: 'x' }), false);
+}
+
 console.log(`\n${pass} نجح، ${fail} فشل`);
 await env.cleanup();
 process.exit(fail ? 1 : 0);

@@ -3,50 +3,79 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0E5A44">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="الأسطول">
+<meta name="apple-mobile-web-app-title" content="أسطول الشركة">
+<script>try{var _t=localStorage.getItem("fleet-theme"),_f=localStorage.getItem("fleet-fs");if(_t&&_t!=="auto")document.documentElement.dataset.theme=_t;if(_f&&_f!=="md")document.documentElement.dataset.fs=_f}catch(e){}</script>
 <script src="i18n.js"></script>
 <script>window.__appReady=new Promise(r=>window.__appReadyResolve=r);</script>
 <script type="module">import('./fb.js');</script>
 <title>نظام أسطول الشركة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600&family=Readex+Pro:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
 /* Layout: sticky signage-green header with tab rail; content column of panels; vehicles shown as Saudi plates */
 :root{
-  --bg:#EEF1EF; --surface:#FFFFFF; --surface-2:#F6F8F7; --ink:#15201B; --muted:#5A6862; --line:#D6DDD9;
-  --accent:#0B6B4F; --accent-2:#0E5A44; --accent-ink:#FFFFFF; --accent-soft:#DDEFE7;
+  --bg:#F4F5F2; --surface:#FFFFFF; --surface-2:#F6F7F4; --ink:#16302A; --muted:#6F7B75; --line:#E1E5E0;
+  --accent:#173B33; --accent-2:#173B33; --accent-ink:#FFFFFF; --accent-soft:#E7EDE9; --brass:#A88653;
   --ok:#23824A; --ok-soft:#E1F3E7; --warn:#A66A0E; --warn-soft:#FBEFD9; --crit:#B42318; --crit-soft:#FBE4E1;
   --info:#2B5C9E; --info-soft:#E2ECF8; --idle:#6B7280; --idle-soft:#ECEEF1;
   --plate-bg:#FFFFFF; --plate-ink:#111; --plate-line:#1B1B1B;
   --shadow:0 1px 2px rgba(20,32,27,.06),0 4px 14px rgba(20,32,27,.05);
-  --f-display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --f-display:"Alexandria","Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
   --f-body:"IBM Plex Sans Arabic","Readex Pro",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
   --r:10px;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+@media (prefers-color-scheme: dark){:root:not([data-theme]){
   --bg:#0F1412; --surface:#161D1A; --surface-2:#1B2420; --ink:#E5ECE8; --muted:#97A59E; --line:#2A3531;
   --accent:#3DBB8C; --accent-2:#5BD0A3; --accent-ink:#06261B; --accent-soft:#163A2D;
   --ok:#5BC27D; --ok-soft:#173424; --warn:#E4A646; --warn-soft:#3A2C13; --crit:#F2675C; --crit-soft:#3E1C19;
   --info:#7FAEF0; --info-soft:#1A2A40; --idle:#A3AAB5; --idle-soft:#252B31;
   --plate-bg:#F4F4F1; --plate-ink:#111; --plate-line:#111;
-  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}}
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark; --head:#0F3B2D}}
 :root[data-theme="dark"]{
   --bg:#0F1412; --surface:#161D1A; --surface-2:#1B2420; --ink:#E5ECE8; --muted:#97A59E; --line:#2A3531;
   --accent:#3DBB8C; --accent-2:#5BD0A3; --accent-ink:#06261B; --accent-soft:#163A2D;
   --ok:#5BC27D; --ok-soft:#173424; --warn:#E4A646; --warn-soft:#3A2C13; --crit:#F2675C; --crit-soft:#3E1C19;
   --info:#7FAEF0; --info-soft:#1A2A40; --idle:#A3AAB5; --idle-soft:#252B31;
   --plate-bg:#F4F4F1; --plate-ink:#111; --plate-line:#111;
-  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark; --head:#0F3B2D}
+:root[data-theme="navy"]{
+  --bg:#EDF1F7; --surface:#FFFFFF; --surface-2:#F5F7FB; --ink:#141C2E; --muted:#5B6578; --line:#D6DDEA;
+  --accent:#1F4FBF; --accent-2:#172F66; --accent-ink:#FFFFFF; --accent-soft:#E0E8FA;
+  --info:#0E7490; --info-soft:#DDF2F6; --shadow:0 1px 2px rgba(20,28,46,.06),0 4px 14px rgba(20,28,46,.06)}
+:root[data-theme="sand"]{
+  --bg:#F3EEE5; --surface:#FFFDF8; --surface-2:#F8F3EA; --ink:#25211A; --muted:#6E665A; --line:#E2D8C6;
+  --accent:#8A6420; --accent-2:#2F2A22; --accent-ink:#FFFFFF; --accent-soft:#F1E5CC;
+  --shadow:0 1px 2px rgba(47,42,34,.06),0 4px 14px rgba(47,42,34,.06)}
+:root[data-theme="graphite"]{
+  --bg:#F0F1F3; --surface:#FFFFFF; --surface-2:#F6F7F9; --ink:#1B1E23; --muted:#626873; --line:#D9DCE1;
+  --accent:#3E4A5C; --accent-2:#22262D; --accent-ink:#FFFFFF; --accent-soft:#E3E6EB;
+  --shadow:0 1px 2px rgba(27,30,35,.06),0 4px 14px rgba(27,30,35,.05)}
+:root[data-theme="night"]{
+  --bg:#0E1320; --surface:#151C2C; --surface-2:#1A2236; --ink:#E4E9F2; --muted:#98A2B6; --line:#28324A;
+  --accent:#6D9BFF; --accent-2:#0A0F1A; --accent-ink:#071026; --accent-soft:#1B2A4A;
+  --ok:#5BC27D; --ok-soft:#173424; --warn:#E4A646; --warn-soft:#3A2C13; --crit:#F2675C; --crit-soft:#3E1C19;
+  --info:#5CC8D8; --info-soft:#14313A; --idle:#A3AAB5; --idle-soft:#252B31;
+  --plate-bg:#F4F4F1; --plate-ink:#111; --plate-line:#111;
+  --shadow:0 1px 2px rgba(0,0,0,.35); color-scheme:dark}
+html[data-fs="lg"] body{zoom:1.12}
+html[data-fs="xl"] body{zoom:1.25}
+.th-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.th-card{border:2px solid var(--line);border-radius:12px;padding:0;background:var(--surface);cursor:pointer;text-align:start;overflow:hidden}
+.th-card[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.th-prev{height:74px;display:flex;flex-direction:column}.th-prev i{height:18px}.th-prev span{flex:1;display:flex;gap:6px;padding:8px}.th-prev span b{flex:1;border-radius:5px}
+.th-card div{padding:8px 10px;font-weight:600;font-size:13.5px}
+.fs-row{display:flex;gap:8px;flex-wrap:wrap}.fs-row button{min-width:84px}
+.fs-row button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 
 html,body{background:var(--bg)}
 body{color:var(--ink);font-family:var(--f-body);font-size:14.5px;line-height:1.55}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--accent-2)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--head,var(--accent-2))}
 *{box-sizing:border-box}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -54,19 +83,20 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.3
 .num{font-variant-numeric:tabular-nums;font-family:var(--f-mono);direction:ltr;unicode-bidi:isolate}
 
 /* header */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--accent-2);color:#fff}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--head,var(--accent-2));color:#fff}
 .top-in{max-width:1440px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .brand{display:flex;align-items:center;gap:12px;padding-block:10px;min-height:58px}
 .menu-btn{display:none;width:40px;height:40px;border-radius:9px;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;cursor:pointer;place-items:center}
 .menu-btn svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none}
 .brand-mark{width:38px;height:26px;border:2px solid #fff;border-radius:4px;display:grid;place-items:center;font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.06em}
-.ai-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:linear-gradient(90deg,#F3EEFF,#EEF6F2);border:1px solid #DDD3F7;border-radius:12px;padding:10px 12px;margin-bottom:12px}.ai-bar span{font-size:12.5px;color:var(--muted)}
-.ai-filled{background:#FFF8E1!important;box-shadow:inset 0 0 0 1px #F2C94C}
-.ai-chat{display:grid;gap:10px;max-height:60vh;overflow:auto}.ai-q{justify-self:start;background:var(--accent,#0E5A44);color:#fff;border-radius:14px 14px 14px 4px;padding:9px 13px;max-width:85%;white-space:pre-wrap}.ai-a{justify-self:end;background:var(--surface-2,#F6F8F7);border:1px solid var(--line);border-radius:14px 14px 4px 14px;padding:10px 14px;max-width:92%;line-height:1.8}.ai-a p{margin:0 0 6px}.ai-a ul,.ai-a ol{margin:4px 0;padding-inline-start:20px}.ai-a h4{margin:6px 0}.ai-a table{border-collapse:collapse;font-size:13px}.ai-a th,.ai-a td{border:1px solid var(--line);padding:4px 8px;text-align:right}.ai-ex{display:flex;flex-wrap:wrap;gap:8px}.ai-in{display:flex;gap:8px;align-items:flex-end;border-top:1px solid var(--line)}.ai-in textarea{flex:1;font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;resize:vertical;min-height:46px}
 .brand-mark.has-logo{width:auto;height:36px;border:0;background:#fff;border-radius:8px;padding:3px 6px;display:grid!important}.brand-mark.has-logo img{height:30px;max-width:96px;object-fit:contain;display:block}
 .brand h1{font-size:18px;font-weight:600}
 .brand small{display:block;font-size:12px;opacity:.75;font-family:var(--f-body)}
+.brand-logo{height:40px;max-width:120px;padding:4px 8px;background:#fff;border-radius:8px;display:flex;align-items:center;flex:none}.brand-logo img{max-height:32px;max-width:104px;object-fit:contain;display:block}
+.co-hero{display:flex;align-items:center;gap:16px}.co-hero .co-logo{height:72px;max-width:180px;padding:8px 12px;background:#fff;border:1px solid var(--line,#e3e7e5);border-radius:12px;display:flex;align-items:center;flex:none}.co-hero .co-logo img{max-height:56px;max-width:156px;object-fit:contain;display:block}
+.logo-prev{display:flex;align-items:center;gap:12px;margin-top:8px}.logo-prev img{max-height:64px;max-width:180px;object-fit:contain;background:#fff;border:1px solid #e3e7e5;border-radius:10px;padding:6px}
 .brand .spacer{flex:1}
+.mode-btn{height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:inherit;font:600 12.5px var(--f-body);padding:0 12px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer}.mode-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2}
 .rolechip{font-size:12px;background:rgba(255,255,255,.16);border-radius:999px;padding:3px 10px;white-space:nowrap;max-width:40vw;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:620px){.rolechip{display:none}}
 .sync{font-size:12px;opacity:.85;display:flex;align-items:center;gap:6px}
@@ -268,7 +298,7 @@ td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:now
 .imp-sum{display:flex;gap:8px;flex-wrap:wrap}
 .imp-map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 12px}
 @media (max-width:640px){.imp-map{grid-template-columns:1fr 1fr}}
-.imp-tbl{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:9px}
+.imp-tbl{max-height:min(320px,34vh);overflow:auto;border:1px solid var(--line);border-radius:9px}
 .imp-tbl table{font-size:12.5px}
 .imp-tbl td,.imp-tbl th{padding:6px 9px}
 .drop{border:2px dashed var(--line);border-radius:10px;padding:18px;text-align:center;color:var(--muted);background:var(--surface-2)}
@@ -348,7 +378,7 @@ body.drvmode main{max-width:560px}
 .btn{min-height:38px;transition:border-color .15s,background .15s}
 .btn.primary{box-shadow:0 1px 0 rgba(0,0,0,.08)}
 td,th{transition:background .12s}
-.modal{display:flex!important;flex-direction:column;max-height:calc(100dvh - 48px);overflow:hidden}
+.modal{display:flex!important;flex-direction:column;max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px);overflow:hidden}
 .modal>form{display:flex;flex-direction:column;min-height:0;flex:1 1 auto}
 .modal .mb{overflow-y:auto;flex:1 1 auto;min-height:0;overscroll-behavior:contain}
 .mh,.mf{flex-shrink:0;background:var(--surface)}
@@ -370,6 +400,8 @@ main>section,main>.cols,main>.quick{animation:none}
   body{font-size:15px}
   .brand{min-height:54px;gap:10px}
   .brand-mark{display:none}
+  .brand-logo{display:none!important}
+  .co-hero .co-logo{height:56px;max-width:130px}.co-hero .co-logo img{max-height:42px;max-width:110px}
   .brand h1{font-size:16px}
   .brand small{font-size:11px}
   .sync span{display:none}
@@ -469,6 +501,7 @@ body.drvmode .srch-btn{display:none}
 .tip-f::before{content:"💡 "}
 /* printable محضر — single light look by design */
 #pdf-sheet{position:fixed;top:0;left:-12000px;width:794px;background:#fff;color:#111;font-family:var(--f-body);font-size:13px;line-height:1.6;padding:34px 38px;display:grid;gap:10px;color-scheme:light}
+#pdf-sheet .ph-logo{display:block;max-height:52px;max-width:170px;object-fit:contain;margin-bottom:6px}
 #pdf-sheet .ph{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;border-bottom:3px solid #0B6B4F;padding-bottom:12px}
 #pdf-sheet .co{font-family:var(--f-display);font-weight:700;font-size:17px;color:#0B6B4F}
 #pdf-sheet .cs{font-size:11.5px;color:#555}
@@ -519,7 +552,7 @@ body.drvmode .srch-btn{display:none}
 .logout svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .logout:hover{background:rgba(255,255,255,.12)}
 
-.msg-btn{position:relative;display:grid;place-items:center;width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.25);color:inherit;flex:none}
+.msg-btn{background:transparent;position:relative;display:grid;place-items:center;width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.25);color:inherit;flex:none}
 .msg-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .msg-btn b{position:absolute;top:-6px;left:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#D92D20;color:#fff;font:700 11px/18px var(--f-body);text-align:center}
 .ib{display:grid;grid-template-columns:320px minmax(0,1fr);height:calc(100vh - 210px);min-height:440px;overflow:hidden}
@@ -564,6 +597,7 @@ body.drvmode .srch-btn{display:none}
 .qrs{width:368px;height:512px;background:#fff;color:#14231c;border:2px solid #0B6B4F;border-radius:22px;overflow:hidden;display:grid;grid-template-rows:auto 1fr auto;font-family:var(--f-display),system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.12);--plate-bg:#fff;--plate-ink:#111;--plate-line:#1B1B1B}
 .qrs-h{background:linear-gradient(135deg,#0B6B4F,#0E8A63);color:#fff;padding:16px 18px 14px;text-align:center;position:relative}
 
+.qrs-logo{display:inline-flex;background:#fff;border-radius:8px;padding:4px 10px;margin-bottom:8px}.qrs-logo img{max-height:34px;max-width:140px;object-fit:contain;display:block}
 .qrs-co{font-size:20px;font-weight:700;line-height:1.3}
 .qrs-t{font-size:12.5px;opacity:.9;margin-top:2px;letter-spacing:.02em}
 .qrs-b{display:grid;justify-items:center;align-content:start;gap:8px;padding:8px 18px 4px}
@@ -588,6 +622,64 @@ body.drvmode .srch-btn{display:none}
 .rem-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
 .rem-row .sub{grid-column:1;font-size:12.5px}
 .rem-row .btn{grid-row:1/3;grid-column:2}
+
+/* ===== هوية «سكون» ===== */
+:root{--r:14px;--shadow:none;--brass:#A88653}
+body::before{background:var(--surface)}
+.top{background:var(--surface)!important;color:var(--ink);border-bottom:1px solid var(--line)}
+.brand h1{font-weight:500;font-size:17px}.brand small{opacity:1;color:var(--muted)}
+.brand-mark{border:0;overflow:hidden;background:var(--accent);color:#EDE3CC;width:38px;height:38px;border-radius:11px;font:600 11px var(--f-mono)}
+.menu-btn,.msg-btn,.logout{border-color:var(--line)!important;color:var(--ink)!important;background:var(--surface)!important}
+.menu-btn:hover,.msg-btn:hover,.logout:hover{background:var(--surface-2)!important}
+.srch-btn{background:var(--surface-2)!important;border:1px solid var(--line)!important;color:var(--muted)!important;border-radius:11px!important;opacity:1!important}.srch-btn kbd{background:var(--line)!important;color:var(--ink)}
+.rolechip{background:var(--accent-soft);color:var(--accent)}
+.mode-btn{border-color:var(--line);background:var(--surface-2)}
+.sync{color:var(--muted);opacity:1}.sync i{background:#3C8A62}
+.side{background:transparent}
+.side a{font-weight:400;color:#4C5953;border-radius:10px;min-height:40px;position:relative}
+.side a:hover{background:var(--surface)}
+.side a.on{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 0 0 1px var(--line)}
+.side a.on::before{content:"";position:absolute;inset-inline-start:-1px;top:9px;bottom:9px;width:3px;border-radius:2px;background:var(--brass)}
+.panel{border-radius:16px;box-shadow:none}
+.panel-h{border-bottom:0;padding:18px 22px 6px}.panel-h h3{font-weight:500;font-size:16.5px}
+.panel-b{padding:14px 22px 20px}
+.btn{border-radius:11px;padding:9px 16px}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.head h2{font-weight:500;font-size:28px}
+.alert{border-bottom-color:var(--line)}
+.quick button{box-shadow:none;border-radius:14px}
+/* الرئيسية */
+.hello small{color:var(--muted);font-size:13.5px}.hello h2{margin-top:2px}
+.dash-acts{display:flex;gap:10px;flex-wrap:wrap}.dash-acts .btn{height:44px;padding:0 18px}
+.stat4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.stat4 button{all:unset;box-sizing:border-box;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:grid;gap:2px;cursor:pointer;position:relative}
+.stat4 button:hover{border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
+.stat4 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stat4 .l{display:flex;align-items:center;gap:8px;font-weight:500}.stat4 .l::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c)}
+.stat4 b{font:500 42px/1.15 var(--f-display);font-variant-numeric:tabular-nums}
+.stat4 small{color:var(--muted);font-size:12.5px}
+.stat4 svg{position:absolute;inset-inline-end:18px;top:20px;width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;opacity:.6;transform:scaleX(-1)}
+.opt-ids{border:1px dashed var(--line);border-radius:14px;padding:12px 14px 4px;background:var(--surface-2)}.opt-h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}.opt-h b{font-weight:500}.opt-h span{color:var(--muted);font-size:12.5px}.opt-g{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}@media (max-width:620px){.opt-g{grid-template-columns:1fr}}
+.ai-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ai-btn{display:inline-flex;align-items:center;gap:8px;border-color:color-mix(in srgb,var(--brass) 55%,var(--line));color:var(--ink)}.ai-btn svg{width:17px;height:17px;fill:color-mix(in srgb,var(--brass) 25%,transparent);stroke:var(--brass);stroke-width:1.6}
+.ai-filled{box-shadow:0 0 0 3px color-mix(in srgb,var(--brass) 35%,transparent)!important;transition:box-shadow .3s}
+.ai-dmg{margin-top:10px;border-radius:12px;padding:12px 14px;border:1px solid var(--line);display:grid;gap:6px}.ai-dmg.crit{border-color:var(--crit);background:var(--crit-soft)}.ai-dmg.warn{border-color:var(--warn);background:var(--warn-soft)}.ai-dmg.ok{background:var(--ok-soft)}.ai-dmg p{margin:0}.ai-dmg ul{margin:0;padding-inline-start:18px}.ai-dmg small{color:var(--muted)}.ai-dmg .btn{justify-self:start}
+.ai-chat .panel-b{display:grid;gap:12px;max-height:calc(100dvh - 330px);min-height:260px;overflow:auto}
+.ai-m{max-width:min(760px,92%);padding:12px 16px;border-radius:16px;line-height:1.75}.ai-m.user{justify-self:start;background:var(--accent);color:#fff;border-end-start-radius:4px}.ai-m.assistant{justify-self:end;background:var(--surface-2);border:1px solid var(--line);border-end-end-radius:4px}
+.ai-m p{margin:0 0 6px}.ai-m h4{margin:8px 0 4px;font:500 15px var(--f-display)}.ai-m ul{margin:0 0 6px;padding-inline-start:20px}.ai-m table{font-size:13px}.ai-wait{color:var(--muted)}
+.ai-sug{display:flex;flex-wrap:wrap;gap:8px}.ai-sug .btn{font-size:13.5px;border-radius:999px}
+.ai-in{display:flex;gap:10px;align-items:flex-end;padding:12px 18px 0;border-top:1px solid var(--line)}.ai-in textarea{flex:1;resize:vertical;min-height:52px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;background:var(--surface);color:var(--ink)}.ai-in .btn{height:52px;padding:0 22px}
+.acc{max-width:620px;width:100%;margin:0 auto;display:grid;gap:10px}.acc-hd{display:grid;justify-items:center;gap:6px;margin:6px 0 8px}.acc-av{width:76px;height:76px;border-radius:50%;background:var(--accent);color:#EDE3CC;display:grid;place-items:center;font:500 30px var(--f-display)}.acc-hd h2{font-weight:500;font-size:22px}.acc-roles{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}.acc-roles span{font-size:12.5px;padding:4px 11px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.acc h3{font:500 14px var(--f-body);color:var(--muted);margin:12px 4px 0}.acc-list{padding:0 18px}.acc-it{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--line)}.acc-it:first-child{border-top:0}.acc-it>svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.8;flex:none}.acc-it>div{flex:1;min-width:0}.acc-it b{display:block;font-weight:500}.acc-it span{font-size:13px;color:var(--muted);display:inline-block}.acc-it i{font-style:normal;color:var(--brass)}.acc-it small{color:var(--muted);font-size:12px}.acc-note{color:var(--muted);font-size:13px;margin:4px 4px 0}
+.dash-acts .btn svg,.more-acts .btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
+a.rolechip{text-decoration:none}
+@media (max-width:960px){.side{background:var(--surface)!important;box-shadow:0 0 0 1px var(--line),0 20px 60px rgba(10,25,20,.28)!important;z-index:60!important}.side a.on{background:var(--accent-soft)}.side a:hover{background:var(--surface-2)}.side.open+.scrim{z-index:59!important;background:rgba(10,25,20,.5)!important}}
+@media (max-width:620px){.brand h1{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}.brand small{display:none}.top .msg-btn[data-act=theme],.top .logout,.sync{display:none!important}.brand-mark{width:34px;height:34px}}
+.side{top:calc(env(safe-area-inset-top,0px) + var(--toph,58px))!important;max-height:calc(100vh - var(--toph,58px) - 12px)!important;max-height:calc(100dvh - var(--toph,58px) - 12px)!important;padding-bottom:28px!important}
+main{padding-bottom:max(72px,env(safe-area-inset-bottom,0px))}
+.row-acts{display:grid;grid-template-columns:repeat(2,max-content);gap:6px}.row-acts .btn{justify-content:center;white-space:nowrap}@media (max-width:1100px) and (min-width:961px){.c-nid{display:none}.row-acts .btn{padding:5px 9px;font-size:12.5px}}.row-acts .del{color:var(--crit)}
+.panel-b>div,.panel-b>section{min-width:0}
+.more-acts{display:flex;gap:8px;flex-wrap:wrap}.more-acts .btn{font-size:13.5px;color:var(--muted)}.more-acts .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8}
+@media (max-width:760px){.stat4{grid-template-columns:1fr 1fr;gap:10px}.stat4 button{padding:14px 16px}.stat4 b{font-size:32px}.stat4 small,.stat4 svg{display:none}.dash-acts{width:100%;display:grid;grid-template-columns:1fr 1fr}.dash-acts .srch-x{display:none}.dash-acts .btn{height:52px;justify-content:center;border-radius:14px}.head h2{font-size:24px}}
 </style>
 </head>
 <body>
@@ -597,10 +689,10 @@ body.drvmode .srch-btn{display:none}
   <header class="top"><div class="top-in">
     <div class="brand">
       <button class="menu-btn" id="menu-btn" data-act="menu" aria-label="فتح القائمة" aria-controls="side"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <div class="brand-mark">KSA</div>
+      <div class="brand-mark" id="brand-mark"><img src="icon-192.png" alt="" style="width:100%;height:100%;border-radius:inherit;display:block"></div><div class="brand-logo" id="brand-logo" hidden><img alt="شعار الشركة"></div><script>try{const b=JSON.parse(localStorage.getItem('fleet-brand')||'{}');if(b&&/^data:image\/(png|jpeg|webp);base64,/.test(b.logo||'')){const l=document.getElementById('brand-logo');l.firstChild.src=b.logo;l.hidden=false;document.getElementById('brand-mark').hidden=true}if(b&&b.name){const sm=document.querySelector('.brand small');if(sm)sm.textContent=b.name}}catch(e){}</script>
       <div><h1>نظام أسطول الشركة</h1><small>السيارات · السائقون · العهد · الصيانة · المخالفات</small></div>
       <div class="spacer"></div>
-      <button class="srch-btn" id="srch-btn" data-act="search" aria-label="بحث في النظام"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><span>بحث باللوحة أو الاسم أو الرقم…</span><kbd>Ctrl K</kbd></button><a class="msg-btn" href="#inbox" aria-label="الرسائل" title="الرسائل"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><b id="msgbadge" hidden></b></a><span class="rolechip" id="rolechip" hidden></span><button class="logout" data-act="logout" aria-label="تسجيل الخروج" title="تسجيل الخروج"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h10"/></svg></button><div class="sync off" id="sync"><i></i><span>جارٍ الاتصال…</span></div>
+      <button class="srch-btn" id="srch-btn" data-act="search" aria-label="بحث في النظام"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><span>بحث باللوحة أو الاسم أو الرقم…</span><kbd>Ctrl K</kbd></button><button class="mode-btn" id="mode-btn" data-act="mode" hidden></button><button class="msg-btn" data-act="theme" aria-label="المظهر" title="المظهر"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.9-.7-1.3-.7-2.1 0-.9.7-1.5 1.6-1.5H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7.2" r="1"/><circle cx="14.5" cy="7.2" r="1"/></svg></button><a class="msg-btn" href="#inbox" aria-label="الرسائل" title="الرسائل"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><b id="msgbadge" hidden></b></a><a class="rolechip" id="rolechip" href="#account" title="حسابي" hidden></a><button class="logout" data-act="logout" aria-label="تسجيل الخروج" title="تسجيل الخروج"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h10"/></svg></button><div class="sync off" id="sync"><i></i><span>جارٍ الاتصال…</span></div>
     </div>
   </div></header>
   <div class="shell"><nav class="side" id="side" aria-label="أقسام النظام"></nav><div class="scrim" data-act="menu-close"></div><main id="main"></main></div>
@@ -621,7 +713,13 @@ const ivKey=x=>String(x&&(x.loginEmail||x.email)||'').toLowerCase();
 const myInvite=()=>{const e=ME&&ME.email&&String(ME.email).toLowerCase();return e?S.invites.find(x=>ivKey(x)===e):null};
 const newCode=()=>String(100000+(crypto.getRandomValues(new Uint32Array(1))[0]%900000));
 const ivActive=iv=>S.seen.some(s=>String(s.email||'').toLowerCase()===ivKey(iv));
-function myRole(){if(!userCap||!ME||!ME.id)return 'admin';if(ME.isOwner)return 'admin';const r=myInvite()||S.roles.find(x=>x.id===ME.id);return r&&ROLES[r.role]?r.role:'viewer'}
+function baseRole(){if(!userCap||!ME||!ME.id)return 'admin';if(ME.isOwner)return 'admin';const r=myInvite()||S.roles.find(x=>x.id===ME.id);return r&&ROLES[r.role]?r.role:'viewer'}
+function canDrive(){if(!userCap||!ME||!ME.id||ME.isOwner)return false;const r=myInvite();return !!(r&&r.role!=='driver'&&r.alsoDriver&&r.driverId)}
+const MODE=()=>{try{return localStorage.getItem('fleet-mode')||''}catch(e){return ''}};
+function myRole(){const b=baseRole();return b!=='driver'&&MODE()==='driver'&&canDrive()?'driver':b}
+const greet=()=>{const h=new Date().getHours();return h<12?'صباح الخير':'مساء الخير'};
+const myFirstName=()=>{const iv=ME&&myInvite();const n=(iv&&iv.name)||(ME&&ME.name)||'';return String(n).trim().split(/\s+/)[0]||''};
+const roleLabel=iv=>{const l=(ROLES[iv.role]||ROLES.viewer)[0];return iv.role!=='driver'&&iv.alsoDriver?`${l} + ${ROLES.driver[0]}`:l};
 const myDriverId=()=>{const r=ME&&(myInvite()||S.roles.find(x=>x.id===ME.id));return r&&r.driverId||null};
 const isAdmin=()=>myRole()==='admin';
 const UI={vq:'',vf:'all',vc:'all',vb:'all',hv:'all',vs:'all',ff:'all',rb:'all',rc:'all',rmode:'month',ryear:'',month:new Date().toISOString().slice(0,7)};
@@ -632,6 +730,13 @@ const WARN_DAYS=30;
 const STATUS={available:['متاحة','p-ok'],assigned:['مع سائق','p-info'],maintenance:['في الورشة','p-warn'],out:['خارج الخدمة','p-idle'],sold:['مُباعة','p-idle']};
 const VTYPES=['سيدان','بيك أب','فان','جيب / SUV','باص','شاحنة'];
 // تحويل نوع الهيكل كما يرد في تمّ إلى أنواع النظام
+function guessVType(model,make){const n=nrm(model)+'|'+nrm(make);if(n==='|')return '';
+  const M=[[['ميني فان','مينى فان','هاي ايس','هايس','هايإيس','hiace','فان','فانه','van','ميكروباص'],'فان'],[['باص','حافله','حافلة','كوستر','coaster','bus'],'باص'],
+    [['شاحنه','شاحنة','صندوق','ثلاجه','ثلاجة','دينا','قلاب','لوري','reward','npr','fuso','كانتر','canter','truck'],'شاحنة'],
+    [['بكس','بكب','بيكاب','بيك اب','غمارتين','غماره','هايلكس','hilux','ديماكس','dmax','d-max','نافارا','navara','l200','ونيت','pickup'],'بيك أب'],
+    [['واجن','wagon','فيلوز','veloz','انوفا','innova','لاندكروزر','land cruiser','برادو','prado','فورتشنر','fortuner','تاهو','tahoe','باترول','patrol','suv','جيب'],'جيب / SUV'],
+    [['يارس','yaris','سبارك','spark','بالينو','baleno','كامري','camry','كورولا','corolla','اكسنت','accent','النترا','إلنترا','elantra','سوناتا','sonata','صني','sunny','ريو','rio','سيراتو','cerato','دزاير','dzire','سيدان','sedan'],'سيدان']];
+  for(const [ks,v] of M)if(ks.some(k=>n.includes(nrm(k))))return v;return ''}
 function normVType(t){t=String(t||'').trim();if(!t||VTYPES.includes(t))return t;const n=nrm(t);
   const M=[[['ونيت','بيكاب','بيكب','غمارتين','غماره','pickup'],'بيك أب'],[['صالون','سيدان','هاتشباك','كوبيه','sedan'],'سيدان'],[['جيب','عائلي','رياضي','suv','دفعرباعي'],'جيب / SUV'],[['فان','فانه','ميكروباص','van'],'فان'],[['باص','حافله','حافلة','bus'],'باص'],[['شاحنه','شاحنة','لوري','دينا','قلاب','نقل','truck'],'شاحنة']];
   for(const [ks,v] of M)if(ks.some(k=>n.includes(nrm(k))))return v;return t}
@@ -678,7 +783,7 @@ let ALLV=[],SOLD=[],ALLH=[];
 const RAW=c=>c==='vehicles'?ALLV:c==='handovers'?ALLH:S[c];
 const myBranchId=()=>{const iv=myInvite();return iv&&iv.branchId||null};
 const isBranchRole=()=>myRole()==='branch';
-const BR_VIEWS=['handovers','vehicles','inbox'];
+const BR_VIEWS=['handovers','vehicles','inbox','account'];
 function applyScope(){const all=ALLV.filter(v=>v.status!=='sold');SOLD=ALLV.filter(v=>v.status==='sold');
   if(isBranchRole()){const b=myBranchId();S.vehicles=all.filter(v=>b&&v.branchId===b);const ids=new Set(S.vehicles.map(v=>v.id));S.handovers=ALLH.filter(h=>ids.has(h.vehicleId));SOLD=[]}
   else{S.vehicles=all;S.handovers=ALLH}}
@@ -703,6 +808,7 @@ async function makeLogo(file){
     if(d.length>300000)throw new Error('الصورة كبيرة جداً');return d}
   finally{URL.revokeObjectURL(url)}
 }
+const phLogo=()=>coLogo()?`<img class="ph-logo" src="${coLogo()}" alt="">`:'';
 const branchesSorted=()=>[...S.branches].sort((a,b)=>(a.city||'').localeCompare(b.city||'','ar')||(a.name||'').localeCompare(b.name||'','ar'));
 const vInScope=(v,city,br)=>(br==='all'||(br==='none'?!v.branchId:v.branchId===br))&&(city==='all'||(brOf(v)?.city===city));
 const plateTxt=v=>v?`${v.plateLetters||''} ${v.plateNumbers||''}`.trim():'—';
@@ -718,8 +824,9 @@ function plate(v,lg){
     <span class="cell"><span class="ar">${esc(L.join(' '))}</span><span>${esc(lat)}</span></span>
     <span class="cell"><span class="ar">${esc(arDigits(N))}</span><span>${esc(N)}</span></span></span>`;
 }
-function expPill(s,label){
+function expPill(s,label,st){
   const d=daysUntil(s);
+  if(d===null&&st){const x=String(st);return /ساري|valid/i.test(x)?`<span class="pill p-ok">${label?label+': ':''}ساري</span>`:/منته|expired/i.test(x)?`<span class="pill p-crit">${label?label+': ':''}منتهي</span>`:/لا يوجد|none/i.test(x)?`<span class="pill p-crit">${label?label+': ':''}لا يوجد</span>`:`<span class="pill p-idle">${label?label+': ':''}${esc(x)}</span>`}
   if(d===null)return `<span class="pill p-idle">${label?label+': ':''}غير مسجل</span>`;
   if(d<0)return `<span class="pill p-crit">${label?label+': ':''}منتهية</span>`;
   if(d<=WARN_DAYS)return `<span class="pill p-warn">${label?label+': ':''}${d} يوم</span>`;
@@ -848,7 +955,7 @@ const personOf=k=>people().find(p=>p.key===k)||(k===myKey()?{key:k,name:ME&&ME.n
 const nameOfKey=k=>{const p=personOf(k);return p?p.name:(k===myKey()?'أنا':'مستخدم')};
 const roleName=r=>(ROLES[r]||ROLES.viewer)[0];
 const canMsg=p=>['admin','fleet','branch'].includes(myRole())||p.owner||['admin','fleet'].includes(p.role);
-const driverUserKey=did=>{const iv=S.invites.find(x=>x.role==='driver'&&x.driverId===did);return iv?ivKey(iv):null};
+const driverUserKey=did=>{const iv=S.invites.find(x=>(x.role==='driver'||x.alsoDriver)&&x.driverId===did);return iv?ivKey(iv):null};
 const isUnread=t=>t.last&&t.last.from!==myKey()&&(!t.readAt||!t.readAt[ek(myKey())]||String(t.readAt[ek(myKey())])<String(t.last.at));
 const unreadCount=()=>THREADS.filter(isUnread).length;
 function startMessaging(){if(!db||!db.watch||!myKey()||MSG_READY)return;MSG_READY=true;
@@ -980,77 +1087,12 @@ async function tkOpen(id){const x=TICKETS.find(t=>t.id===id);if(!x)return;let ms
   const sb=$('#tk-send');if(sb)sb.onclick=async()=>{const v=$('#tk-r').value.trim();if(!v)return;sb.disabled=true;try{await PLT().reply(id,v);closeModal();TICKETS=null;render();toast('أُرسل الرد')}catch(e){sb.disabled=false;toast('تعذر الإرسال')}};
   const cb=$('#tk-close');if(cb)cb.onclick=async()=>{await PLT().closeTicket(id);closeModal();TICKETS=null;render()};
 }
-/* ---------- الذكاء الاصطناعي: قراءة المستندات والمساعد ---------- */
-let AI_PUB=null,AI_CHAT=[],AI_DRAFT='',AI_BUSY=false;
+/* ---------- الذكاء الاصطناعي: هل تسمح المنصة وباقة الشركة به؟ ---------- */
+let AI_PUB=null;
 function aiOk(){if(!PLT()||myRole()==='driver')return false;
   if(AI_PUB===null){AI_PUB={};PLT().pub().then(p=>{AI_PUB=p||{};render()});return false}
   if(AI_PUB.aiEnabled!=='on')return false;const c=PLT().company();if(c.status==='trial')return true;
   const pl=(AI_PUB.plans||[]).find(p=>p.id===c.planId);return !pl||!!pl.ai}
-async function aiCall(body){
-  let r;try{const tk=await PLT().token();r=await fetch('/.netlify/functions/ai',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tk},body:JSON.stringify(body)})}catch(e){return {ok:false,message:'تعذر الاتصال، تأكد من الإنترنت'}}
-  let j={};try{j=await r.json()}catch(e){}
-  if(!r.ok)return {ok:false,message:j.message||([502,504].includes(r.status)?'استغرقت المعالجة وقتاً أطول من المسموح. جرّب صورة أوضح أو سؤالاً أدق':'تعذر تنفيذ الطلب')};return j}
-const b64=blob=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.onerror=rej;fr.readAsDataURL(blob)});
-async function aiFile(f){
-  if(f.type==='application/pdf'){if(f.size>4.5e6)throw new Error('ملف PDF كبير، الحد 4.5 ميجا');return {type:f.type,data:await b64(f)}}
-  if(!/^image\//.test(f.type))throw new Error('اختر صورة أو PDF');
-  const url=URL.createObjectURL(f);
-  try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('تعذر قراءة الصورة'));i.src=url});
-    const r=Math.min(1,1600/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*r);c.height=Math.round(img.naturalHeight*r);
-    const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);
-    return {type:'image/jpeg',data:c.toDataURL('image/jpeg',0.85).split(',')[1]}}finally{URL.revokeObjectURL(url)}}
-const AI_SCAN_FORMS=/^(إضافة سيارة|تعديل بيانات السيارة|إضافة سائق|بيانات السائق|تسجيل مخالفة|تفاصيل المخالفة|تعبئة وقود|سجل تعبئة|تسجيل صيانة|سجل صيانة|تسجيل حادث|تفاصيل الحادث|تجديد وثيقة|تعديل عملية التجديد|إرفاق وثيقة|مطالبة على سائق|تسجيل بيع السيارة)/;
-function aiScanBar(title){if(readOnly||!AI_SCAN_FORMS.test(title)||!aiOk())return;const mb=$('#frm .mb');if(!mb)return;
-  mb.insertAdjacentHTML('afterbegin',`<div class="ai-bar"><button type="button" class="btn sm" data-act="ai-scan" data-id="${esc(title)}">✨ تعبئة تلقائية من صورة المستند</button><span>صوّر الاستمارة أو الرخصة أو الفاتورة أو المخالفة، وتُعبّأ الحقول لتراجعها</span></div>`)}
-function aiScan(title,btn){const inp=document.createElement('input');inp.type='file';inp.accept='image/*,application/pdf';
-  inp.onchange=async()=>{const f=inp.files[0];if(!f)return;const old=btn.textContent;btn.disabled=true;btn.textContent='⏳ جارٍ قراءة المستند…';
-    try{const file=await aiFile(f);
-      const els=[...document.querySelectorAll('#frm [name]')].filter(el=>!['file','hidden','submit','button','checkbox','radio','password'].includes(el.type)&&!el.disabled&&!el.readOnly);
-      const fields=els.map(el=>({name:el.name,label:(el.closest('.f')?.querySelector('label')?.textContent||el.name).replace(/\*/g,'').trim(),type:el.tagName==='SELECT'?'select':el.type,options:el.tagName==='SELECT'?[...el.options].filter(o=>o.value).map(o=>({text:o.textContent.trim()})):undefined}));
-      const r=await aiCall({action:'scan',form:title,fields,file});if(!r.ok){toast(r.message||'تعذر قراءة المستند');return}
-      let n=0;for(const[k,v]of Object.entries(r.values||{})){const el=els.find(x=>x.name===k);if(!el)continue;
-        if(el.tagName==='SELECT'){const o=[...el.options].find(o=>o.value&&(o.value===v||o.textContent.trim()===v));if(!o)continue;el.value=o.value}else el.value=v;
-        if(el.value!==''){n++;el.classList.add('ai-filled');el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}))}}
-      toast(n?`عُبّئ ${n===1?'حقل واحد':n===2?'حقلان':n<=10?n+' حقول':n+' حقلاً'} من المستند ✓ راجعها قبل الحفظ`:'لم أجد في المستند بيانات لهذا النموذج')}
-    catch(e){toast(e.message||'تعذر قراءة المستند')}finally{btn.disabled=false;btn.textContent=old}};
-  inp.click()}
-// بيانات الشركة للمساعد: نصوص مختصرة بلا صور أو توقيعات أو أرقام هويات
-function aiData(){
-  const skip=/photo|image|img|sig|attach|file|blob|logo|pdf|thumb|qr|pass|token|^code$|idNo|idNumber|iqama|national/i;
-  const clean=o=>{const x={};for(const[k,v]of Object.entries(o||{})){if(skip.test(k)||v==null||v==='')continue;
-    if(typeof v==='string'){if(!v.startsWith('data:')&&v.length<=300)x[k]=v}else if(typeof v==='number'||typeof v==='boolean')x[k]=v;
-    else{const j=JSON.stringify(v);if(j.length<=300&&!j.includes('data:'))x[k]=v}}return x};
-  const vl=id=>{const v=S.vehicles.find(v=>v.id===id)||SOLD.find(v=>v.id===id);return v?`${plateTxt(v)} ${vName(v)}`.trim():undefined};
-  const dl=id=>dById(id)?.name;
-  const order=['vehicles','drivers','branches','renewals','maintenance','fuel','violations','charges','accidents','handovers','inspections'];
-  const dk=r=>String(r.date||r.at||r.createdAt||r.updatedAt||'');
-  const lines=[];let size=0;const cap=300000;
-  for(const col of order){const recs=[...(col==='vehicles'?[...S.vehicles,...SOLD]:(S[col]||[]))].sort((a,b)=>dk(b).localeCompare(dk(a)));
-    for(const r of recs){const x=clean(r);if(r.vehicleId&&vl(r.vehicleId))x.vehicle=vl(r.vehicleId);if(r.driverId&&dl(r.driverId))x.driver=dl(r.driverId);if(col==='vehicles'&&r.driverId)x.driverName=dl(r.driverId);
-      const ln=col+'\t'+JSON.stringify(x);if(size+ln.length>cap)break;lines.push(ln);size+=ln.length+1}}
-  return lines.join('\n')}
-const mdLite=src=>{const e=esc(src).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');const out=[];let list=null,tbl=null;
-  const flush=()=>{if(list){out.push(`<${list.t}>${list.i.map(x=>`<li>${x}</li>`).join('')}</${list.t}>`);list=null}if(tbl){const rows=tbl.filter(r=>!/^\s*\|?\s*:?-{2,}/.test(r)).map(r=>r.replace(/^\s*\||\|\s*$/g,'').split('|').map(c=>c.trim()));out.push(`<div class="tw"><table>${rows.map((r,i)=>`<tr>${r.map(c=>i?`<td>${c}</td>`:`<th>${c}</th>`).join('')}</tr>`).join('')}</table></div>`);tbl=null}};
-  for(const ln of e.split('\n')){let m;
-    if(/^\s*\|/.test(ln)){if(list)flush();(tbl||(tbl=[])).push(ln);continue}if(tbl)flush();
-    if(m=ln.match(/^\s*[-*•]\s+(.*)/)){if(list&&list.t!=='ul')flush();(list||(list={t:'ul',i:[]})).i.push(m[1]);continue}
-    if(m=ln.match(/^\s*\d+[.)]\s+(.*)/)){if(list&&list.t!=='ol')flush();(list||(list={t:'ol',i:[]})).i.push(m[1]);continue}
-    flush();if(m=ln.match(/^#{1,4}\s+(.*)/))out.push(`<h4>${m[1]}</h4>`);else if(ln.trim())out.push(`<p>${ln}</p>`)}
-  flush();return out.join('')};
-const AI_EX=['ما السيارات التي تنتهي وثائقها خلال 30 يوماً؟','كم صرفنا على الوقود هذا الشهر لكل سيارة؟','من أكثر السائقين مخالفات؟ وكم مجموعها؟','ما السيارات التي تحتاج تغيير زيت قريباً؟','لخّص تكاليف الصيانة في آخر 3 أشهر'];
-function vAi(){
-  const head=`<div class="head"><div><h2>المساعد الذكي</h2><p>اسأل عن سياراتك وسائقيك وتكاليفك، ويجيبك من بيانات شركتك</p></div>${AI_CHAT.length?'<div class="actions"><button class="btn" data-act="ai-clear">محادثة جديدة</button></div>':''}</div>`;
-  if(!aiOk())return head+`<div class="empty">${AI_PUB&&AI_PUB.aiEnabled==='on'?'المساعد الذكي غير متاح في باقتك الحالية. <button class="btn sm" data-act="plan-req">طلب ترقية</button>':'المساعد الذكي غير متاح حالياً'}</div>`;
-  return head+`<section class="panel"><div class="panel-b ai-chat">${AI_CHAT.length?AI_CHAT.map(m=>`<div class="ai-q">${esc(m.q)}</div><div class="ai-a">${m.a==null?'<span class="sub">⏳ جارٍ التحليل…</span>':m.err?`<span class="sub" style="color:var(--danger,#B42318)">${esc(m.a)}</span>`:mdLite(m.a)}</div>`).join(''):`<div class="sub">أمثلة:</div><div class="ai-ex">${AI_EX.map(x=>`<button class="btn sm ghost" data-act="ai-ex">${esc(x)}</button>`).join('')}</div>`}</div>
-    <div class="panel-b ai-in"><textarea id="ai-q" placeholder="اكتب سؤالك…" rows="2" ${AI_BUSY?'disabled':''}>${esc(AI_DRAFT)}</textarea><button class="btn primary" data-act="ai-ask" ${AI_BUSY?'disabled':''}>إرسال</button></div>
-    <div class="panel-b sub" style="font-size:12px">يعتمد على البيانات المسجلة في النظام، وقد يخطئ أحياناً: تحقق من الأرقام المهمة.</div></section>`}
-async function aiAsk(q){q=String(q||'').trim();if(!q||AI_BUSY)return;AI_BUSY=true;AI_DRAFT='';const hist=AI_CHAT.filter(m=>m.a&&!m.err).map(m=>({q:m.q,a:m.a}));const m={q,a:null};AI_CHAT.push(m);render();
-  const r=await aiCall({action:'ask',question:q,history:hist,data:aiData()});m.a=r.ok?r.answer:(r.message||'تعذر الحصول على إجابة');m.err=!r.ok;AI_BUSY=false;render();
-  const box=document.querySelector('.ai-chat');if(box)box.lastElementChild?.scrollIntoView({block:'nearest'})}
-document.addEventListener('input',e=>{if(e.target.id==='ai-q')AI_DRAFT=e.target.value});
-document.addEventListener('keydown',e=>{if(e.target.id==='ai-q'&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiAsk(e.target.value)}});
-document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
-  if(a==='ai-scan')aiScan(b.dataset.id,b);if(a==='ai-ask')aiAsk(($('#ai-q')||{}).value);if(a==='ai-ex')aiAsk(b.textContent);if(a==='ai-clear'){AI_CHAT=[];render()}});
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
   if(a==='bill-reload'){BILL=null;render()}
   if(a==='plan-req')upgradeReq();
@@ -1083,7 +1125,7 @@ let TIPS=true;try{TIPS=localStorage.getItem('fleet_tips')!=='0'}catch(e){}
 function setTips(on){TIPS=on;try{localStorage.setItem('fleet_tips',on?'1':'0')}catch(e){}render();toast(on?'تم إظهار الشروحات':'تم إخفاء الشروحات – تقدر ترجعها من الإعدادات')}
 const tipbox=(title,steps)=>TIPS?`<div class="tipbox" role="note"><div class="tipbox-h"><span class="tipbox-i">؟</span><b>${title}</b><button type="button" class="tipbox-x" data-act="tips-off">إخفاء الشروحات</button></div>${steps.length>1?`<ol>${steps.map(x=>`<li>${x}</li>`).join('')}</ol>`:`<p>${steps[0]}</p>`}</div>`:'';
 const PTIPS={
-  dashboard:['كيف تقرأ الرئيسية',['الشريط الملوّن يوزّع السيارات حسب حالتها: متاحة، مع سائق، في الورشة، خارج الخدمة.','الأزرار السريعة لأكثر الأعمال تكراراً: تسليم، استلام، صيانة، وقود، مخالفة.','التنبيهات مرتبة بالأولوية: <b>الأحمر عاجل</b> والبرتقالي قريب. اضغط أي تنبيه لفتح ملفه.']],
+  dashboard:['كيف تقرأ الرئيسية',['البطاقات الأربع تعرض عدد السيارات في كل حالة، واضغط أي بطاقة لعرض سياراتها.','الأزرار السريعة لأكثر الأعمال تكراراً: تسليم، استلام، صيانة، وقود، مخالفة.','التنبيهات مرتبة بالأولوية: <b>الأحمر عاجل</b> والبرتقالي قريب. اضغط أي تنبيه لفتح ملفه.']],
   vehicles:['السيارات',['كل بطاقة تعرض اللوحة والحالة والوثائق وشريط الزيت.','اضغط البطاقة لفتح ملف السيارة: تجديد الوثائق، الحوادث، السجل الكامل، التسليم والاستلام.','أضف سياراتك من «إضافة سيارة» أو دفعة واحدة من «استيراد Excel».']],
   branches:['الفروع',['أضف الفرع ومدينته، ثم اربط كل سيارة بفرعها من «تعديل البيانات» في ملف السيارة.']],
   drivers:['السائقون',['اضغط اسم السائق لفتح ملفه: عهده، مخالفاته، حوادثه، وكشف المطالبات والخصومات.','عمود «مستحق للخصم» يوضح المبالغ التي لم تُخصم بعد.']],
@@ -1137,7 +1179,7 @@ function applyFormTips(title){if(I18N.ui!=='ar')return;
 function formModal(title,fields,onSave,{wide,extraFoot}={}){
   modal(title,`<form id="frm" novalidate><div class="mb"><div class="fgrid">${fields}</div></div>
     <div class="mf"><button class="btn primary" type="submit" ${readOnly?'disabled':''}>${t('حفظ')}</button><button class="btn" type="button" data-act="close">${t('إلغاء')}</button>${extraFoot||''}<div class="err" id="ferr" role="alert"></div></div></form>`,'',wide);
-  applyFormTips(title);aiScanBar(title);
+  applyFormTips(title);
   $('#frm').onsubmit=async ev=>{ev.preventDefault();const f=Object.fromEntries(new FormData(ev.target).entries());
     ev.target.querySelectorAll('input[type=checkbox]').forEach(c=>f[c.name]=c.checked);
     const btn=ev.target.querySelector('[type=submit]');btn.disabled=true;
@@ -1154,9 +1196,9 @@ const vOpts=(list,blank)=>[...(blank?[['',blank]]:[]),...list.map(v=>[v.id,`${pl
 const dOpts=(blank)=>[...(blank?[['',blank]]:[]),...S.drivers.filter(d=>d.active!==false).sort((a,b)=>a.name.localeCompare(b.name,'ar')).map(d=>[d.id,d.name+(d.empNo?` (${d.empNo})`:'')])];
 
 /* ---------- views ---------- */
-const VIEWS={dashboard:'الرئيسية',vehicles:'السيارات',branches:'الفروع',drivers:'السائقون',handovers:'التسليم والاستلام',inspect:'الفحص الأسبوعي',maintenance:'الصيانة',fuel:'الوقود',violations:'المخالفات',accidents:'الحوادث',reports:'التقارير',company:'الإعدادات',audit:'سجل التدقيق',inbox:'الرسائل',billing:'الاشتراك والفواتير',support:'الدعم الفني',ai:'المساعد الذكي'};
-const NAV=[[null,[['dashboard','home'],['ai','spark'],['inbox','chat']]],['الأسطول',[['vehicles','car'],['branches','pin']]],['السائقون والعهد',[['drivers','user'],['handovers','swap'],['inspect','check']]],['التشغيل والتكاليف',[['maintenance','wrench'],['fuel','fuel'],['violations','ticket'],['accidents','alert']]],['التحليل والإعدادات',[['reports','chart'],['company','gear'],['audit','log']]],['حسابك في المنصة',[['billing','card'],['support','help']]]];
-const NI={spark:'<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',card:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><circle cx="12" cy="17" r=".6"/>',home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',car:'<path d="M3 13l2-5a2 2 0 0 1 2-1.4h10A2 2 0 0 1 19 8l2 5v4H3z"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/>',pin:'<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',swap:'<path d="M7 4L3 8l4 4"/><path d="M3 8h14"/><path d="M17 12l4 4-4 4"/><path d="M21 16H7"/>',check:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 12l3 3 5-6"/>',wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.4-.4-2.4z"/>',fuel:'<path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16"/><path d="M3 21h13M6 8h7"/><path d="M15 10h2a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8l-3-3"/>',ticket:'<path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/>',alert:'<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/>',chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',log:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 15h7M9 7h4"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>'};
+const VIEWS={dashboard:'الرئيسية',ai:'المساعد الذكي',account:'حسابي',vehicles:'السيارات',branches:'الفروع',drivers:'السائقون',handovers:'التسليم والاستلام',inspect:'الفحص الأسبوعي',maintenance:'الصيانة',fuel:'الوقود',violations:'المخالفات',accidents:'الحوادث',reports:'التقارير',company:'الإعدادات',audit:'سجل التدقيق',inbox:'الرسائل',billing:'الاشتراك والفواتير',support:'الدعم الفني'};
+const NAV=[[null,[['dashboard','home'],['ai','spark'],['inbox','chat'],['account','user']]],['الأسطول',[['vehicles','car'],['branches','pin']]],['السائقون والعهد',[['drivers','user'],['handovers','swap'],['inspect','check']]],['التشغيل والتكاليف',[['maintenance','wrench'],['fuel','fuel'],['violations','ticket'],['accidents','alert']]],['التحليل والإعدادات',[['reports','chart'],['company','gear'],['audit','log']]],['حسابك في المنصة',[['billing','card'],['support','help']]]];
+const NI={card:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><circle cx="12" cy="17" r=".6"/>',spark:'<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',msg:'<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/>',home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',car:'<path d="M3 13l2-5a2 2 0 0 1 2-1.4h10A2 2 0 0 1 19 8l2 5v4H3z"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/>',pin:'<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',swap:'<path d="M7 4L3 8l4 4"/><path d="M3 8h14"/><path d="M17 12l4 4-4 4"/><path d="M21 16H7"/>',check:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 12l3 3 5-6"/>',wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.4-.4-2.4z"/>',fuel:'<path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16"/><path d="M3 21h13M6 8h7"/><path d="M15 10h2a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8l-3-3"/>',ticket:'<path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/>',alert:'<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/>',chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',log:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 15h7M9 7h4"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>'};
 function navBadge(k,alerts){
   if(k==='dashboard'){const c=alerts.filter(a=>a.sev==='crit').length;return alerts.length?`<b class="${c?'c':'w'}">${alerts.length}</b>`:''}
   if(k==='maintenance'){const n=S.maintenance.filter(m=>m.status==='open').length;return n?`<b class="w">${n}</b>`:''}
@@ -1168,27 +1210,34 @@ function navBadge(k,alerts){
   return '';
 }
 const route=()=>{const h=location.hash.slice(1);return VIEWS[h]||h==='driver'?h:'dashboard'};
-document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.rem&&isAdmin())remSet(t.dataset.rem,t.checked);if(t.dataset&&t.dataset.feat&&isAdmin())setFeat(t.dataset.feat,t.checked)});
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.rem&&isAdmin())remSet(t.dataset.rem,t.checked);if(t.dataset&&t.dataset.feat&&isAdmin())setFeat(t.dataset.feat,t.checked);
+  if(t.dataset&&(t.dataset.aiSet||t.dataset.aiRole)&&isAdmin()){const A=AIC();const upd=t.dataset.aiSet?{enabled:t.checked}:{askRoles:t.checked?[...new Set([...A.askRoles,t.dataset.aiRole])]:A.askRoles.filter(x=>x!==t.dataset.aiRole)};
+    db.merge('settings','ai',{...upd,updatedAt:new Date().toISOString()}).then(()=>toast('تم الحفظ')).catch(handleWriteErr)}});
+document.addEventListener('submit',e=>{if(e.target.id==='ai-form'){e.preventDefault();const q=$('#ai-q');aiAsk(q.value)}});
+document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='ai-q'&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiAsk(e.target.value)}});
 window.addEventListener('hashchange',()=>{$('#side').classList.remove('open');render();window.scrollTo(0,0)});
 
 function render(){
   const role=myRole();readOnly=baseRO||role==='viewer';takeVLink();applyScope();I18N.use(role==='driver'?I18N.lang:'ar');{const bt=document.querySelector('.brand h1');if(bt){bt.textContent=t('نظام أسطول الشركة');bt.nextElementSibling.textContent=t('السيارات · السائقون · العهد · الصيانة · المخالفات')}}{const sb=$('#srch-btn');if(sb)sb.hidden=role==='branch'}
-  let r=route();if(role==='branch'&&!BR_VIEWS.includes(r)){history.replaceState(null,'','#handovers');r='handovers'}if(role==='driver'&&r!=='driver'&&r!=='inbox'){history.replaceState(null,'','#driver');r='driver'}
+  let r=route();if(role==='branch'&&!BR_VIEWS.includes(r)){history.replaceState(null,'','#handovers');r='handovers'}if(role==='driver'&&r!=='driver'&&r!=='inbox'&&r!=='account'){history.replaceState(null,'','#driver');r='driver'}
   if((r==='audit'||r==='billing')&&!isAdmin()){history.replaceState(null,'','#dashboard');r='dashboard'}
   const alerts=computeAlerts();
+  {const tp=document.querySelector('.top');if(tp){const h=Math.round(tp.getBoundingClientRect().height);if(h&&document.documentElement.style.getPropertyValue('--toph')!==h+'px')document.documentElement.style.setProperty('--toph',h+'px')}}
+  {const mb=$('#mode-btn');if(mb){const cd=canDrive();mb.hidden=!cd;if(cd){const inD=role==='driver';mb.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/></svg>${inD?t('لوحة')+' '+(ROLES[baseRole()]||ROLES.viewer)[0]:t('سيارتي')}`;mb.title=inD?'العودة إلى صلاحيات '+(ROLES[baseRole()]||ROLES.viewer)[0]:'الانتقال إلى وضع مستخدم المركبة'}}}
   {const rc=$('#rolechip');if(rc){rc.textContent=userCap&&ME&&ME.id?`${ME.name||'أنت'} · ${t(ROLES[role][0])}`:'';rc.hidden=!(userCap&&ME&&ME.id)}}
-  $('#side').innerHTML=NAV.map(([g,items])=>[g,items.filter(([k])=>((k!=='audit'&&k!=='billing')||isAdmin())&&(k!=='ai'||aiOk())&&(role!=='branch'||BR_VIEWS.includes(k)))]).filter(([g,items])=>items.length).map(([g,items])=>`<div class="grp">${g?`<span>${g}</span>`:''}${items.filter(([k])=>((k!=='audit'&&k!=='billing')||isAdmin())&&(k!=='ai'||aiOk())&&(role!=='branch'||BR_VIEWS.includes(k))).map(([k,ic])=>`<a href="#${k}" class="${k===r?'on':''}"${k===r?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${NI[ic]}</svg>${VIEWS[k]}${navBadge(k,alerts)}</a>`).join('')}</div>`).join('');
+  $('#side').innerHTML=NAV.map(([g,items])=>[g,items.filter(([k])=>((k!=='audit'&&k!=='billing')||isAdmin())&&(k!=='ai'||aiCanAsk())&&(role!=='branch'||BR_VIEWS.includes(k)))]).filter(([g,items])=>items.length).map(([g,items])=>`<div class="grp">${g?`<span>${g}</span>`:''}${items.filter(([k])=>((k!=='audit'&&k!=='billing')||isAdmin())&&(k!=='ai'||aiCanAsk())&&(role!=='branch'||BR_VIEWS.includes(k))).map(([k,ic])=>`<a href="#${k}" class="${k===r?'on':''}"${k===r?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${NI[ic]}</svg>${VIEWS[k]}${navBadge(k,alerts)}</a>`).join('')}</div>`).join('');
   const allLoaded=!db||COLS.every(c=>loaded[c]);
   let html='';
   const demo=COLS.some(c=>RAW(c).some(x=>x.demo));
   if(company())document.querySelector('.brand small').textContent=company();
-  {const bm=document.querySelector('.brand-mark');if(bm){const l=coLogo();if(l&&!bm.classList.contains('has-logo')||l&&bm.dataset.l!==String(l.length)){bm.innerHTML=`<img src="${l}" alt="">`;bm.classList.add('has-logo');bm.dataset.l=String(l.length)}else if(!l&&bm.classList.contains('has-logo')){bm.textContent='KSA';bm.classList.remove('has-logo');delete bm.dataset.l}}}
-  document.body.classList.toggle('drvmode',r==='driver'||(role==='driver'&&r==='inbox'));
+  try{const bd=JSON.stringify({name:company(),logo:coLogo()});if(company()&&localStorage.getItem('fleet-brand')!==bd)localStorage.setItem('fleet-brand',bd)}catch(e){}
+  {let lg=coLogo();if(!lg&&!loaded.settings){try{lg=(JSON.parse(localStorage.getItem('fleet-brand')||'{}')||{}).logo||''}catch(e){}}const bl=$('#brand-logo'),bm=$('#brand-mark');if(bl){bl.hidden=!lg;if(lg&&bl.firstChild.getAttribute('src')!==lg)bl.firstChild.setAttribute('src',lg);if(bm)bm.hidden=!!lg}}
+  document.body.classList.toggle('drvmode',r==='driver'||(role==='driver'&&(r==='inbox'||r==='account')));
   {const mb=$('#msgbadge');if(mb){const n=unreadCount();mb.textContent=n>9?'9+':n;mb.hidden=!n}}
   if(demo&&!readOnly&&r!=='driver')html+=`<div class="banner"><div><b>بيانات توضيحية:</b> السجلات الحالية أمثلة لتجربة النظام. احذفها متى ما بدأت بإدخال بيانات سيارات شركتك.</div><button class="btn sm" data-act="clear-demo">حذف الأمثلة</button></div>`;
   html+=subBanner(r);
   if(db&&!allLoaded&&!['billing','support'].includes(r))html+=`<div class="empty">جارٍ تحميل بيانات الأسطول…</div>`;
-  else html+=({dashboard:vDash,vehicles:vVehicles,drivers:vDrivers,handovers:vHand,maintenance:vMaint,fuel:vFuel,violations:vViol,accidents:vAcc,inspect:vInsp,driver:vDriver,reports:vReports,branches:vBranches,company:vSettings,audit:vAudit,inbox:vInbox,billing:vBilling,support:vSupport,ai:vAi})[r](alerts);
+  else html+=({dashboard:vDash,vehicles:vVehicles,drivers:vDrivers,handovers:vHand,maintenance:vMaint,fuel:vFuel,violations:vViol,accidents:vAcc,inspect:vInsp,driver:vDriver,reports:vReports,branches:vBranches,company:vSettings,audit:vAudit,inbox:vInbox,billing:vBilling,support:vSupport,ai:vAi,account:vAccount})[r](alerts);
   const _ae=document.activeElement,_aid=_ae&&_ae.id&&['msg-in'].includes(_ae.id)?_ae.id:null,_ss=_aid?_ae.selectionStart:0;
   $('#main').innerHTML=html;stampTables($('#main'));
   if(_aid){const n=document.getElementById(_aid);if(n){n.focus();try{n.setSelectionRange(_ss,_ss)}catch(e){}}}
@@ -1218,24 +1267,12 @@ function vDash(alerts){
   const recent=[...S.handovers].sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,7);
   const monName=new Intl.DateTimeFormat('ar-SA-u-ca-gregory',{month:'long',year:'numeric'}).format(new Date());
   return `
-  <div class="head"><div><h2>لوحة الأسطول</h2><p>${n} سيارة · ${S.drivers.filter(d=>d.active!==false).length} سائق نشط · ${alerts.filter(a=>a.sev==='crit').length} تنبيه عاجل</p></div></div>
-  <section class="panel"><div class="panel-b">
-    <div class="strip" role="img" aria-label="توزيع السيارات حسب الحالة">${seg('available','var(--ok)')}${seg('assigned','var(--info)')}${seg('maintenance','var(--warn)')}${seg('out','var(--idle)')}</div>
-    <div class="legend">
-      <div class="c-avail"><b>${c.available}</b><span>متاحة في الموقف</span></div>
-      <div class="c-asg"><b>${c.assigned}</b><span>مسلّمة لسائقين</span></div>
-      <div class="c-mnt"><b>${c.maintenance}</b><span>في الورشة</span></div>
-      <div class="c-out"><b>${c.out}</b><span>خارج الخدمة</span></div>
-    </div></div></section>
-  <section class="quick" aria-label="إجراءات سريعة">
-    <button data-act="ho-out">${ICONS.out}<b>تسليم سيارة</b><span>إخراج سيارة لسائق بعهدة</span></button>
-    <button data-act="ho-in">${ICONS.in}<b>استلام سيارة</b><span>إرجاع السيارة وفحصها</span></button>
-    <button data-act="m-new">${ICONS.wrench}<b>تسجيل صيانة</b><span>زيت، إطارات، إصلاح…</span></button>
-    <button data-act="f-new">${ICONS.fuel}<b>تعبئة وقود</b><span>لترات، مبلغ، عداد</span></button>
-    <button data-act="x-new">${ICONS.ticket}<b>تسجيل مخالفة</b><span>تحديد السائق تلقائياً</span></button>
-  </section>
+  <div class="head"><div class="co-hero">${coLogo()?`<div class="co-logo"><img src="${coLogo()}" alt="شعار ${esc(company())}"></div>`:''}<div class="hello"><small>${esc(new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-arab',{weekday:'long',day:'numeric',month:'long'}).format(new Date()))} · ${n} سيارة${S.branches.length?` في ${S.branches.length} فروع`:''}</small><h2>${greet()}${myFirstName()?'، '+esc(myFirstName()):''}</h2></div></div>
+    ${readOnly?'':`<div class="dash-acts"><button class="btn" data-act="ho-in">${ICONS.in} استلام سيارة</button><button class="btn primary" data-act="ho-out">${ICONS.out} تسليم سيارة</button></div>`}</div>
+  <section class="stat4" aria-label="حالات السيارات">${[['assigned','مع السائقين','var(--info)','سُلّمت بمحاضر موقّعة'],['available','متاحة','var(--ok)','جاهزة للتسليم الآن'],['maintenance','في الورشة','var(--warn)','تحت الصيانة أو الإصلاح'],['out','خارج الخدمة','var(--idle)','متوقفة بانتظار قرار']].map(([k,l,col,sub])=>`<button type="button" data-act="dash-vf" data-id="${k}" style="--c:${col}"><span class="l">${l}</span><b>${c[k]}</b><small>${sub}</small><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>`).join('')}</section>
+  ${readOnly?'':`<div class="more-acts"><button class="btn ghost" data-act="m-new">${ICONS.wrench} تسجيل صيانة</button><button class="btn ghost" data-act="f-new">${ICONS.fuel} تعبئة وقود</button><button class="btn ghost" data-act="x-new">${ICONS.ticket} تسجيل مخالفة</button></div>`}
   <div class="cols">
-    <section class="panel"><div class="panel-h"><h3>التنبيهات</h3><span>${alerts.length?alerts.length+' تنبيه':'لا يوجد'}</span></div>
+    <section class="panel"><div class="panel-h"><h3>يحتاج قرارك</h3><span>${alerts.length?alerts.length+' أمر':'لا يوجد'}</span></div>
       ${alerts.length?`<div class="alerts">${alerts.map(a=>`<div class="alert ${a.sev}" tabindex="0" ${a.v?`data-act="v-open" data-id="${a.v}"`:a.d?`data-act="d-open" data-id="${a.d}"`:`data-act="go" data-id="${a.go}"`}><span class="sev"></span><div><b>${esc(a.title)}</b><small>${esc(a.sub)}</small></div><span class="pill ${a.sev==='crit'?'p-crit':'p-warn'}">${a.sev==='crit'?'عاجل':'قريب'}</span></div>`).join('')}</div>`:`<div class="empty">كل الوثائق سارية والصيانة في موعدها.</div>`}
     </section>
     <div style="display:grid;gap:18px;align-content:start">
@@ -1250,7 +1287,7 @@ function vDash(alerts){
           <div><span>تجديد الوثائق</span><b class="num">${money(sum(rm,'cost'))}</b></div>
           <div style="grid-column:1/-1;border-top:1px solid var(--line);padding-top:10px"><span>الإجمالي</span><b class="num" style="color:var(--accent)">${money(sum(fm,'cost')+sum(mm,'cost')+sum(vm,'amount')+sum(rm,'cost'))}</b></div>
         </div></section>
-      <section class="panel"><div class="panel-h"><h3>آخر الحركات</h3><a class="btn ghost sm" href="#handovers">السجل</a></div>
+      <section class="panel"><div class="panel-h"><h3>آخر الحركات</h3><a class="btn ghost sm" href="#handovers">السجل كاملاً</a></div>
         ${recent.length?`<div class="feed">${recent.map(h=>{const v=vById(h.vehicleId);return `<div class="feed-i"><span class="dir ${h.type}">${h.type==='out'?'↖':'↘'}</span><div class="t">${h.type==='out'?'تسليم':'استلام'} ${esc(plateTxt(v))} ${h.type==='out'?'إلى':'من'} ${esc(dName(h.driverId))}<small>${esc(vName(v))}</small></div><span class="sub num">${fmtDT(h.at)}</span></div>`}).join('')}</div>`:`<div class="empty">لا توجد حركات بعد. ابدأ بتسليم أول سيارة.</div>`}
       </section>
     </div>
@@ -1278,12 +1315,13 @@ function vSettings(){
   return `<div class="head"><div><h2>الإعدادات</h2><p>بيانات الشركة، الاستيراد، التنبيهات التلقائية، والنسخ الاحتياطي</p></div></div>
   <section class="panel"><div class="panel-h"><h3>الشروحات للمستخدمين الجدد</h3><button class="btn sm${TIPS?'':' primary'}" data-act="${TIPS?'tips-off':'tips-on'}">${TIPS?'إخفاء الشروحات':'إظهار الشروحات'}</button></div><div class="panel-b sub">مربعات إرشادية مظللة أعلى كل صفحة ونموذج، وتلميح تحت الخانات المهمة. الإعداد خاص بجهازك ومتصفحك.</div></section>
   <section class="panel"><div class="panel-h"><h3>الإشعارات على هذا الجهاز</h3></div><div class="panel-b">${pushCard(false)}</div></section>
-  <section class="panel"><div class="panel-h"><h3>بيانات الشركة</h3>${isAdmin()&&!readOnly?'<button class="btn sm" data-act="co-edit">تعديل</button>':''}</div><div class="panel-b" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">${coLogo()?`<img src="${coLogo()}" alt="شعار الشركة" style="height:56px;max-width:160px;object-fit:contain;border:1px solid var(--line);border-radius:10px;padding:4px;background:#fff">`:''}<div><b style="font-family:var(--f-display);font-size:17px">${esc(company()||'اسم الشركة غير مسجل')}</b>${custNo()?`<div class="sub">رقم العميل: <b dir="ltr">${esc(custNo())}</b></div>`:''}<div class="sub">الاسم والشعار يظهران أعلى النظام وفي رأس المحاضر وتقارير الإدارة، ولا يراهما إلا مستخدمو شركتك${coLogo()?'':'. أضف شعار شركتك من «تعديل»'}</div></div></div></section>
+  <section class="panel"><div class="panel-h"><h3>بيانات الشركة</h3>${isAdmin()&&!readOnly?'<button class="btn sm" data-act="co-edit">تعديل</button>':''}</div><div class="panel-b"><div class="co-hero">${coLogo()?`<div class="co-logo"><img src="${coLogo()}" alt="شعار الشركة"></div>`:`<div class="co-logo" style="color:var(--muted,#6b7a72);font-size:12px">بدون شعار</div>`}<div><b style="font-family:var(--f-display);font-size:17px">${esc(company()||'اسم الشركة غير مسجل')}</b>${custNo()?`<div class="sub">رقم العميل: <b dir="ltr">${esc(custNo())}</b></div>`:''}<div class="sub">الاسم والشعار يظهران أعلى النظام وفي الصفحة الرئيسية، والاسم في رأس المحاضر والتقارير</div></div></div></div></section>
   <section class="panel"><div class="panel-h"><h3>استيراد البيانات من Excel</h3><span>مع معاينة قبل الحفظ</span></div><div class="panel-b actions">${Object.entries(IMP).map(([k,v])=>`<button class="btn" data-act="imp" data-id="${k}" ${readOnly?'disabled':''}>${v.label}</button>`).join('')}</div></section>
   <section class="panel"><div class="panel-h"><h3>صفحة السائقين للفحص الأسبوعي (كل جمعة)</h3><a class="btn sm" href="#driver">فتح الصفحة</a></div><div class="panel-b sub">افتح الصفحة، ثم انسخ الرابط من شريط العنوان وأرسله للسائقين. أضف السائق من «المستخدمون والصلاحيات» بنوع «مستخدم المركبة» واربطه بملف السائق، ثم أرسل له رابط التفعيل بالواتساب، ويدخل برقم جواله وكلمة مرور يختارها، فيرى سياراته فقط.</div></section>
   ${remPanel()}
   ${hrPanel()}
   ${featPanel()}
+  ${aiPanel()}
   <section class="panel"><div class="panel-h"><h3>الحسابات البنكية للشركة</h3>${isAdmin()&&!readOnly?'<button class="btn sm primary" data-act="bk-new">+ إضافة حساب</button>':''}</div>
     ${BANKS().length?`<div class="tw"><table><thead><tr><th>البنك</th><th>اسم الحساب</th><th>الآيبان</th><th>رقم الحساب</th><th></th></tr></thead><tbody>${BANKS().map(b=>`<tr><td><b>${esc(b.bank)}</b></td><td>${esc(b.name)}</td><td class="n">${esc(fmtIban(b.iban))}</td><td class="n">${esc(b.accNo||'—')}</td><td>${isAdmin()&&!readOnly?`<button class="btn sm" data-act="bk-edit" data-id="${b.id}">تعديل</button>`:''}</td></tr>`).join('')}</tbody></table></div>`:'<div class="panel-b sub">أضف حسابات الشركة البنكية لتختارها عند استلام مبالغ مطالبات التأمين وفي سندات القبض.</div>'}</section>
   ${isAdmin()&&userCap?usersPanel():''}
@@ -1298,8 +1336,8 @@ function usersPanel(){
     <div class="stat3">${Object.entries(ROLES).map(([k,[l,d]])=>`<div><b style="font-size:14px">${l}</b><span>${d}</span></div>`).join('')}</div>
     ${ME&&ME.isOwner?`<div class="push-card${IDS.owner?' ok':''}"><span>🪪 رقم هويتك للتوقيع على المحاضر: <b dir="ltr">${IDS.owner?esc(maskNid(IDS.owner)):'غير مسجل'}</b> <span class="sub">— يُسحب تلقائياً في كل محضر توقّعه</span></span><button class="btn sm${IDS.owner?' ghost':' primary'}" data-act="my-nid">${IDS.owner?'تعديل':'إضافة'}</button></div>`:''}
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn primary" data-act="u-new">+ إضافة مستخدم</button><span class="sub">تضيف الاسم والجوال ونوعه، فيُنشأ له رمز تفعيل وترسل له الرابط بالواتساب. يدخل برقم جواله وكلمة مرور يختارها، والصلاحية تُطبق تلقائياً.</span></div>
-    ${S.invites.length?`<div><div class="h3">المستخدمون المضافون (${S.invites.length})</div><div class="tw" style="border:1px solid var(--line);border-radius:9px"><table><thead><tr><th>الاسم</th><th>الجوال</th><th>الهوية</th><th>النوع</th><th>السائق المرتبط</th><th>الحالة</th><th></th></tr></thead><tbody>
-      ${S.invites.map(iv=>`<tr><td><b>${esc(iv.name)}</b></td><td class="n">${esc(iv.phone||iv.email||'—')}</td><td class="n">${(()=>{const n=iv.role==='driver'?(dById(iv.driverId)||{}).idNo:IDS[iv.id];return n?esc(maskNid(n)):'<span class="pill p-warn">غير مسجل</span>'})()}</td><td>${esc((ROLES[iv.role]||ROLES.viewer)[0])}</td><td>${iv.role==='driver'?esc(dName(iv.driverId)):iv.role==='branch'?esc((S.branches.find(b=>b.id===iv.branchId)||{}).name||'—'):'—'}</td><td>${ivActive(iv)?'<span class="pill p-ok">مفعّل</span>':'<span class="pill p-warn">بانتظار التفعيل</span>'}</td><td style="white-space:nowrap"><button class="btn sm" data-act="u-edit" data-id="${iv.id}">تعديل</button> <button class="btn sm ghost" data-act="u-share" data-id="${iv.id}">إرسال الدعوة</button> ${iv.loginEmail?`<button class="btn sm ghost" data-act="u-reset" data-id="${iv.id}">رمز جديد</button>`:''} <button class="btn sm ghost" data-act="u-rm" data-id="${iv.id}">حذف</button></td></tr>`).join('')}
+    ${S.invites.length?`<div><div class="h3">المستخدمون المضافون (${S.invites.length})</div><div class="tw" style="border:1px solid var(--line);border-radius:9px"><table><thead><tr><th>الاسم</th><th>الجوال</th><th class="c-nid">الهوية</th><th>النوع</th><th>السائق المرتبط</th><th>الحالة</th><th></th></tr></thead><tbody>
+      ${S.invites.map(iv=>`<tr><td><b>${esc(iv.name)}</b></td><td class="n">${esc(iv.phone||iv.email||'—')}</td><td class="n c-nid">${(()=>{const n=iv.role==='driver'?(dById(iv.driverId)||{}).idNo:IDS[iv.id];return n?esc(maskNid(n)):'<span class="pill p-warn">غير مسجل</span>'})()}</td><td>${esc(roleLabel(iv))}</td><td>${iv.role==='driver'||iv.alsoDriver?esc(dName(iv.driverId)):iv.role==='branch'?esc((S.branches.find(b=>b.id===iv.branchId)||{}).name||'—'):'—'}</td><td>${ivActive(iv)?'<span class="pill p-ok">مفعّل</span>':'<span class="pill p-warn">بانتظار التفعيل</span>'}</td><td><div class="row-acts"><button class="btn sm" data-act="u-edit" data-id="${iv.id}">تعديل</button><button class="btn sm ghost" data-act="u-share" data-id="${iv.id}">إرسال الدعوة</button>${iv.loginEmail?`<button class="btn sm ghost" data-act="u-reset" data-id="${iv.id}">رمز جديد</button>`:''}<button class="btn sm ghost del" data-act="u-rm" data-id="${iv.id}">حذف</button></div></td></tr>`).join('')}
     </tbody></table></div></div>`:''}
   </div>
   <div class="panel-h" style="border-top:1px solid var(--line)"><h3>الحسابات التي دخلت النظام</h3><span>${S.seen.length}</span></div><div class="tw"><table><thead><tr><th>المستخدم</th><th>الجوال / الإيميل</th><th>نوع المستخدم</th><th>السائق المرتبط</th><th>آخر دخول</th></tr></thead><tbody>
@@ -1332,29 +1370,92 @@ async function resetInvite(id){const iv=S.invites.find(x=>x.id===id);if(!iv||!iv
   confirmBox(`إنشاء رمز تفعيل جديد لـ <b>${esc(iv.name)}</b>؟ يتوقف حسابه الحالي فوراً، ويفعّل حساباً جديداً بكلمة مرور جديدة من الرابط الذي ترسله له.`,'إنشاء رمز جديد',async()=>{
     const code=newCode();await patch('invites',id,{code,loginEmail:window.__phoneEmail(iv.phone,code),updatedAt:new Date().toISOString()});
     setTimeout(()=>shareHelp(S.invites.find(x=>x.id===id)),400)})}
+const EMAIL_RE=/^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const suggestUser=em=>{let u=String(em||'').split('@')[0].toLowerCase().replace(/[^a-z0-9._]/g,'').replace(/^[._]+|[._]+$/g,'').slice(0,30);if(u&&!/[a-z]/.test(u))u='u'+u;return u.length>=3?u:''};
+async function setLoginIds(o){
+  const em=String(o.email||'').trim().toLowerCase(),un=String(o.username||'').trim().toLowerCase().replace(/^@/,'');
+  if(em&&!EMAIL_RE.test(em))throw 'الإيميل غير صحيح';
+  if(un&&!window.__userRe.test(un))throw 'اسم المستخدم من 3 إلى 30 حرفاً: حروف إنجليزية صغيرة وأرقام والنقطة والشرطة السفلية، وفيه حرف واحد على الأقل';
+  const ek=em?await window.__loginKey('e',em):'',uk=un?await window.__loginKey('u',un):'';
+  const same=(a,b)=>String(a||'').toLowerCase()===String(b||'').toLowerCase(),moved=o.prevAuth&&!same(o.prevAuth,o.auth);
+  for(const [k,l] of [[ek,'هذا الإيميل'],[uk,'اسم المستخدم هذا']]){if(!k)continue;let d=null;try{d=await db.getOne('logins',k)}catch(e){}if(d&&!same(d.email,o.auth)&&!same(d.email,o.prevAuth))throw l+' مستخدم لحساب آخر'}
+  const at=new Date().toISOString();
+  if(ek&&(ek!==o.curEK||moved))await put('logins',ek,{email:String(o.auth||'').toLowerCase(),at,companyId:PLT().company().id});
+  if(uk&&(uk!==o.curUK||moved))await put('logins',uk,{email:String(o.auth||'').toLowerCase(),at,companyId:PLT().company().id});
+  for(const k of [o.curEK!==ek&&o.curEK,o.curUK!==uk&&o.curUK])if(k){try{await del('logins',k)}catch(e){}}
+  return {contactEmail:em||null,username:un||null,eKey:ek||null,uKey:uk||null};
+}
+function myIdRec(){if(ME&&ME.isOwner){const o=S.settings.find(x=>x.id==='owner')||{};return {kind:'owner',rec:o}}const iv=myInvite();return iv?{kind:'invite',rec:iv}:null}
+function vAccount(){
+  const r=myIdRec(),rec=r?r.rec:{},iv=myInvite(),role=baseRole();
+  const nm=(iv&&iv.name)||(ME&&ME.name)||'';const ph=myPhone()||(iv&&iv.phone)||'';
+  const roles=[(ROLES[role]||ROLES.viewer)[0],...(iv&&iv.alsoDriver&&role!=='driver'?[ROLES.driver[0]]:[])];
+  const authMail=ME&&ME.email&&!/@m\.manhalfleet\.app$/i.test(ME.email)?ME.email:'';
+  const row=(ic,l,v,act,note)=>`<div class="acc-it"><svg viewBox="0 0 24 24" aria-hidden="true">${NI[ic]||''}</svg><div><b>${t(l)}</b><span dir="ltr">${v?esc(v):`<i>${t('غير مضاف')}</i>`}</span></div>${act?`<button class="btn ghost sm" data-act="${act}">${t(v?'تعديل':'إضافة')}</button>`:note?`<small>${t(note)}</small>`:''}</div>`;
+  return `<div class="acc"><div class="acc-hd"><div class="acc-av">${esc((nm||'؟').trim().charAt(0))}</div><h2>${esc(nm||t('حسابي'))}</h2><div class="acc-roles">${roles.map(x=>`<span>${t(x)}</span>`).join('')}</div></div>
+  <h3>${t('بيانات الدخول')}</h3><div class="panel acc-list">
+    ${ph?row('msg','رقم الجوال',ph,'','يغيّره مدير النظام'):''}
+    ${authMail?row('chat','إيميل الحساب',authMail,'',''):''}
+    ${r?row('chat','الإيميل',rec.contactEmail||'', 'acc-email'):''}
+    ${r?row('user','اسم المستخدم',rec.username||'','acc-user'):''}
+    ${row('lock','كلمة المرور','••••••••','acc-pass')}
+  </div>
+  <p class="acc-note">${t('تقدر تدخل النظام بأي منها: رقم الجوال أو الإيميل أو اسم المستخدم، مع نفس كلمة المرور.')}</p>
+  <h3>${t('التفضيلات')}</h3><div class="panel acc-list">
+    ${role==='driver'||myRole()==='driver'?`<div class="acc-it"><svg viewBox="0 0 24 24">${NI.chat||''}</svg><div><b>${t('اللغة')}</b></div>${I18N.picker('lang')}</div>`:''}
+    <div class="acc-it"><svg viewBox="0 0 24 24">${NI.home||''}</svg><div><b>${t('المظهر')}</b><span>${t((THEMES.find(x=>x[0]===curTheme())||THEMES[0])[1])}</span></div><button class="btn ghost sm" data-act="theme">${t('تغيير')}</button></div>
+  </div>
+  <div style="margin-top:18px"><button class="btn danger" data-act="logout">${t('تسجيل الخروج')}</button></div></div>`;
+}
+function accIdForm(field){
+  const r=myIdRec();if(!r)return;const rec=r.rec;const isE=field==='email';
+  formModal(t(isE?'الإيميل':'اسم المستخدم'),isE?`${fld(t('الإيميل'),inp('v',rec.contactEmail||'','email','dir="ltr" autocomplete="email"'),{w:1,hint:t('تدخل به بدل رقم الجوال. اتركه فاضياً لحذفه.')})}`
+    :`${fld(t('اسم المستخدم'),inp('v',rec.username||suggestUser(rec.contactEmail)||'','text','dir="ltr" autocapitalize="none" spellcheck="false"'),{w:1,hint:t('حروف إنجليزية صغيرة وأرقام و . _ من 3 إلى 30. اتركه فاضياً لحذفه.')})}`,
+  async f=>{try{const ids=await setLoginIds({auth:ME.email,curEK:rec.eKey,curUK:rec.uKey,email:isE?f.v:rec.contactEmail,username:isE?(rec.username||''):f.v});
+      const upd={...ids,updatedAt:new Date().toISOString()};
+      if(r.kind==='owner'){const o={...rec,...upd};delete o.id;await put('settings','owner',o)}else await patch('invites',rec.id,upd);
+      toast(t('تم الحفظ'))}catch(e){return typeof e==='string'?t(e):t('تعذر الحفظ، حاول مرة أخرى')}});
+}
+function accPassForm(){
+  formModal(t('تغيير كلمة المرور'),`${fld(t('كلمة المرور الحالية'),inp('cur','','password','dir="ltr" autocomplete="current-password"'),{w:1})}${fld(t('كلمة المرور الجديدة'),inp('nw','','password','dir="ltr" autocomplete="new-password" minlength="6"'),{w:1,hint:t('6 أحرف أو أرقام على الأقل')})}`,
+  async f=>{if(String(f.nw).length<6)return t('كلمة المرور الجديدة قصيرة (6 على الأقل)');try{await window.__changePassword(f.cur,f.nw);toast(t('تم تغيير كلمة المرور'))}catch(e){return e&&(e.code==='auth/invalid-credential'||e.code==='auth/wrong-password')?t('كلمة المرور الحالية غير صحيحة'):t('تعذر التغيير، حاول مرة أخرى')}});
+}
 function inviteForm(id){
   const iv=id?S.invites.find(x=>x.id===id):{role:'viewer'};
   formModal(id?'تعديل المستخدم':'إضافة مستخدم',`
     ${fld('الاسم',inp('name',iv.name,'text','required'),{req:1})}${fld('رقم الجوال',inp('phone',iv.phone,'tel','dir="ltr" placeholder="05xxxxxxxx" inputmode="tel"'),{req:1,hint:'يدخل به النظام مع كلمة مرور يختارها'})}
     ${fld('نوع المستخدم',sel('role',Object.entries(ROLES).map(([k,[l]])=>[k,l]),iv.role),{req:1,hintId:'urh',hint:(ROLES[iv.role]||ROLES.viewer)[1]})}
-    <div class="f w" id="udw" ${iv.role==='driver'?'':'hidden'}>${fld('ملف السائق المرتبط',sel('driverId',dOpts('— اختر السائق —'),iv.driverId),{req:1,hint:'رقم الهوية يؤخذ من ملف السائق'})}</div>
+    <div class="f w" id="uaw" ${iv.role==='driver'?'hidden':''}><label style="display:flex;gap:10px;align-items:center;font-weight:500;cursor:pointer"><input type="checkbox" name="alsoDriver" id="f-alsoDriver" ${iv.alsoDriver?'checked':''} style="width:20px;height:20px"> يستخدم مركبة أيضاً (يجمع مع دوره صلاحيات مستخدم المركبة)</label><div class="hint">يظهر له زر للتبديل بين لوحته و«سيارتي» ليوقّع محاضره ويسجل الفحص الأسبوعي</div></div>
+    <div class="f w" id="udw" ${iv.role==='driver'||iv.alsoDriver?'':'hidden'}>${fld('ملف السائق المرتبط',sel('driverId',dOpts('— اختر السائق —'),iv.driverId),{req:1,hint:'رقم الهوية يؤخذ من ملف السائق'})}</div>
     <div class="f w" id="ubw" ${iv.role==='branch'?'':'hidden'}>${fld('الفرع',sel('branchId',[['','— اختر الفرع —'],...branchesSorted().map(b=>[b.id,`${b.city} — ${b.name}`])],iv.branchId),{req:1,hint:S.branches.length?'يرى سيارات هذا الفرع فقط':'أضف الفروع أولاً من صفحة «الفروع»'})}</div>
     <div class="f w" id="unw" ${iv.role==='driver'?'hidden':''}>${fld('رقم الهوية / الإقامة',inp('nid',id?IDS[id]||'':'','text','dir="ltr" inputmode="numeric" maxlength="10" placeholder="1xxxxxxxxx"'),{req:1,hint:'يظهر في توقيعه على المحاضر. يراه مدير النظام كاملاً، والباقون آخر 4 أرقام فقط'})}</div>
+    <div class="f w opt-ids"><div class="opt-h"><b>بيانات دخول إضافية</b><span>اختيارية، اتركها فاضية إذا ما يحتاجها</span></div>
+      <div class="opt-g">${fld('الإيميل',inp('contactEmail',iv.contactEmail||'','email','dir="ltr" autocomplete="off"'),{hint:'يدخل به بدل رقم الجوال'})}${fld('اسم المستخدم',inp('username',iv.username||'','text','dir="ltr" autocapitalize="none" spellcheck="false"'),{hintId:'unh',hint:'يُقترح من الإيميل، ويقدر يغيّره لاحقاً من «حسابي»'})}</div></div>
     ${fld('ملاحظات',inp('notes',iv.notes),{w:1})}`,
   async f=>{{const e=need(f,[['name','الاسم'],['phone','رقم الجوال'],['role','نوع المستخدم']]);if(e)return e}
+    {const em=String(f.contactEmail||'').trim(),un=String(f.username||'').trim().toLowerCase();if(em&&!EMAIL_RE.test(em))return 'الإيميل غير صحيح';if(un&&!window.__userRe.test(un))return 'اسم المستخدم من 3 إلى 30 حرفاً: حروف إنجليزية صغيرة وأرقام و . _ وفيه حرف واحد على الأقل';
+      if(S.invites.some(x=>x.id!==id&&((em&&String(x.contactEmail||'').toLowerCase()===em.toLowerCase())||(un&&x.username===un))))return 'الإيميل أو اسم المستخدم مستخدم لمستخدم آخر'}
     const phone=window.__normPhone(f.phone);if(!/^05\d{8}$/.test(phone))return 'رقم الجوال يبدأ بـ 05 ويتكون من 10 أرقام';
     if(S.invites.some(x=>x.id!==id&&window.__normPhone(x.phone)===phone))return 'هذا الرقم مضاف مسبقاً';
-    if(f.role==='driver'&&!f.driverId)return 'اختر ملف السائق المرتبط';
+    const alsoD=f.role!=='driver'&&!!f.alsoDriver;
+    if((f.role==='driver'||alsoD)&&!f.driverId)return 'اختر ملف السائق المرتبط';
+    if(f.driverId&&(f.role==='driver'||alsoD)&&S.invites.some(x=>x.id!==id&&(x.role==='driver'||x.alsoDriver)&&x.driverId===f.driverId))return 'ملف السائق هذا مرتبط بمستخدم آخر';
     if(f.role==='branch'&&!f.branchId)return 'اختر الفرع';
     let nidv='';if(f.role!=='driver'){nidv=toLat(f.nid||'').trim();if(!nidv)return 'الخانة «رقم الهوية / الإقامة» إلزامية';if(!validNid(nidv))return 'رقم الهوية أو الإقامة غير صحيح (10 أرقام يبدأ بـ 1 أو 2)';if(nidInUse(nidv,id||'__new'))return 'رقم الهوية مسجل لمستخدم آخر'}
     else{const dv=dById(f.driverId);if(dv&&!dv.idNo)return 'ملف السائق المرتبط ليس فيه رقم هوية. أضفه من ملف السائق أولاً'}
-    const data={...(id?iv:{}),name:f.name.trim(),phone,role:f.role,driverId:f.role==='driver'?f.driverId:null,branchId:f.role==='branch'?f.branchId:null,notes:f.notes.trim(),updatedAt:new Date().toISOString()};delete data.id;if(!id)data.createdAt=data.updatedAt;
+    const data={...(id?iv:{}),name:f.name.trim(),phone,role:f.role,alsoDriver:alsoD,driverId:(f.role==='driver'||alsoD)?f.driverId:null,branchId:f.role==='branch'?f.branchId:null,notes:f.notes.trim(),updatedAt:new Date().toISOString()};delete data.id;if(!id)data.createdAt=data.updatedAt;
     if(!data.loginEmail||window.__normPhone(iv.phone)!==phone){data.code=newCode();data.loginEmail=window.__phoneEmail(phone,data.code)}
     const nid=await put('invites',id,data);
+    {const auth=data.loginEmail||data.email;if(auth&&(f.contactEmail||f.username||iv.eKey||iv.uKey)){try{const ids=await setLoginIds({auth,prevAuth:iv.loginEmail||iv.email||'',curEK:iv.eKey,curUK:iv.uKey,email:f.contactEmail,username:f.username});await patch('invites',nid||id,ids)}catch(e){toast(typeof e==='string'?e:'تعذر حفظ الإيميل أو اسم المستخدم')}}}
     if(nidv&&IDS[nid||id]!==nidv){await put('ids',nid||id,{nid:nidv,name:data.name,at:new Date().toISOString()});IDS[nid||id]=nidv}
     const changed=!id||data.code!==iv.code;
     return ()=>{if(changed)shareHelp({...data,id:nid||id})}});
-  $('#f-role').onchange=e=>{$('#udw').hidden=e.target.value!=='driver';$('#unw').hidden=e.target.value==='driver';$('#ubw').hidden=e.target.value!=='branch';$('#urh').textContent=(ROLES[e.target.value]||ROLES.viewer)[1]};
+  {const ds=$('#f-driverId');if(ds)ds.addEventListener('change',()=>{const d=dById(ds.value);if(!d)return;const n=$('#f-name'),ph=$('#f-phone');
+    if(n&&d.name)n.value=d.name;if(ph&&d.phone){const p=window.__normPhone?window.__normPhone(String(d.phone)):String(d.phone);ph.value=p}
+    [n,ph].forEach(el=>{if(el&&el.value){el.style.transition='background .6s';el.style.background='var(--accent-soft)';setTimeout(()=>el.style.background='',900)}})})}
+  {const ce=$('#f-contactEmail'),un=$('#f-username');let last=un?un.value:'';if(ce&&un)ce.addEventListener('input',()=>{const sg=suggestUser(ce.value);if(!un.value||un.value===last){un.value=sg;last=sg}})}
+  {const ad=$('#f-alsoDriver');if(ad)ad.onchange=()=>{$('#udw').hidden=!($('#f-role').value==='driver'||ad.checked)}}
+  $('#f-role').onchange=e=>{const ad=$('#f-alsoDriver');$('#uaw').hidden=e.target.value==='driver';$('#udw').hidden=!(e.target.value==='driver'||(ad&&ad.checked));$('#unw').hidden=e.target.value==='driver';$('#ubw').hidden=e.target.value!=='branch';$('#urh').textContent=(ROLES[e.target.value]||ROLES.viewer)[1]};
 }
 async function setRole(uid,patchData){const ex=S.roles.find(x=>x.id===uid)||{};const d={role:ex.role||'viewer',driverId:ex.driverId||null,...patchData,updatedAt:new Date().toISOString()};delete d.id;
   if(d.role!=='driver')d.driverId=null;try{await put('roles',uid,d);toast('تم تحديث الصلاحية')}catch(e){}}
@@ -1396,6 +1497,29 @@ function branchForm(id){
     await put('branches',id,data)},
   {extraFoot:id&&!readOnly?`<button class="btn danger" type="button" data-act="b-del" data-id="${id}" style="margin-inline-start:auto">حذف</button>`:''});
 }
+const THEMES=[['auto','تلقائي (حسب الجهاز)',['#FFFFFF','#F4F5F2','#173B33','#0F1412']],['light','سكون (الفاتح)',['#FFFFFF','#F4F5F2','#173B33','#FFFFFF']],['navy','الأزرق التنفيذي',['#172F66','#EDF1F7','#1F4FBF','#FFFFFF']],['sand','الرملي الفاخر',['#2F2A22','#F3EEE5','#8A6420','#FFFDF8']],['graphite','الرمادي الهادئ',['#22262D','#F0F1F3','#3E4A5C','#FFFFFF']],['dark','الداكن الأخضر',['#0E5A44','#0F1412','#3DBB8C','#161D1A']],['night','الليلي الأزرق',['#0A0F1A','#0E1320','#6D9BFF','#151C2C']]];
+const curTheme=()=>{try{return localStorage.getItem('fleet-theme')||'auto'}catch(e){return 'auto'}};
+const curFs=()=>{try{return localStorage.getItem('fleet-fs')||'md'}catch(e){return 'md'}};
+function applyTheme(){const r=document.documentElement,t=curTheme(),f=curFs();if(t==='auto')delete r.dataset.theme;else r.dataset.theme=t;if(f==='md')delete r.dataset.fs;else r.dataset.fs=f;
+  const m=document.querySelector('meta[name=theme-color]');if(m){const cs=getComputedStyle(r),c=(cs.getPropertyValue('--head')||cs.getPropertyValue('--accent-2')).trim();if(c)m.setAttribute('content',c)}}
+function themePicker(){
+  const t=curTheme(),f=curFs();
+  modal(t_('المظهر'),`<div class="mb"><div class="h3" style="margin-bottom:10px">${t_('اختر التصميم')}</div><div class="th-grid">${THEMES.map(([k,l,c])=>`<button type="button" class="th-card" data-act="theme-set" data-th="${k}" aria-pressed="${k===t}"><span class="th-prev" style="background:${c[1]}"><i style="background:${c[0]}"></i><span><b style="background:${c[3]}"></b><b style="background:${c[2]};flex:.5"></b></span></span><div>${t_(l)}</div></button>`).join('')}</div>
+    <div class="h3" style="margin:18px 0 10px">${t_('حجم الخط')}</div><div class="fs-row">${[['md','عادي'],['lg','كبير'],['xl','كبير جداً']].map(([k,l])=>`<button type="button" class="btn" data-act="fs-set" data-fs="${k}" aria-pressed="${k===f}">${t_(l)}</button>`).join('')}</div>
+    <div class="hint" style="margin-top:12px">${t_('يُحفظ اختيارك على هذا الجهاز فقط.')}</div></div>`,`<div class="mf"><button class="btn primary" data-act="close">${t_('تم')}</button></div>`);
+}
+const t_=x=>(window.t?window.t(x):x);
+applyTheme();
+window.addEventListener('resize',()=>{const tp=document.querySelector('.top');if(tp)document.documentElement.style.setProperty('--toph',Math.round(tp.getBoundingClientRect().height)+'px')});
+async function logoData(file){
+  if(!/^image\/(png|jpeg|webp|svg\+xml|gif)$/.test(file.type))throw 'type';
+  const url=URL.createObjectURL(file);
+  try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const W=img.naturalWidth||512,H=img.naturalHeight||512,r=Math.min(1,480/Math.max(W,H));
+    const c=document.createElement('canvas');c.width=Math.max(1,Math.round(W*r));c.height=Math.max(1,Math.round(H*r));c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    let d=c.toDataURL('image/png');if(d.length>350000)d=c.toDataURL('image/webp',0.9);if(d.length>350000||!d.startsWith('data:image/'))d=c.toDataURL('image/jpeg',0.85);
+    return d}finally{URL.revokeObjectURL(url)}
+}
 function companyForm(){
   let LOGO=coLogo();
   const prev=()=>{const b=$('#lg-prev');if(b)b.innerHTML=LOGO?`<img src="${LOGO}" alt="" style="height:64px;max-width:200px;object-fit:contain;border:1px solid var(--line);border-radius:10px;padding:4px;background:#fff"><button class="btn sm ghost" type="button" id="lg-rm">إزالة الشعار</button>`:'<span class="sub">لا يوجد شعار</span>';const rm=$('#lg-rm');if(rm)rm.onclick=()=>{LOGO='';prev()}};
@@ -1406,12 +1530,44 @@ function companyForm(){
   $('#f-logo').onchange=async e=>{const fl=e.target.files[0];if(!fl)return;try{LOGO=await makeLogo(fl);prev()}catch(x){toast(x.message||'تعذر قراءة الصورة');e.target.value=''}};
 }
 
+function vDupGroups(){
+  const all=[...S.vehicles,...SOLD],g={};
+  for(const v of all){const ks=[v.vin&&String(v.vin).trim()?'v:'+String(v.vin).trim().toUpperCase():'',v.serialNo&&String(v.serialNo).trim()?'s:'+String(toLat(v.serialNo)).trim():''].filter(Boolean);for(const k of ks)(g[k]=g[k]||new Set()).add(v.id)}
+  const done=new Set(),out=[];for(const ids of Object.values(g)){if(ids.size<2)continue;const key=[...ids].sort().join();if(done.has(key))continue;done.add(key);out.push([...ids].map(vById).filter(Boolean))}return out}
+const V_REFCOLS=['handovers','maintenance','fuel','violations','charges','accidents','renewals','inspections'];
+const vRefCount=id=>V_REFCOLS.reduce((n,c)=>n+(S[c]||[]).filter(r=>r.vehicleId===id).length,0);
+async function vMergeDups(){
+  const groups=vDupGroups();if(!groups.length)return toast('لا توجد سيارات مكررة');
+  const ts=v=>v.createdAt||v.updatedAt||'';
+  const plan=groups.map(arr=>{const byRefs=[...arr].sort((a,b)=>vRefCount(b.id)-vRefCount(a.id)||String(ts(a)).localeCompare(String(ts(b))));const keep=byRefs[0];const newest=[...arr].sort((a,b)=>String(ts(b)).localeCompare(String(ts(a))))[0];return {keep,newest,drop:arr.filter(v=>v.id!==keep.id)}});
+  const html=plan.map(p=>`<li>تبقى: <b>${esc(plateTxt(p.newest))}</b> — وتُدمج معها: ${[p.keep,...p.drop].filter(v=>pkey(v.plateLetters,v.plateNumbers)!==pkey(p.newest.plateLetters,p.newest.plateNumbers)).map(v=>esc(plateTxt(v))).join('، ')||'نسخة بنفس اللوحة'}</li>`).join('');
+  if(!(await askYesNo('دمج السيارات المكررة',`نفس رقم الهيكل أو الرقم التسلسلي مسجل لأكثر من سيارة. بعد الدمج تبقى سيارة واحدة باللوحة الأحدث، وتنتقل لها كل السجلات (المحاضر، الوقود، الصيانة، المخالفات، الحوادث…)، وتُحفظ اللوحة القديمة في «اللوحة السابقة».<ul style="margin:10px 0 0;padding-inline-start:18px">${html}</ul>`,'نعم، ادمج','إلغاء')))return;
+  const F=['plateLetters','plateNumbers','make','model','color','type','year','fuelCard','opCardNo','hasOpCard','istimaraExp','insuranceExp','fahasExp','opCardExp','insuranceStatus','fahasStatus','insuranceFrom','insPolicyNo','insType','insPremium','insDeductible','insVehValue','insProvider','branchId','tankCapacity'];
+  let moved=0;
+  for(const p of plan){const k=p.keep,n=p.newest;const upd={};
+    if(n.id!==k.id)F.forEach(f=>{if(n[f]!=null&&String(n[f]).trim()!==''&&String(n[f])!==String(k[f]??''))upd[f]=n[f]});
+    for(const d of p.drop){F.forEach(f=>{if(upd[f]==null&&(k[f]==null||String(k[f]).trim()==='')&&d[f]!=null&&String(d[f]).trim()!=='')upd[f]=d[f]});}
+    const all=[k,...p.drop];upd.odometer=Math.max(...all.map(v=>+v.odometer||0));upd.lastOilKm=Math.max(...all.map(v=>+v.lastOilKm||0));
+    const asg=all.find(v=>v.status==='assigned');if(asg&&k.status!=='assigned'&&k.status!=='sold'){upd.status='assigned';upd.driverId=asg.driverId}
+    const fin=pkey(upd.plateLetters||k.plateLetters,upd.plateNumbers||k.plateNumbers);const hist=[];const hk=new Set([fin]);
+    for(const v of all){for(const h of [...(v.plateHistory||[]),{letters:v.plateLetters,numbers:String(v.plateNumbers),until:today()}]){const x=pkey(h.letters,h.numbers);if(!hk.has(x)){hk.add(x);hist.push(h)}}}
+    if(hist.length)upd.plateHistory=hist;
+    const files=[...(k.files||[])];for(const d of p.drop)for(const f of d.files||[])if(!files.some(x=>x.id===f.id))files.push(f);if(files.length!==(k.files||[]).length)upd.files=files;
+    upd.updatedAt=new Date().toISOString();
+    for(const d of p.drop){for(const c of V_REFCOLS)for(const r of (S[c]||[]).filter(r=>r.vehicleId===d.id)){await patch(c,r.id,{vehicleId:k.id});moved++}}
+    await patch('vehicles',k.id,upd);
+    for(const d of p.drop)await del('vehicles',d.id);
+  }
+  toast(`تم دمج ${plan.length} سيارة مكررة${moved?` · نُقل ${moved} سجل`:''}`);
+}
 function vVehicles(){
+  const dups=isAdmin()&&!readOnly?vDupGroups():[];
   const chips=[['all','الكل'],...Object.entries(STATUS).filter(([k])=>k!=='sold'||(SOLD.length&&!isBranchRole())).map(([k,v])=>[k,k==='sold'?`${v[0]} (${SOLD.length})`:v[0]])];
   return `<div class="head"><div><h2>السيارات</h2><p>${S.vehicles.length} سيارة${SOLD.length?` · ${SOLD.length} مُباعة`:''}${isBranchRole()?` · ${esc((S.branches.find(b=>b.id===myBranchId())||{}).name||'')}`:''}</p></div><div class="actions"><button class="btn" data-act="imp" data-id="vehicles" ${readOnly?'disabled':''}>استيراد Excel</button><button class="btn" data-act="csv" data-id="vehicles">تصدير Excel</button><button class="btn" data-act="qr-all">ملصقات QR</button><button class="btn primary" data-act="v-new" ${readOnly?'disabled':''}>+ إضافة سيارة</button></div></div>
   <div class="toolbar"><input class="search" id="vq" type="search" placeholder="ابحث باللوحة أو الموديل أو السائق" value="${esc(UI.vq)}" aria-label="بحث">
   ${S.branches.length?scopeSelects('vc','vb'):''}
   <div class="chips">${chips.map(([k,l])=>`<button class="chip${UI.vf===k?' on':''}" data-act="vf" data-id="${k}">${l}</button>`).join('')}</div></div>
+  ${dups.length?`<div class="banner" style="margin:0 0 12px"><div><b>سيارات مكررة (${dups.length}):</b> نفس رقم الهيكل أو الرقم التسلسلي مسجل لأكثر من لوحة: ${dups.map(a=>a.map(v=>esc(plateTxt(v))).join(' = ')).join('، ')}. غالباً تغيّرت لوحتها وأُضيفت كسيارة جديدة.</div><button class="btn primary" data-act="v-merge">دمجها</button></div>`:''}
   <div id="vlist"></div>`;
 }
 function scopeSelects(ck,bk){
@@ -1427,7 +1583,7 @@ function renderVList(){if(!$("#vlist"))return;
   $('#vlist').innerHTML=list.length?`<div class="vgrid">${list.map(v=>{const o=oilState(v);return `<button class="vcard" data-act="v-open" data-id="${v.id}">
     <div class="row">${plate(v)}${stPill(v.status)}</div>
     <div><h3>${esc(vName(v))} ${esc(v.year||'')}</h3><div class="meta">${brOf(v)?`<b style="color:var(--accent)">${esc(brLabel(v))}</b> · `:''}${esc(v.type||'')} · ${esc(v.color||'')}${v.status==='assigned'?` · مع <b>${esc(dName(v.driverId))}</b>`:''}</div></div>
-    <div class="docs">${expPill(v.istimaraExp,'استمارة')}${expPill(v.insuranceExp,'تأمين')}${expPill(v.fahasExp,'فحص')}${v.hasOpCard?expPill(v.opCardExp,'تشغيل'):''}</div>
+    <div class="docs">${expPill(v.istimaraExp,'استمارة')}${expPill(v.insuranceExp,'تأمين',v.insuranceStatus)}${expPill(v.fahasExp,'فحص',v.fahasStatus)}${v.hasOpCard?expPill(v.opCardExp,'تشغيل'):''}</div>
     ${(()=>{const ac=S.accidents.filter(a=>a.vehicleId===v.id),op=ac.filter(a=>a.status!=='closed').length;
       return `<div class="docs">${ac.length?`<span class="pill ${op?'p-crit':'p-idle'}">الحوادث: ${ac.length}${op?` · ${op} مفتوح`:''}</span>`:'<span class="pill p-ok">بدون حوادث</span>'}</div>`})()}
     <div class="facts"><div><span>العداد</span><b class="num">${km(odoInfo(v).km)}</b></div><div><span>الزيت</span><div class="bar ${o.sev==='ok'?'':o.sev}" title="${km(o.since)} من ${km(o.every)}"><i style="width:${Math.min(100,o.r*100)}%"></i></div></div></div>
@@ -1532,16 +1688,16 @@ function fuelFlags(){
 const fuelFlagPill=r=>r&&r.length?`<span class="pill p-crit" title="${esc(r.join(' · '))}">مشبوهة</span>`:'';
 
 /* ---------- أرشيف وثائق السيارة (اختياري) ---------- */
-const VDOCK={istimara:'الاستمارة',insurance:'وثيقة التأمين',fahas:'شهادة الفحص الدوري',opcard:'بطاقة التشغيل',other:'وثيقة أخرى'};
+const VDOCK={istimara:'الاستمارة',insurance:'وثيقة التأمين',fahas:'شهادة الفحص الدوري',opcard:'بطاقة التشغيل',sale:'مستند البيع',other:'وثيقة أخرى'};
 function vDocsBlock(v){
-  const fl=v.files||[];const can=!readOnly&&assetsCap&&!['driver','branch'].includes(myRole())&&v.status!=='sold';
+  const fl=v.files||[];const can=!readOnly&&assetsCap&&!['driver','branch'].includes(myRole())&&(v.status!=='sold'||isAdmin());
   return `<div><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px"><div class="h3" style="margin:0">الوثائق المرفقة (${fl.length})</div>${can?`<button class="btn sm" data-act="vd-add" data-id="${v.id}">📎 إرفاق وثيقة</button>`:''}</div>
   ${fl.length?`<div class="attl">${fl.map((a,k)=>attItem({...a,name:`${VDOCK[a.kind]||VDOCK.other}${a.note?' – '+a.note:''}`},can?`<button type="button" class="btn sm ghost" data-act="vd-del" data-id="${v.id}" data-k="${k}">حذف</button>`:'')).join('')}</div>`
    :`<div class="sub">اختياري: أرفق صورة الاستمارة أو وثيقة التأمين أو الفحص الدوري لتبقى في ملف السيارة وتُفتح من أي جهاز.</div>`}</div>`}
 function vDocForm(vid){
   const v=vById(vid);if(!v)return;
   formModal(`إرفاق وثيقة – ${plateTxt(v)}`,`
-    ${fld('نوع الوثيقة',sel('kind',Object.entries(VDOCK),'istimara'))}${fld('ملاحظة (اختياري)',inp('note','','text','placeholder="مثال: سارية حتى 1448/03"'))}
+    ${fld('نوع الوثيقة',sel('kind',Object.entries(VDOCK),v.status==='sold'?'sale':'istimara'))}${fld('ملاحظة (اختياري)',inp('note','','text','placeholder="مثال: سارية حتى 1448/03"'))}
     <div class="f w"><label>الملف <i class="rq">*</i></label><input type="file" id="f-vdf" accept="image/*,application/pdf"><div class="hint">صورة أو PDF. الصور تُضغط تلقائياً.</div></div>`,
   async f=>{const file=$('#f-vdf').files[0];if(!file)return 'اختر الملف';if(!assetsCap)return 'رفع الملفات غير متاح لحسابك';
     if(file.size>12*1048576)return 'حجم الملف كبير (الحد 12 م.ب)';
@@ -1560,10 +1716,15 @@ function sellForm(id){const v=vById(id);if(!v||!isAdmin())return;
   if(v.status==='assigned'){toast('استلم السيارة من السائق أولاً ثم سجّل البيع');return}
   formModal(`تسجيل بيع السيارة – ${plateTxt(v)}`,`<div class="f w"><div class="hint">بعد البيع تختفي السيارة من كل الصفحات والقوائم والتنبيهات، وتظهر في خانة «مُباعة» فقط مع كامل سجلها، ولا يمكن تسجيل أي عملية جديدة عليها.</div></div>
     ${fld('تاريخ البيع',inp('soldAt',today(),'date'),{req:1})}${fld('مبلغ البيع (ر.س)',inp('soldPrice','','number','min="0"'))}
-    ${fld('المشتري',inp('soldTo',''),{w:1})}${fld('ملاحظات',inp('soldNotes',''),{w:1})}`,
+    ${fld('المشتري',inp('soldTo',''),{w:1})}${fld('ملاحظات',inp('soldNotes',''),{w:1})}
+    ${assetsCap?`<div class="f w"><label>مستندات البيع (اختياري)</label><input type="file" id="f-sdf" accept="image/*,application/pdf" multiple><div class="hint">عقد البيع، أو ورقة التنازل، أو صورة الإيصال. صور أو PDF، وتقدر تختار أكثر من ملف.</div></div>`:''}`,
   async f=>{if(!f.soldAt)return 'الخانة «تاريخ البيع» إلزامية';
+    const sf=[...(($('#f-sdf')||{}).files||[])];if(sf.some(x=>x.size>12*1048576))return 'حجم أحد الملفات كبير (الحد 12 م.ب)';
     if(!(await askYesNo('تأكيد البيع',`تسجيل السيارة <b>${esc(plateTxt(v))}</b> كمُباعة؟ ستختفي من القوائم والتنبيهات.`,'نعم، سجّل البيع','إلغاء')))return 'لم يتم التسجيل';
-    await patch('vehicles',id,{status:'sold',statusBeforeSale:v.status||'available',soldAt:f.soldAt,soldPrice:+f.soldPrice||null,soldTo:f.soldTo.trim(),soldNotes:f.soldNotes.trim(),driverId:null,updatedAt:new Date().toISOString()})})}
+    let files=v.files||[];if(sf.length){const e=$('#ferr');if(e){e.style.color='var(--muted)';e.textContent='جارٍ رفع المستندات…'}files=[...files];
+      for(const file of sf){const isImg=/^image\//.test(file.type);const blob=isImg?await shrink(file):file;const r=await assetsCap.upload(blob,{type:isImg?'image/jpeg':'application/pdf'});
+        files.push({id:r.id,kind:'sale',note:'',name:file.name,type:isImg?'image/jpeg':'application/pdf',size:r.sizeBytes||file.size,at:new Date().toISOString(),by:ME&&ME.name||''})}}
+    await patch('vehicles',id,{...(sf.length?{files}:{}),status:'sold',statusBeforeSale:v.status||'available',soldAt:f.soldAt,soldPrice:+f.soldPrice||null,soldTo:f.soldTo.trim(),soldNotes:f.soldNotes.trim(),driverId:null,updatedAt:new Date().toISOString()})})}
 async function unsell(id){const v=vById(id);if(!v||!isAdmin())return;
   if(!(await askYesNo('إلغاء البيع',`إرجاع السيارة <b>${esc(plateTxt(v))}</b> إلى السيارات العاملة؟`,'نعم','لا')))return;
   try{await patch('vehicles',id,{status:v.statusBeforeSale&&v.statusBeforeSale!=='assigned'?v.statusBeforeSale:'available',soldAt:null,soldPrice:null,soldTo:'',soldNotes:'',updatedAt:new Date().toISOString()});closeModal();toast('أُعيدت السيارة للخدمة')}catch(e){}}
@@ -1573,7 +1734,7 @@ const vLink=id=>location.origin+location.pathname.replace(/index\.html$/,'')+'#v
 async function qrLib(){if(!window.qrcode)await loadScript('qr.js')}
 function qrData(text){const q=window.qrcode(0,'M');q.addData(text);q.make();return q.createDataURL(10,0)}
 function stickerHTML(v){
-  return `<div class="qrs"><div class="qrs-h">${logoImg(36)}<div class="qrs-co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="qrs-t">ملف السيارة الرقمي</div></div>
+  return `<div class="qrs"><div class="qrs-h">${coLogo()?`<div class="qrs-logo"><img src="${coLogo()}" alt=""></div>`:''}<div class="qrs-co">${esc(company()||'إدارة أسطول الشركة')}</div><div class="qrs-t">ملف السيارة الرقمي</div></div>
   <div class="qrs-b"><div class="qrs-pl">${plate(v,1)}</div><div class="qrs-vn">${esc(vName(v))}${v.year?' · '+esc(v.year):''}</div>
     <div class="qrs-q"><i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i><img src="${qrData(vLink(v.id))}" alt=""></div>
     <div class="qrs-cap"><b>امسح الرمز بكاميرا الجوال</b><span>الفحص الأسبوعي · ملف السيارة · التسليم والاستلام</span></div></div>
@@ -1696,7 +1857,7 @@ function vViol(){
 function vAcc(){
   const list=[...S.accidents].sort(byDate);const open=list.filter(a=>a.status!=='closed');
   const rep=sum(list,'repairCost'),ins=sum(list,'insurancePaid'),drv=sum(list,'driverCharge');
-  return `<div class="head"><div><h2>الحوادث</h2><p>${open.length} حادث مفتوح من ${list.length}</p></div><div class="actions"><button class="btn" data-act="csv" data-id="accidents">تصدير Excel</button><button class="btn primary" data-act="a-new" ${readOnly?'disabled':''}>+ تسجيل حادث</button></div></div>
+  return `<div class="head"><div><h2>الحوادث</h2><p>${open.length} حادث مفتوح من ${list.length}</p></div><div class="actions"><button class="btn" data-act="imp" data-id="accidents" ${readOnly?'disabled':''}>استيراد Excel</button><button class="btn" data-act="csv" data-id="accidents">تصدير Excel</button><button class="btn primary" data-act="a-new" ${readOnly?'disabled':''}>+ تسجيل حادث</button></div></div>
   ${list.length?`<section class="panel"><div class="panel-b stat3"><div><span>حوادث مفتوحة</span><b class="num" style="color:${open.length?'var(--crit)':'inherit'}">${open.length}</b></div><div><span>تكلفة الإصلاح</span><b class="num">${money(rep)}</b></div><div><span>تعويضات التأمين</span><b class="num">${money(ins)}</b></div><div><span>محمّل على السائقين</span><b class="num">${money(drv)}</b></div><div><span>صافي التكلفة على الشركة</span><b class="num" style="color:var(--accent)">${money(Math.max(0,rep-ins-drv))}</b></div></div></section>`:''}
   ${list.length?(()=>{const cs=list.map(claimOf);const grp=k=>cs.filter(c=>k.includes(c.stage));
     const sub=grp(['submitted','review']),apr=grp(['approved']),paid=grp(['paid']),rej=grp(['rejected']),none=list.filter((a,i)=>cs[i].stage==='none'&&(+a.repairCost||+a.estCost));
@@ -1714,9 +1875,9 @@ function vAcc(){
 function accForm(id,vid){
   const a=id?S.accidents.find(x=>x.id===id):{date:nowDT(),status:'reported',fault:0,vehicleId:vid||''};
   formModal(id?'تفاصيل الحادث':'تسجيل حادث',`
-    ${fld('السيارة',sel('vehicleId',vOpts(S.vehicles,'— اختر السيارة —'),a.vehicleId))}${fld('تاريخ ووقت الحادث',inp('date',a.date,'datetime-local'))}
+    ${fld('السيارة',sel('vehicleId',vOpts(S.vehicles,'— اختر السيارة —'),a.vehicleId))}${fld('تاريخ ووقت الحادث',inp('date',a.date&&String(a.date).length===10?a.date+'T00:00':a.date,'datetime-local'))}
     ${fld('السائق',sel('driverId',dOpts('— غير محدد —'),a.driverId),{w:1,hintId:'ah'})}
-    ${fld('موقع الحادث',inp('location',a.location,'text','placeholder="الطريق / الحي / المدينة"'))}${fld('رقم تقرير نجم أو المرور',inp('najmNo',a.najmNo,'text','dir="ltr"'))}
+    ${fld('موقع الحادث',inp('location',a.location,'text','placeholder="الطريق / الحي / المدينة"'))}${fld('رقم تقرير نجم أو المرور',inp('najmNo',a.najmNo,'text','dir="ltr"'))}${fld('رقم التقدير',inp('taqdeerNo',a.taqdeerNo||'','text','dir="ltr" placeholder="مثال: DA2805253179"'))}${fld('الإجراء المتخذ',inp('action',a.action||''))}
     ${fld('نسبة خطأ سائقنا',sel('fault',FAULT.map(x=>[x,x+'%']),a.fault??0))}${fld('حالة الملف',sel('status',Object.entries(ACST).map(([k,v])=>[k,v[0]]),a.status))}
     <div class="f w"><label class="inl"><input type="checkbox" name="injuries" id="f-injuries" ${a.injuries?'checked':''}> توجد إصابات</label></div>
     ${fld('وصف الحادث والأضرار',ta('description',a.description),{w:1})}
@@ -1746,7 +1907,7 @@ function accForm(id,vid){
     if(id&&a.claim&&a.claim.receipt)cl.receipt=a.claim.receipt;
     let photos;try{photos=await uploadPhotos();cl.attachments=await uploadAtt()}catch(e){return photoErr(e)}
     if(['submitted','review','approved'].includes(cl.stage)&&f.status!=='closed')f.status='claim';
-    const data={...(id?a:{}),claim:cl,vehicleId:v.id,date:f.date||nowDT(),driverId:f.driverId||null,location:f.location.trim(),najmNo:f.najmNo.trim(),fault:+f.fault,status:f.status,injuries:!!f.injuries,
+    const data={...(id?a:{}),claim:cl,vehicleId:v.id,date:f.date||nowDT(),driverId:f.driverId||null,location:f.location.trim(),najmNo:f.najmNo.trim(),taqdeerNo:String(f.taqdeerNo||'').trim(),action:String(f.action||'').trim(),fault:+f.fault,status:f.status,injuries:!!f.injuries,
       description:f.description.trim(),estCost:+f.estCost||0,repairCost:+f.repairCost||0,claimNo:cl.claimNo||'',insurancePaid:cl.stage==='paid'?(+cl.paidAmount||0):0,driverCharge:+f.driverCharge||0,photos,updatedAt:new Date().toISOString()};
     delete data.id;if(!id)data.demo=false;
     const aid=await put('accidents',id,data);
@@ -1916,8 +2077,8 @@ function openVehicle(id){
   const sold=v.status==='sold';const ro=readOnly||sold||isBranchRole();
   modal(`${vName(v)} ${v.year||''}`,`<div class="mb">
     ${sold?`<div class="banner" style="background:var(--idle-soft,#eee);border-color:transparent"><div><b>سيارة مُباعة</b> بتاريخ ${fmtD(v.soldAt)}${v.soldTo?` إلى ${esc(v.soldTo)}`:''}${v.soldPrice?` بمبلغ ${money(v.soldPrice)}`:''}. بياناتها محفوظة للاطلاع فقط، ولا تُسجَّل عليها عمليات جديدة.</div></div>`:''}
-    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">${plate(v,1)}<div style="display:grid;gap:4px">${stPill(v.status)}${brOf(v)?`<b style="color:var(--accent)">${esc(brLabel(v))}</b>`:''}<span class="sub">${esc(v.type||'')} · ${esc(v.color||'')}${v.vin?` · <span class="num">${esc(v.vin)}</span>`:''}${v.fuelCard?` · بطاقة الوقود <span class="num">${esc(v.fuelCard)}</span>`:''}</span>${v.status==='assigned'?`<span>العهدة لدى <b>${esc(dName(v.driverId))}</b> منذ ${fmtDT(lastOut(v.id)?.at)}</span>`:''}</div></div>
-    <div class="dgrid">${docs.map(([l,f,k])=>{const last=S.renewals.filter(r=>r.vehicleId===id&&r.doc===k).sort(byDate)[0];return `<div class="doc"><div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><span>${l}</span>${ro?'':`<button class="btn sm" data-act="r-new" data-id="${id}" data-doc="${k}">تجديد</button>`}</div>${expPill(v[f])}<b>${fmtD(v[f])}</b><span>${hijri(v[f])}</span>${last?`<span>آخر تجديد ${fmtD(last.date)} · ${money(last.cost)}</span>`:''}${(()=>{const fa=(v.files||[]).filter(x=>x.kind===k).pop();return fa?(/^image\//.test(fa.type)?`<button type="button" class="btn sm ghost" data-lb="${fa.id}" style="justify-self:start">📎 عرض المرفق</button>`:`<a class="btn sm ghost" href="_blob/${fa.id}" target="_blank" rel="noopener" style="justify-self:start">📎 فتح المرفق</a>`):''})()}</div>`}).join('')}</div>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">${plate(v,1)}<div style="display:grid;gap:4px">${stPill(v.status)}${brOf(v)?`<b style="color:var(--accent)">${esc(brLabel(v))}</b>`:''}<span class="sub">${esc(v.type||'')} · ${esc(v.color||'')}${v.vin?` · <span class="num">${esc(v.vin)}</span>`:''}${v.serialNo?` · الرقم التسلسلي <span class="num">${esc(v.serialNo)}</span>`:''}${(v.plateHistory||[]).length?` · اللوحة السابقة ${v.plateHistory.map(h=>esc(h.letters+' '+h.numbers)).join('، ')}`:''}${v.fuelCard?` · بطاقة الوقود <span class="num">${esc(v.fuelCard)}</span>`:''}</span>${v.status==='assigned'?`<span>العهدة لدى <b>${esc(dName(v.driverId))}</b> منذ ${fmtDT(lastOut(v.id)?.at)}</span>`:''}</div></div>
+    <div class="dgrid">${docs.map(([l,f,k])=>{const last=S.renewals.filter(r=>r.vehicleId===id&&r.doc===k).sort(byDate)[0];return `<div class="doc"><div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><span>${l}</span>${ro?'':`<button class="btn sm" data-act="r-new" data-id="${id}" data-doc="${k}">تجديد</button>`}</div>${expPill(v[f],'',{insuranceExp:v.insuranceStatus,fahasExp:v.fahasStatus}[f])}<b>${fmtD(v[f])}</b><span>${hijri(v[f])}</span>${k==='insurance'&&(v.insPolicyNo||v.insType||v.insProvider)?`<span>${[v.insType?'تأمين '+esc(v.insType):'',v.insProvider?esc(v.insProvider):'',v.insPolicyNo?'وثيقة <span class="num">'+esc(v.insPolicyNo)+'</span>':'',+v.insDeductible?'التحمل '+money(v.insDeductible):''].filter(Boolean).join(' · ')}</span>`:''}${last?`<span>آخر تجديد ${fmtD(last.date)} · ${money(last.cost)}</span>`:''}${(()=>{const fa=(v.files||[]).filter(x=>x.kind===k).pop();return fa?(/^image\//.test(fa.type)?`<button type="button" class="btn sm ghost" data-lb="${fa.id}" style="justify-self:start">📎 عرض المرفق</button>`:`<a class="btn sm ghost" href="_blob/${fa.id}" target="_blank" rel="noopener" style="justify-self:start">📎 فتح المرفق</a>`):''})()}</div>`}).join('')}</div>
     ${vDocsBlock(v)}
     <div class="kv" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"><div><span>قراءة العداد</span><b class="num">${km(odoInfo(v).km)}</b>${(()=>{const o=odoInfo(v);return o.date?`<small class="sub">من ${o.src} · ${fmtD(o.date)}</small>`:''})()}</div><div><span>منذ آخر تغيير زيت</span><b class="num">${km(o.since)}</b><div class="bar ${o.sev==='ok'?'':o.sev}"><i style="width:${Math.min(100,o.r*100)}%"></i></div></div><div><span>إجمالي المصروف عليها</span><b class="num">${money(sum(S.fuel.filter(f=>f.vehicleId===id),'cost')+sum(S.maintenance.filter(f=>f.vehicleId===id),'cost')+sum(S.renewals.filter(f=>f.vehicleId===id),'cost'))}</b></div></div>
     ${v.notes?`<div class="sub">${esc(v.notes)}</div>`:''}
@@ -1935,7 +2096,7 @@ function openVehicle(id){
 function vehicleForm(id){
   const v=id?vById(id):{status:'available',oilEveryKm:5000,type:'سيدان'};
   const stOpts=v.status==='assigned'?[['assigned','مع سائق (يتغير عند الاستلام)']]:v.status==='maintenance'?[['maintenance','في الورشة (يتغير عند الخروج)']]:[['available','متاحة'],['out','خارج الخدمة']];
-  formModal(id?'تعديل بيانات السيارة':'إضافة سيارة',`
+  formModal(id?'تعديل بيانات السيارة':'إضافة سيارة',`${aiBtn('istimara','قراءة الاستمارة من صورة')}
     <div class="sec">اللوحة</div>
     ${fld('حروف اللوحة',inp('plateLetters',v.plateLetters,'text','placeholder="مثال: ر س ا" required'),{req:1,hint:'الحروف المعتمدة: ا ب ح د ر س ص ط ع ق ك ل م ن ه و ى'})}
     ${fld('أرقام اللوحة',inp('plateNumbers',v.plateNumbers,'text','inputmode="numeric" maxlength="4" placeholder="1234" required'),{req:1})}
@@ -2007,7 +2168,7 @@ const readChecks=f=>{const miss=CHECKS.filter(([k])=>!f['c_'+k]);if(miss.length)
 const gaugeHTML=v=>`<div class="f"><label>مستوى الوقود</label><div class="gauge"><span>E</span><input type="range" name="fuel" id="f-fuel" min="0" max="8" value="${v??8}" oninput="this.parentNode.querySelector('b').textContent=this.value+'/8'"><span>F</span><b>${v??8}/8</b></div></div>`;
 /* ---------- رقم الهوية ---------- */
 const validNid=n=>{n=String(n||'');if(!/^[12]\d{9}$/.test(n))return false;let t=0;for(let i=0;i<10;i++){let d=+n[i];if(i%2===0){d*=2;if(d>9)d-=9}t+=d}return t%10===0};
-const maskNid=n=>n?'••••••'+String(n).slice(-4):'';
+const maskNid=n=>n?'\u2066••••••'+String(n).slice(-4)+'\u2069':''; // عزل اتجاه النص حتى تظهر النقاط يساراً والأرقام يميناً كما في الهوية
 let IDS={},IDS_LOADED=false;
 function myNidRef(){if(!ME)return '';if(myRole()==='driver'){const d=myDriverId();return d?'drv:'+d:''}if(ME.isOwner||!userCap)return 'owner';const iv=myInvite();return iv?iv.id:''}
 function nidOfRef(ref){if(!ref)return '';if(ref.startsWith('drv:')){const d=dById(ref.slice(4));return d&&d.idNo||''}return IDS[ref]||''}
@@ -2027,7 +2188,7 @@ function issuerSignHTML(){const ph=myPhone();
     ${ph?'':`<div class="f" style="max-width:320px;margin-bottom:8px"><label>رقم جوالك (يظهر في التوقيع) <i class="rq">*</i></label><input name="isphone" type="tel" dir="ltr" inputmode="tel" placeholder="05xxxxxxxx"></div>`}
     ${myNid()?'':`<div class="hint" style="margin-bottom:8px">لا يوجد رقم هوية مسجل لك، فسيُحفظ التوقيع بدونه. ${ME&&ME.isOwner?'أضفه مرة واحدة من الإعدادات ← المستخدمون والصلاحيات.':'اطلب من مدير النظام إضافته لحسابك.'}</div>`}
     <label class="inl sign-ok"><input type="checkbox" name="isign"> أقرّ أنا <b>${esc(ME&&ME.name||'')}</b>${ph?` (<span dir="ltr">${esc(ph)}</span>)`:''}${myNid()?` · هوية <span dir="ltr">${esc(maskNid(myNid()))}</span>`:''} بصحة بيانات هذا المحضر، وتُعدّ موافقتي الإلكترونية توقيعاً مني بصفتي مُصدر المحضر.</label></div>`}
-async function issuerOf(f){if(!f.isign)return 'وقّع المحضر: ضع علامة على إقرار مُصدر المحضر';
+async function issuerOf(f){{const md=myDriverId();if(md&&f.driverId===md)return 'لا يمكنك تحرير محضر تسليم أو استلام لنفسك. يحرره لك مستخدم آخر (مدير الحركة أو مشرف الفرع أو مدير النظام).'}if(!f.isign)return 'وقّع المحضر: ضع علامة على إقرار مُصدر المحضر';
   let ph=myPhone();if(!ph){ph=window.__normPhone?window.__normPhone(f.isphone||''):String(f.isphone||'').trim();if(!/^05\d{8}$/.test(ph))return 'اكتب رقم جوالك الصحيح للتوقيع (05xxxxxxxx)';try{await db.merge('seen',ME.id,{phone:ph})}catch(e){}}
   const nid=myNid();const ref=myNidRef();
   return {uid:ME&&ME.id||null,name:ME&&ME.name||'',phone:ph,...(nid?{nid4:nid.slice(-4),nidRef:ref}:{}),at:new Date().toISOString()}}
@@ -2040,7 +2201,7 @@ function handOutForm(vid){
     ${fld('السيارة',sel('vehicleId',[['','— اختر السيارة —'],...vOpts(av)],vid&&v0.id===vid?v0.id:''),{req:1})}
     ${fld('السائق المستلم',sel('driverId',dOpts('— اختر السائق —'),''),{hintId:'dh',req:1})}
     ${fld('تاريخ ووقت التسليم',inp('at',nowDT(),'datetime-local'),{req:1})}
-    ${fld('قراءة العداد',inp('odometer',vid&&v0.id===vid?v0.odometer:'','number','min="0" inputmode="numeric"'),{hintId:'oh',req:1,hint:vid&&v0.id===vid?`آخر قراءة مسجلة ${km(v0.odometer)}`:''})}
+    ${aiBtn('odometer','قراءة العداد من صورة')}${fld('قراءة العداد',inp('odometer',vid&&v0.id===vid?v0.odometer:'','number','min="0" inputmode="numeric"'),{hintId:'oh',req:1,hint:vid&&v0.id===vid?`آخر قراءة مسجلة ${km(v0.odometer)}`:''})}
     ${gaugeHTML(8)}${fld('اسم المسلِّم (موظف الحركة)',inp('by',''))}
     ${checksHTML()}
     ${fld('أضرار أو ملاحظات على الهيكل',ta('damages',''),{w:1})}${fld('ملاحظات / الغرض من العهدة',inp('notes',''),{w:1})}
@@ -2075,11 +2236,11 @@ function handInForm(vid){
     ${fld('السائق المُسلِّم',sel('driverId',dOpts('— اختر السائق —'),vid&&v0.id===vid?v0.driverId:''),{req:1,hintId:'idh'})}
     <div class="f w"><div class="hint" id="ih">${vid&&v0.id===vid?esc(info(v0)):'اختر السيارة لعرض بيانات التسليم السابقة'}</div></div>
     ${fld('تاريخ ووقت الاستلام',inp('at',nowDT(),'datetime-local'),{req:1})}
-    ${fld('قراءة العداد',inp('odometer',vid&&v0.id===vid?v0.odometer:'','number','min="0" inputmode="numeric"'),{req:1})}
+    ${aiBtn('odometer','قراءة العداد من صورة')}${fld('قراءة العداد',inp('odometer',vid&&v0.id===vid?v0.odometer:'','number','min="0" inputmode="numeric"'),{req:1})}
     ${gaugeHTML(lastOut(v0.id)?.fuel??8)}${fld('اسم المستلِم (موظف الحركة)',inp('by',''))}
     ${checksHTML(lastOut(v0.id)?.checks)}
     ${fld('أضرار جديدة أو ملاحظات',ta('damages',''),{w:1,hint:'اكتب أي ضرر لم يكن موجوداً عند التسليم ليُحمَّل على العهدة'})}
-    ${photoField([],'صور السيارة عند الاستلام')}
+    ${photoField([],'صور السيارة عند الاستلام')}${aiOn()?`<div class="f w"><button type="button" class="btn ai-btn" data-act="ai-dmg"><svg viewBox="0 0 24 24" aria-hidden="true">${NI.spark}</svg>${t('مقارنة صور الاستلام بصور التسليم')}</button><div id="ai-dmg"></div></div>`:''}
     ${issuerSignHTML()}`,
   async f=>{if(!f.vehicleId)return 'الخانة «السيارة» إلزامية';const v=vById(f.vehicleId);if(!v||v.status!=='assigned')return 'السيارة ليست مسلّمة حالياً';if(!f.driverId)return 'الخانة «السائق» إلزامية';if(!f.at)return 'الخانة «التاريخ والوقت» إلزامية';if(String(f.odometer).trim()==='')return 'الخانة «قراءة العداد» إلزامية';
     const o=lastOut(v.id);const odo=+f.odometer;const base=+(o?.odometer??v.odometer)||0;if(!(odo>=0))return 'أدخل قراءة العداد';if(odo<base)return `القراءة أقل من قراءة التسليم (${km(base)})`;
@@ -2121,7 +2282,7 @@ function maintForm(id,vid){
 }
 function fuelForm(id){
   const f0=id?S.fuel.find(x=>x.id===id):{date:today()};
-  formModal(id?'سجل تعبئة':'تعبئة وقود',`
+  formModal(id?'سجل تعبئة':'تعبئة وقود',`${aiBtn('fuel','قراءة فاتورة الوقود من صورة')}
     ${fld('السيارة',sel('vehicleId',vOpts(S.vehicles,'— اختر السيارة —'),f0.vehicleId))}
     ${fld('السائق',sel('driverId',dOpts('— بدون —'),f0.driverId))}
     ${fld('التاريخ',inp('date',f0.date,'date'))}${fld('قراءة العداد',inp('odometer',f0.odometer,'number','min="0"'))}
@@ -2137,7 +2298,7 @@ function fuelForm(id){
 }
 function violForm(id){
   const x=id?S.violations.find(y=>y.id===id):{date:today()+'T12:00',status:'unpaid',kind:VKINDS[0]};
-  formModal(id?'تفاصيل المخالفة':'تسجيل مخالفة',`
+  formModal(id?'تفاصيل المخالفة':'تسجيل مخالفة',`${id?'':aiBtn('violation','قراءة المخالفة من صورة')}
     ${fld('السيارة',sel('vehicleId',vOpts(S.vehicles,'— اختر السيارة —'),x.vehicleId))}
     ${fld('تاريخ ووقت المخالفة',inp('date',x.date&&x.date.length===10?x.date+'T12:00':x.date,'datetime-local'))}
     ${fld('السائق المسؤول',sel('driverId',dOpts('— غير محدد —'),x.driverId),{w:1,hintId:'vh'})}
@@ -2196,6 +2357,97 @@ async function uploadPhotos(){
 const photoErr=e=>e&&e.code==='too_large'?'إحدى الصور كبيرة جداً':e&&e.code==='quota_or_state'?'امتلأت مساحة الصور في النظام':'تعذر رفع الصور، تحقق من الاتصال وحاول مرة أخرى';
 const thumbsView=ids=>ids&&ids.length?`<div class="thumbs">${ids.map(id=>`<span class="th"><img src="_blob/${id}" data-lb="${id}" alt="صورة"></span>`).join('')}</div>`:'';
 function lightbox(id){const d=document.createElement('div');d.className='lb';d.innerHTML=`<img src="_blob/${id}" alt="">`;d.onclick=()=>d.remove();document.body.appendChild(d)}
+
+
+/* ---------- الذكاء الاصطناعي ---------- */
+const AIC=()=>{const a=S.settings.find(x=>x.id==='ai')||{};return {enabled:!!a.enabled,askRoles:a.askRoles||['admin','fleet'],readRoles:a.readRoles||['admin','fleet','branch','driver']}};
+const aiOn=()=>AIC().enabled&&myRole()==='admin'&&aiOk();
+const aiCanAsk=()=>aiOn();
+const AI_ERR={'no key':'مفتاح الذكاء الاصطناعي غير مضاف بعد في إعدادات الخادم','disabled':'الذكاء الاصطناعي غير مفعّل من الإعدادات','role':'ليست لديك صلاحية استخدام هذه الخاصية','not allowed':'ليست لديك صلاحية','timeout':'استغرق الرد وقتاً أطول من المسموح، حاول مرة أخرى أو اختصر السؤال','ai-off':'الذكاء الاصطناعي غير متاح حالياً في المنصة','plan':'الذكاء الاصطناعي غير متاح في باقتك الحالية','quota':'وصلت شركتك للحد اليومي لاستخدام الذكاء الاصطناعي، ويتجدد غداً','status':'اشتراك الشركة غير نشط','busy':'الخدمة مشغولة الآن، حاول بعد قليل'};
+async function aiCall(body){const tk=window.__fbIdToken&&await window.__fbIdToken();if(!tk)throw new Error('no token');
+  const r=await fetch('/.netlify/functions/ai',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tk},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(AI_ERR[j.error]||j.message||j.error||([502,504].includes(r.status)?AI_ERR.timeout:'HTTP '+r.status));return j}
+const blobB64=b=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.onerror=rej;fr.readAsDataURL(b)});
+async function imgB64(src,max=1280){const blob=src instanceof Blob?src:await (await fetch(src)).blob();const f=new File([blob],'i.jpg',{type:blob.type||'image/jpeg'});
+  const url=URL.createObjectURL(f);try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});const r=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight));
+    const c=document.createElement('canvas');c.width=Math.round(im.naturalWidth*r);c.height=Math.round(im.naturalHeight*r);c.getContext('2d').drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/jpeg',0.8).split(',')[1]}finally{URL.revokeObjectURL(url)}}
+const aiBtn=(kind,label)=>aiOn()?`<div class="f w ai-row"><button type="button" class="btn ai-btn" data-act="ai-read" data-id="${kind}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>${t(label)}</button><span class="hint" id="ai-st"></span></div>`:'';
+function setF(name,val,{onlyEmpty}={}){const el=$('#f-'+name);if(!el||val===undefined||val===null||val==='')return false;if(onlyEmpty&&el.value)return false;if(el.type==='datetime-local'&&/^\d{4}-\d{2}-\d{2}$/.test(String(val)))val=val+'T09:00';if(el.type==='date')val=String(val).slice(0,10);
+  if(el.tagName==='SELECT'){const o=[...el.options].find(o=>o.value===String(val)||o.textContent.trim()===String(val).trim())||[...el.options].find(o=>String(val).length>2&&o.textContent.includes(String(val)));if(!o)return false;el.value=o.value}else el.value=val;
+  el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));el.classList.add('ai-filled');setTimeout(()=>el.classList.remove('ai-filled'),2500);return true}
+function aiPlateVid(txt){if(!txt)return '';const p=parsePlate(String(txt));if(!p.numbers||!p.letters)return '';const k=pkey(p.letters,p.numbers);const v=S.vehicles.find(x=>pkey(x.plateLetters,x.plateNumbers)===k);return v?v.id:''}
+function aiPick(kind){const i=document.createElement('input');i.type='file';i.accept='image/*';i.setAttribute('capture','environment');
+  i.onchange=async()=>{const f=i.files[0];if(!f)return;const st=$('#ai-st');const b=$(`[data-act="ai-read"][data-id="${kind}"]`);
+    try{if(b)b.disabled=true;if(st)st.textContent=t('جارٍ قراءة الصورة…');const r=await aiCall({action:'read',kind,image:await imgB64(f)});const x=r.fields||{};
+      if(x.readable===false){if(st)st.textContent=t('الصورة غير واضحة أو ليست من النوع المطلوب');return}
+      let n=0;const S_=(k,v,o)=>{if(setF(k,v,o))n++};
+      if(kind==='fuel'){const vid=aiPlateVid(x.plate);if(vid)S_('vehicleId',vid,{onlyEmpty:true});S_('date',x.date);S_('liters',x.liters);S_('cost',x.amount);S_('station',x.station);S_('odometer',x.odometer)}
+      if(kind==='odometer'){S_('odometer',x.odometer);if(x.fuelEighths!=null)S_('fuel',x.fuelEighths)}
+      if(kind==='violation'){const vid=aiPlateVid(x.plate);if(vid)S_('vehicleId',vid,{onlyEmpty:true});S_('date',x.date);S_('ref',x.ref);S_('amount',x.amount);S_('kind',x.kind);if(x.location&&$('#f-notes')&&!$('#f-notes').value)S_('notes',x.location)}
+      if(kind==='istimara'){S_('istimaraExp',x.expiry);['make','model','year','vin','serialNo','color'].forEach(k=>S_(k,x[k],{onlyEmpty:true}));if(x.plate&&$('#f-plateNumbers')&&!$('#f-plateNumbers').value){const p=parsePlate(x.plate);if(p.numbers){S_('plateLetters',p.letters.join?p.letters.join(' '):p.letters);S_('plateNumbers',p.numbers)}}}
+      if(st)st.textContent=n?t('تمت تعبئة')+' '+n+' '+t('خانات، راجعها قبل الحفظ'):t('لم أجد بيانات واضحة في الصورة')}
+    catch(e){if(st)st.textContent=t('تعذرت القراءة')+': '+(e.message||'')}finally{if(b)b.disabled=false}};
+  i.click()}
+async function aiDamage(){const st=$('#ai-dmg');const vid=$('#f-vehicleId')&&$('#f-vehicleId').value;if(!st)return;
+  if(!vid){st.innerHTML=`<span class="err">${t('اختر السيارة أولاً')}</span>`;return}
+  const out=[...S.handovers].filter(h=>h.vehicleId===vid&&h.type==='out'&&(h.photos||[]).length).sort((a,b)=>String(b.at).localeCompare(String(a.at)))[0];
+  if(!out){st.innerHTML=`<span class="hint">${t('لا توجد صور في محضر التسليم السابق لهذه السيارة للمقارنة')}</span>`;return}
+  const afterSrc=[...PF.keep.map(id=>'_blob/'+id),...PF.files];if(!afterSrc.length){st.innerHTML=`<span class="err">${t('أضف صور الاستلام أولاً')}</span>`;return}
+  st.innerHTML=`<span class="hint">${t('جارٍ مقارنة الصور…')}</span>`;
+  try{const before=await Promise.all(out.photos.slice(0,5).map(id=>imgB64('_blob/'+id,900)));const after=await Promise.all(afterSrc.slice(0,5).map(x=>imgB64(x,900)));
+    const r=(await aiCall({action:'damage',before,after})).report||{};const cls=r.verdict==='clear'?'crit':r.verdict==='possible'?'warn':'ok';
+    const txt=`${r.summary||''}${(r.items||[]).length?' — '+r.items.map(i=>`${i.where}: ${i.what}${i.severity?' ('+i.severity+')':''}`).join('، '):''}`;
+    st.innerHTML=`<div class="ai-dmg ${cls}"><b>${r.verdict==='clear'?t('ضرر جديد محتمل بوضوح'):r.verdict==='possible'?t('يحتاج تأكيداً بالعين'):t('لا تظهر أضرار جديدة')}</b><p>${esc(r.summary||'')}</p>${(r.items||[]).length?`<ul>${r.items.map(i=>`<li><b>${esc(i.where)}:</b> ${esc(i.what)}${i.severity?` <span class="pill">${esc(i.severity)}</span>`:''}</li>`).join('')}</ul>`:''}${r.uncovered?`<small>${t('غير مصوّر')}: ${esc(r.uncovered)}</small>`:''}<small>${t('نتيجة آلية مساعدة، والقرار النهائي بالمعاينة.')}</small>${$('#f-damages')||$('#f-notes')?`<button type="button" class="btn sm" data-act="ai-dmg-note">${t('أضف للملاحظات')}</button>`:''}</div>`;
+    st.dataset.note='فحص آلي للصور: '+txt}
+  catch(e){console.warn('ai-dmg',e);st.innerHTML=`<span class="err">${t('تعذرت المقارنة')}: ${esc(e.message||String(e)||'')}</span>`}}
+/* المساعد */
+function aiData(){const L=[];const csv=(h,rows)=>{L.push(h.join(','));rows.forEach(r=>L.push(r.map(x=>String(x==null?'':x).replace(/[,\n]/g,' ')).join(',')))};
+  const pt=id=>{const v=vById(id);return v?plateTxt(v):''};const dn=id=>id?dName(id):'';const since=new Date(Date.now()-400*864e5).toISOString().slice(0,10);
+  {const per={};const add=(id,k,v)=>{(per[id]=per[id]||{fl:0,fc:0,mc:0,mn:0,vi:0,va:0,ac:0,ae:0,o:[]})[k]+=v};
+    S.fuel.filter(f=>String(f.date)>=since).forEach(f=>{add(f.vehicleId,'fl',+f.liters||0);add(f.vehicleId,'fc',+f.cost||0);if(+f.odometer>0)(per[f.vehicleId].o).push(+f.odometer)});
+    S.maintenance.filter(m=>String(m.date)>=since).forEach(m=>{add(m.vehicleId,'mc',+m.cost||0);add(m.vehicleId,'mn',1)});
+    S.violations.filter(x=>String(x.date)>=since).forEach(x=>{add(x.vehicleId,'vi',1);add(x.vehicleId,'va',+x.amount||0)});
+    S.accidents.forEach(a=>{add(a.vehicleId,'ac',1);add(a.vehicleId,'ae',+a.estCost||0)});
+    const vrow=v=>{const p=per[v.id]||{fl:0,fc:0,mc:0,mn:0,vi:0,va:0,ac:0,ae:0,o:[]};const km=p.o.length>1?Math.max(...p.o)-Math.min(...p.o):0;return {v,p,km,l100:km>200&&p.fl?Math.round(p.fl/km*1000)/10:''}};
+    const rows=S.vehicles.map(vrow);L.push(`# ملخصات محسوبة (من ${since} إلى اليوم)`);
+    csv(['اللوحة','الطراز','النوع','كم مقطوعة (من عدادات الوقود)','لترات','تكلفة الوقود','لتر/100كم','عدد الصيانات','تكلفة الصيانة','المخالفات','مبالغ المخالفات','الحوادث','تقدير أضرار الحوادث'],rows.map(({v,p,km,l100})=>[plateTxt(v),[v.make,v.model,v.year].filter(Boolean).join(' '),v.type,km,Math.round(p.fl),Math.round(p.fc),l100,p.mn,Math.round(p.mc),p.vi,Math.round(p.va),p.ac,Math.round(p.ae)]));
+    const byT={};rows.forEach(r=>{const k=r.v.type||'غير محدد';const x=byT[k]=byT[k]||{n:0,km:0,fl:0,fc:0,mc:0,mn:0,vi:0,ac:0,lk:0,ll:0};x.n++;x.km+=r.km;x.fl+=r.p.fl;if(r.km>200&&r.p.fl){x.lk+=r.km;x.ll+=r.p.fl}x.fc+=r.p.fc;x.mc+=r.p.mc;x.mn+=r.p.mn;x.vi+=r.p.vi;x.ac+=r.p.ac});
+    L.push('## حسب نوع السيارة');csv(['النوع','عدد السيارات','كم','لتر/100كم','تكلفة الوقود','تكلفة الصيانة','صيانة لكل سيارة','مخالفات','حوادث'],Object.entries(byT).map(([k,x])=>[k,x.n,x.km,x.lk>500?Math.round(x.ll/x.lk*1000)/10:'',Math.round(x.fc),Math.round(x.mc),Math.round(x.mc/x.n),x.vi,x.ac]));
+    const byM={};S.fuel.filter(f=>String(f.date)>=since).forEach(f=>{const m=String(f.date).slice(0,7);const x=byM[m]=byM[m]||{l:0,c:0};x.l+=+f.liters||0;x.c+=+f.cost||0});
+    L.push('## الوقود شهرياً');csv(['الشهر','لترات','التكلفة'],Object.keys(byM).sort().map(m=>[m,Math.round(byM[m].l),Math.round(byM[m].c)]));}
+  L.push('# السيارات');csv(['اللوحة','الشركة','الطراز','السنة','النوع','الحالة','الفرع','العداد','السائق الحالي','الاستمارة','التأمين','الفحص'],S.vehicles.map(v=>[plateTxt(v),v.make,v.model,v.year,v.type,(STATUS[v.status]||[v.status])[0],((bById(v.branchId)||{}).name||''),v.odometer,dn(v.driverId),v.istimaraExp,v.insuranceExp,v.fahasExp]));
+  L.push('# السائقون');csv(['الاسم','نشط','القسم'],S.drivers.map(d=>[d.name,d.active===false?'لا':'نعم',d.dept]));
+  L.push('# الوقود (آخر 13 شهراً)');csv(['التاريخ','اللوحة','السائق','لترات','المبلغ','العداد','المحطة'],S.fuel.filter(f=>String(f.date)>=since).map(f=>[String(f.date).slice(0,10),pt(f.vehicleId),dn(f.driverId),f.liters,f.cost,f.odometer,f.station]));
+  L.push('# الصيانة');csv(['التاريخ','اللوحة','النوع','المبلغ','العداد','الورشة','الوصف'],S.maintenance.filter(m=>String(m.date)>=since).map(m=>[String(m.date).slice(0,10),pt(m.vehicleId),m.kind||m.type,m.cost,m.odometer,m.shop||m.vendor,String(m.notes||m.description||'').slice(0,60)]));
+  L.push('# المخالفات');csv(['التاريخ','اللوحة','السائق','النوع','المبلغ','الحالة'],S.violations.filter(x=>String(x.date)>=since).map(x=>[String(x.date).slice(0,10),pt(x.vehicleId),dn(x.driverId),x.kind,x.amount,x.status]));
+  L.push('# الحوادث');csv(['التاريخ','اللوحة','السائق','نسبة الخطأ','تقدير الأضرار','الحالة','شركة التأمين'],S.accidents.map(a=>[String(a.date).slice(0,10),pt(a.vehicleId),dn(a.driverId),a.fault,a.estCost,a.status,(a.claim||{}).insurer]));
+  L.push('# محاضر التسليم والاستلام (آخر 13 شهراً)');csv(['التاريخ','النوع','اللوحة','السائق','العداد'],S.handovers.filter(h=>String(h.at)>=since).map(h=>[String(h.at).slice(0,10),h.type==='out'?'تسليم':'استلام',pt(h.vehicleId),dn(h.driverId),h.odometer]));
+  return L.join('\n')}
+function mdHtml(md){const lines=esc(md).split('\n');let o='',inT=false,inL=false;const inl=x=>x.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  for(let i=0;i<lines.length;i++){const l=lines[i];
+    if(/^\s*\|/.test(l)){if(/^\s*\|[\s:|-]+\|\s*$/.test(l))continue;const c=l.trim().replace(/^\||\|$/g,'').split('|').map(x=>inl(x.trim()));if(!inT){o+='<div class="tw"><table><thead><tr>'+c.map(x=>`<th>${x}</th>`).join('')+'</tr></thead><tbody>';inT=true}else o+='<tr>'+c.map(x=>`<td>${x}</td>`).join('')+'</tr>';continue}
+    if(inT){o+='</tbody></table></div>';inT=false}
+    if(/^\s*[-*•]\s+/.test(l)){if(!inL){o+='<ul>';inL=true}o+=`<li>${inl(l.replace(/^\s*[-*•]\s+/,''))}</li>`;continue}
+    if(inL){o+='</ul>';inL=false}
+    if(/^#{1,4}\s/.test(l)){o+=`<h4>${inl(l.replace(/^#+\s/,''))}</h4>`;continue}
+    if(l.trim())o+=`<p>${inl(l)}</p>`}
+  if(inT)o+='</tbody></table></div>';if(inL)o+='</ul>';return o}
+function vAi(){
+  if(!aiCanAsk())return `<div class="empty">${t(aiOk()?'المساعد الذكي متاح لمالك النظام ومدير النظام فقط، بعد تفعيله من الإعدادات.':'المساعد الذكي غير متاح في باقتك الحالية.')}</div>`;
+  const H=UI.aih||(UI.aih=[]);const SUG=['كم صرفنا على الوقود في آخر شهر؟ وأي سيارة الأعلى؟','قارن بين أنواع السيارات: أيها أفضل للعمل من حيث الاستهلاك والصيانة؟','من أكثر السائقين مخالفات هذه السنة؟','ما السيارات التي تنتهي وثائقها خلال 60 يوماً؟','لخّص حالة الحوادث المفتوحة'];
+  return `<div class="head"><div><h2>${t('المساعد الذكي')}</h2><p>${t('اسأل عن أي شيء في بيانات الأسطول، أو اطلب مقارنة.')}</p></div>${H.length?`<button class="btn ghost" data-act="ai-clear">${t('محادثة جديدة')}</button>`:''}</div>
+  <section class="panel ai-chat"><div class="panel-b" id="ai-log">${H.length?H.map(m=>`<div class="ai-m ${m.role}">${m.role==='user'?esc(m.content):mdHtml(m.content)}</div>`).join(''):`<div class="ai-sug">${SUG.map(q=>`<button type="button" class="btn" data-act="ai-sug">${esc(q)}</button>`).join('')}</div>`}${UI.aiBusy?`<div class="ai-m assistant ai-wait">${t('جارٍ التفكير…')}</div>`:''}</div>
+  <form class="ai-in" id="ai-form"><textarea id="ai-q" rows="2" placeholder="${t('اكتب سؤالك… مثال: قارن بين هايلكس وديماكس في الاستهلاك')}"></textarea><button class="btn primary" ${UI.aiBusy?'disabled':''}>${t('اسأل')}</button></form>
+  <p class="hint" style="margin-top:8px">${t('يجيب من بيانات النظام التي تملك صلاحية رؤيتها فقط. راجع الأرقام المهمة قبل الاعتماد عليها.')}</p></section>`}
+async function aiAsk(q){q=String(q||'').trim();if(!q||UI.aiBusy)return;const H=UI.aih||(UI.aih=[]);const hist=H.slice(-6);H.push({role:'user',content:q});UI.aiBusy=true;render();
+  try{const r=await aiCall({action:'ask',question:q,history:hist,data:aiData()});H.push({role:'assistant',content:r.answer||t('لم يصل رد')})}
+  catch(e){H.push({role:'assistant',content:'⚠ '+(e.message||t('تعذر الرد'))})}finally{UI.aiBusy=false;render();const lg=$('#ai-log');if(lg)lg.scrollTop=lg.scrollHeight}}
+function aiPanel(){const A=AIC();const adm=isAdmin()&&!readOnly;const RL=[['fleet','مدير الحركة'],['branch','مشرف الفرع'],['viewer','مسؤول الاطلاع']];
+  return `<section class="panel"><div class="panel-h"><h3>الذكاء الاصطناعي</h3><span>${A.enabled?'مفعّل':'غير مفعّل'}</span></div><div class="panel-b" style="display:grid;gap:10px">
+  <label class="inl"><input type="checkbox" data-ai-set="enabled" ${A.enabled?'checked':''} ${adm?'':'disabled'}> <b>تفعيل الذكاء الاصطناعي</b></label>
+  <div class="sub">قراءة الصور (فواتير الوقود، العداد، الاستمارة، المخالفات)، ومقارنة صور الاستلام بالتسليم، والمساعد الذكي.</div>${aiOk()?'':`<div class="sub" style="color:var(--warn)">${AI_PUB&&AI_PUB.aiEnabled==='on'?'غير متاح في باقتك الحالية. رقِّ باقتك من «الاشتراك والفواتير».':'غير متاح حالياً في المنصة.'}</div>`}
+  <div class="sub"><b style="font-weight:500;color:var(--ink)">المستخدمون:</b> مالك النظام ومدير النظام فقط. باقي الأدوار لا تظهر لهم هذه الخصائص.</div>
+  </div></section>`}
 
 /* ---------- PDF (محضر) ---------- */
 const loadScript=src=>new Promise((res,rej)=>{if(document.querySelector(`script[src="${src}"]`)){res();return}const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('load'));document.head.appendChild(s)});
@@ -2316,7 +2568,7 @@ function vDriver(){
   const toSign=drv?S.handovers.filter(h=>h.driverId===d.id&&!h.ack).sort((a,b)=>String(b.at).localeCompare(String(a.at))):[];
   const signed=drv?S.handovers.filter(h=>h.driverId===d.id&&h.ack).sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,5):[];
   const un=unreadCount();
-  return `<div class="drv">${drv?I18N.picker('lang'):''}<h2>${drv?t('مرحباً {name}',{name:esc(d.name)}):'الفحص الأسبوعي للسيارة'}</h2>
+  return `<div class="drv">${drv?`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">${I18N.picker('lang')}<a class="btn ghost sm" href="#account">${t('حسابي')}</a></div>`:''}<h2>${drv?t('مرحباً {name}',{name:esc(d.name)}):'الفحص الأسبوعي للسيارة'}</h2>
   ${drv?pushCard(true):''}
   ${drv?`<a class="drv-car drv-msg" href="#inbox"><span class="av">💬</span><span><b>${t('الرسائل')}</b><small>${un?t('لديك {n} رسالة جديدة',{n:un}):t('تواصل مع إدارة الأسطول')}</small></span>${un?`<span class="pill p-crit">${t('{n} جديدة',{n:un})}</span>`:''}</a>`:''}
   ${toSign.length?`<div class="sign-box"><div class="h3">✍️ ${t('محاضر بانتظار توقيعك ({n})',{n:toSign.length})}</div>${toSign.map(h=>`<button class="drv-car" data-act="h-sign" data-id="${h.id}">${plate(vById(h.vehicleId))}<span><b>${t(h.type==='out'?'محضر تسليم':'محضر استلام')}</b><small>${fmtDT(h.at)}</small></span><span class="pill p-warn">${t('راجع ووقّع')}</span></button>`).join('')}</div>`:''}
@@ -2346,7 +2598,7 @@ function inspForm(vid,mode){
   formModal(t('الفحص الأسبوعي'),`
     ${fld(t('السيارة'),sel('vehicleId',[['',t('— اختر السيارة —')],...vOpts(due)],vid||''),{req:1,w:drv})}
     ${drv?`<input type="hidden" name="driverId" value="${esc(myDriverId()||'')}">`:fld('السائق',sel('driverId',dOpts('— غير محدد —'),v0&&v0.status==='assigned'?v0.driverId:''))}
-    ${fld(t('التاريخ'),inp('date',today(),'date'),{req:1})}${fld(t('قراءة العداد'),inp('odometer','','number',`min="0" inputmode="numeric" placeholder="${t('اقرأ العداد الآن')}"`),{req:1,hintId:'ioh',hint:v0?t('آخر قراءة مسجلة {km}',{km:km(v0.odometer)}):''})}
+    ${fld(t('التاريخ'),inp('date',today(),'date'),{req:1})}${aiBtn('odometer','قراءة العداد من صورة')}${fld(t('قراءة العداد'),inp('odometer','','number',`min="0" inputmode="numeric" placeholder="${t('اقرأ العداد الآن')}"`),{req:1,hintId:'ioh',hint:v0?t('آخر قراءة مسجلة {km}',{km:km(v0.odometer)}):''})}
     ${INSP.map(([k,l,h])=>`<div class="f w insp-item"><label>${t(l)} <i class="rq">*</i><span class="sub"> – ${t(h)}</span></label>
       <div class="opt2"><label><input type="radio" name="it_${k}" value="ok"><span>${t('سليم')}</span></label><label class="bad"><input type="radio" name="it_${k}" value="bad"><span>${t('يحتاج متابعة')}</span></label></div>
       <input id="f-note_${k}" name="note_${k}" type="text" placeholder="${t('وش الملاحظة؟')}" hidden>
@@ -2549,7 +2801,7 @@ function mgmtPdf(){pdfFromSheets(mgmtSheets(),`تقرير ملخص الأسطو�
 
 
 /* ---------- global search ---------- */
-const plateKeys=v=>{if(!v)return '';const L=normLetters(v.plateLetters);const N=String(v.plateNumbers||'');const lat=L.map(c=>PL[c]||'').reverse().join('');return [L.join('')+N,N+L.join(''),lat+N,N+lat,N,plateTxt(v)].join(' ')};
+const plateKeys=v=>{if(!v)return '';const L=normLetters(v.plateLetters);const N=String(v.plateNumbers||'');const lat=L.map(c=>PL[c]||'').reverse().join('');return [L.join('')+N,N+L.join(''),lat+N,N+lat,N,plateTxt(v),...(v.plateHistory||[]).map(h=>normLetters(h.letters).join('')+h.numbers+' '+h.numbers)].join(' ')};
 const SXI={car:NI.car,user:NI.user,ticket:NI.ticket,alert:NI.alert,wrench:NI.wrench,fuel:NI.fuel,check:NI.check,swap:NI.swap,pin:NI.pin};
 function searchAll(q){
   const nq=nrm(toLat(q));if(nq.length<2&&!/^\d$/.test(nq))return [];
@@ -2595,7 +2847,7 @@ const IMP={
   vehicles:{label:'السيارات',f:[['plate','اللوحة كاملة',['اللوحة','رقم اللوحة','لوحة السيارة','plate','plate no','plate number','رقم اللوحه']],['plateLetters','حروف اللوحة',['حروف اللوحة','الحروف','letters']],['plateNumbers','أرقام اللوحة',['أرقام اللوحة','ارقام اللوحة','الأرقام','numbers']],
     ['make','الشركة الصانعة',['الشركة الصانعة','الصانع','الماركة','make','brand','manufacturer']],['model','الطراز',['الطراز','الموديل','model']],['year','سنة الصنع',['سنة الصنع','السنة','year','model year']],['color','اللون',['اللون','اللون الأساسي','color']],['type','النوع',['النوع','نوع المركبة','نوع السيارة','نوع الهيكل','type','vehicle type'],['التسجيل']],
     ['vin','رقم الهيكل',['رقم الهيكل','الهيكل','الشاصي','vin','chassis','chassis no']],['serialNo','الرقم التسلسلي',['الرقم التسلسلي','التسلسلي','serial','serial no','sequence number']],['odometer','العداد',['العداد','قراءة العداد','الممشى','odometer','mileage']],['istimaraExp','انتهاء الاستمارة',['انتهاء الاستمارة','تاريخ انتهاء الاستمارة','تاريخ انتهاء رخصة السير','الاستمارة','انتهاء رخصة السير','registration expiry'],['اصدار','حاله']],
-    ['insuranceExp','انتهاء التأمين',['انتهاء التأمين','تاريخ انتهاء التأمين','التأمين','insurance expiry'],['حاله']],['fahasExp','انتهاء الفحص',['انتهاء الفحص','الفحص الدوري','تاريخ انتهاء الفحص','inspection expiry'],['حاله']],['branch','الفرع',['الفرع','branch']],['city','المدينة',['المدينة','city']],['fuelCard','بطاقة الوقود',['بطاقة الوقود','رقم بطاقة الوقود','رقم البطاقة','fuel card','card no']],['opCardNo','رقم بطاقة التشغيل',['رقم بطاقة التشغيل','بطاقة التشغيل','operating card']],['opCardExp','انتهاء بطاقة التشغيل',['انتهاء بطاقة التشغيل','تاريخ انتهاء بطاقة التشغيل','operating card expiry']]],
+    ['insuranceExp','انتهاء التأمين',['انتهاء التأمين','تاريخ انتهاء التأمين','التأمين','insurance expiry'],['حاله']],['fahasExp','انتهاء الفحص',['انتهاء الفحص','الفحص الدوري','تاريخ انتهاء الفحص','inspection expiry'],['حاله']],['insuranceStatus','حالة التأمين',['حالة التأمين','حاله التامين','insurance status']],['fahasStatus','حالة الفحص',['حالة الفحص','حاله الفحص','inspection status']],['branch','الفرع',['الفرع','branch']],['city','المدينة',['المدينة','city']],['fuelCard','بطاقة الوقود',['بطاقة الوقود','رقم بطاقة الوقود','رقم البطاقة','fuel card','card no']],['opCardNo','رقم بطاقة التشغيل',['رقم بطاقة التشغيل','بطاقة التشغيل','operating card']],['opCardExp','انتهاء بطاقة التشغيل',['انتهاء بطاقة التشغيل','تاريخ انتهاء بطاقة التشغيل','operating card expiry']]],
     ex:['ر س ا 4821','','','تويوتا','هايلكس','2023','أبيض','بيك أب','MR0HA3CD5P0123456','123456789','48210','2027-03-14','2027-01-20','2026-11-15','الفرع الرئيسي','الدمام','7000123','','']},
   drivers:{label:'السائقون',f:[['name','الاسم',['الاسم','اسم السائق','اسم الموظف','name','driver','driver name']],['empNo','الرقم الوظيفي',['الرقم الوظيفي','رقم الموظف','employee no','emp no','id']],['dept','القسم',['القسم','الإدارة','dept','department']],
     ['phone','الجوال',['الجوال','رقم الجوال','الهاتف','phone','mobile']],['idNo','رقم الهوية / الإقامة',['رقم الهوية','الهوية','الإقامة','رقم الإقامة','iqama','national id']],['licenseNo','رقم الرخصة',['رقم الرخصة','رخصة القيادة','license no']],['licenseExp','انتهاء الرخصة',['انتهاء الرخصة','تاريخ انتهاء الرخصة','license expiry']]],
@@ -2609,7 +2861,25 @@ const IMP={
   maintenance:{label:'الصيانة',f:[['date','التاريخ',['التاريخ','تاريخ الصيانة','date']],['plate','اللوحة',['اللوحة','رقم اللوحة','plate']],['kind','نوع الصيانة',['نوع الصيانة','النوع','الخدمة','service','type']],['cost','التكلفة',['التكلفة','المبلغ','القيمة','الإجمالي','cost','amount','total']],
     ['odometer','العداد',['العداد','odometer','mileage']],['workshop','الورشة',['الورشة','الوكالة','مقدم الخدمة','workshop','vendor']],['details','التفاصيل',['التفاصيل','الوصف','ملاحظات','details','description']]],
     ex:['2026-08-30','ر س ا 4821','تغيير زيت','285','43900','بترومين','زيت 5W-30 وفلتر']},
+  accidents:{label:'الحوادث',f:[['najmNo','رقم الحادث (نجم)',['رقم الحادث','رقم تقرير نجم','رقم نجم','رقم التقرير','رقم البلاغ','najm','najm no','accident no']],['plate','اللوحة',['رقم اللوحة','اللوحة','لوحة السيارة','plate','plate no']],
+    ['date','تاريخ الحادث',['تاريخ الحادث','التاريخ','date','accident date']],['taqdeerNo','رقم التقدير',['رقم التقدير','رقم تقدير','التقدير','taqdeer','estimate no']],
+    ['insurer','شركة التأمين',['شركة المطالبة','شركة التأمين','المؤمن','جهة المطالبة','insurer','insurance company']],['amount','المبلغ',['المبلغ','مبلغ التقدير','قيمة التقدير','قيمة الأضرار','amount']],
+    ['driver','السائق',['السواق','السائق','اسم السائق','driver']],['action','الإجراء المتخذ',['الاجراء','الإجراء','الإجراء المتخذ','action']],
+    ['claimNo','رقم المطالبة',['رقم المطالبة','مرجع المطالبة','ملاحظات','claim no','claim number']],['location','موقع الحادث',['موقع الحادث','الموقع','مكان الحادث','location']],
+    ['description','الوصف',['الوصف','وصف الحادث','الأضرار','description']]],
+    ex:['JD270525479','ب ط س 4569','2025-05-28','DA2805253179','الوطنية','3220','الطيب','','C-01-2026-4-411-120966-001','الدمام','صدمة خلفية']},
+  insurance:{label:'بيانات التأمين',f:[['plate','اللوحة',['REG NO','رقم اللوحة','اللوحة','plate','plate no','registration no']],['vin','رقم الهيكل',['ENG CHA NO','رقم الهيكل','الشاصي','vin','chassis','chassis no']],['serialNo','الرقم التسلسلي',['VEHICLE SERIAL NO','الرقم التسلسلي','serial no','sequence number']],
+    ['policyNo','رقم الوثيقة',['POLICY NO','رقم الوثيقة','رقم البوليصة','policy','policy number']],['from','بداية التأمين',['DATE FROM','بداية التأمين','تاريخ البداية','من تاريخ','start date']],['to','نهاية التأمين',['DATE TO','نهاية التأمين','انتهاء التأمين','تاريخ الانتهاء','إلى تاريخ','end date','expiry date']],
+    ['premium','القسط',['PREMIUM','القسط','قسط التأمين','المبلغ','premium amount']],['lob','نوع التأمين',['LOB CODE','نوع التأمين','نوع الوثيقة','coverage','lob']],['deductible','مبلغ التحمل',['DEDUCTABLE AMOUNT','DEDUCTIBLE AMOUNT','مبلغ التحمل','التحمل','deductible']],
+    ['vehValue','قيمة المركبة',['VEH VAL','قيمة المركبة','vehicle value','sum insured']],['provider','شركة التأمين',['شركة التأمين','المؤمن','insurer','insurance company']],
+    ['make','الشركة الصانعة',['MAKE','الشركة الصانعة','الماركة','make']],['model','الطراز',['MODEL','الطراز','الموديل','model']],['year','سنة الصنع',['YEAR OF MNF','سنة الصنع','year']],['body','نوع الهيكل',['TYPE OF BODY','نوع الهيكل','body type']]],
+    ex:['ر ر ل 8480','MR2BE9B30P0021357','935336910','60228476','2026-11-05','2027-11-04','1457','TP','0','','','TOYOTA','YARIS','2023','SEDAN']},
 };
+const MAKE_AR={TOYOTA:'تويوتا',HYUNDAI:'هيونداي',KIA:'كيا',ISUZU:'ايسوزو',MITSUBISHI:'متسوبيشي',PEUGEOT:'بيجو',NISSAN:'نيسان',SUZUKI:'سوزوكي',CHEVROLET:'شيفروليه',FORD:'فورد',GMC:'جي ام سي',HONDA:'هوندا',MAZDA:'مازدا',CHANGAN:'شانجان',GEELY:'جيلي',MG:'ام جي',HINO:'هينو',FUSO:'فوسو',RENAULT:'رينو',VOLKSWAGEN:'فولكس واجن',LEXUS:'لكزس',JAC:'جاك',FOTON:'فوتون',DODGE:'دودج',JEEP:'جيب'};
+const insLob=x=>{const t=String(x||'').trim();return /^tp$|third|ضد/i.test(t)?'ضد الغير':/^co|comp|شامل/i.test(t)?'شامل':t};
+function matchDriver(name){const n=nrm(name);if(!n)return null;const ds=S.drivers;let m=ds.filter(d=>nrm(d.name)===n);if(m.length===1)return m[0].id;
+  const tk=String(name).trim().split(/\s+/).map(nrm).filter(x=>x.length>1);if(!tk.length)return null;
+  m=ds.filter(d=>{const w=String(d.name||'').split(/\s+/).map(nrm);return tk.every(x=>w.includes(x))});return m.length===1?m[0].id:null}
 let IS=null;
 const nrm=s=>String(s??'').toLowerCase().replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[\s_\-\.\/\\:()#]+/g,'');
 const toLat=s=>String(s??'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
@@ -2639,8 +2909,8 @@ function parsePlate(str){
   if(!ar.length){const lat=(s.toUpperCase().match(/[A-Z]/g)||[]);ar=lat.map(c=>LP[c]).filter(Boolean).reverse()}
   return {letters:ar.join(' '),numbers:nums?String(parseInt(nums,10)):''};
 }
-const pkey=(l,n)=>normLetters(l).join('')+'|'+(n?String(parseInt(toLat(n),10)):'');
-const pkeyLoose=(l,n)=>normLetters(l).sort().join('')+'|'+(n?String(parseInt(toLat(n),10)):'');
+const pkey=(l,n)=>normLetters(l).join('').replace(/ي/g,'ى')+'|'+(n?String(parseInt(toLat(n),10)):'');
+const pkeyLoose=(l,n)=>normLetters(l).map(x=>x==='ي'?'ى':x).sort().join('')+'|'+(n?String(parseInt(toLat(n),10)):'');
 function findVehicle(r){
   if(r.fuelCard){const c=String(toLat(r.fuelCard)).replace(/\s/g,'');const v=S.vehicles.find(x=>x.fuelCard&&String(x.fuelCard).replace(/\s/g,'')===c);if(v)return v}
   const p=r.plate?parsePlate(r.plate):{letters:(parsePlate(r.plateLetters||'').letters),numbers:String(toLat(r.plateNumbers||'')).replace(/\D/g,'')};
@@ -2677,7 +2947,7 @@ async function readImport(file){
   }catch(e){$('#imp-body').innerHTML='<div class="empty" style="color:var(--crit)">تعذرت قراءة الملف. تأكد أنه ملف Excel أو CSV صحيح.</div>'}
 }
 function autoMap(){
-  const def=IMP[IS.type];const saved=(S.settings.find(s=>s.id==='import_'+IS.type)||{}).map||{};IS.map={};const used=new Set();
+  const def=IMP[IS.type];const svd=S.settings.find(s=>s.id==='import_'+IS.type)||{};const saved=svd.map||{};if(IS.provider==null)IS.provider=svd.provider||'';IS.map={};const used=new Set();
   def.f.forEach(([k])=>{if(saved[k]){const i=IS.headers.findIndex(h=>h===saved[k]);if(i>=0&&!used.has(i)){IS.map[k]=i;used.add(i)}}});
   for(const pass of [3,1])def.f.forEach(([k,,syn,no])=>{if(IS.map[k]!=null)return;
     const ns=syn.map(nrm),bad=(no||[]).map(nrm);let best=-1;
@@ -2695,16 +2965,22 @@ function analyze(){
       if(!p.numbers||!p.letters)throw 'اللوحة غير مقروءة';
       const k=pkey(p.letters,p.numbers);if(seen.has(k))throw 'لوحة مكررة في الملف';seen.add(k);
       const data={plateLetters:p.letters,plateNumbers:String(parseInt(p.numbers,10))};
-      ['make','model','color','type','fuelCard','opCardNo'].forEach(f=>{if(String(o[f]).trim())data[f]=String(o[f]).trim()});if(data.type)data.type=normVType(data.type);if(String(o.vin).trim())data.vin=String(o.vin).trim().toUpperCase();if(String(o.serialNo).trim())data.serialNo=String(toLat(o.serialNo)).trim();
+      ['make','model','color','type','fuelCard','opCardNo'].forEach(f=>{if(String(o[f]).trim())data[f]=String(o[f]).trim()});{const g=guessVType(data.model,data.make),nt=data.type?normVType(data.type):'';data.type=g||(VTYPES.includes(nt)?nt:'');if(!data.type)delete data.type}if(String(o.vin).trim())data.vin=String(o.vin).trim().toUpperCase();if(String(o.serialNo).trim())data.serialNo=String(toLat(o.serialNo)).trim();
       if(String(o.year).trim())data.year=String(toNum(o.year)||o.year);if(toNum(o.odometer)!=null)data.odometer=toNum(o.odometer);
       for(const f of ['istimaraExp','insuranceExp','fahasExp','opCardExp']){if(String(o[f]).trim()){const d=toDate(o[f]);if(!d)throw `تاريخ غير مفهوم: ${o[f]}`;data[f]=d}}
       if(data.opCardExp||data.opCardNo)data.hasOpCard=true;
+      for(const f of ['insuranceStatus','fahasStatus']){const x=String(o[f]??'').trim();if(x&&x!=='-')data[f]=x}
       if(String(o.branch).trim())data._branch=[String(o.branch).trim(),String(o.city||'').trim()];
-      const ex=S.vehicles.find(x=>pkey(x.plateLetters,x.plateNumbers)===k);
+      const exId=(data.vin&&S.vehicles.find(x=>x.vin&&String(x.vin).trim().toUpperCase()===data.vin))||(data.serialNo&&S.vehicles.find(x=>x.serialNo&&String(toLat(x.serialNo)).trim()===data.serialNo))||null;
+      const exPl=S.vehicles.find(x=>pkey(x.plateLetters,x.plateNumbers)===k);
+      if(exId&&exPl&&exPl.id!==exId.id)throw `اللوحة ${p.letters} ${p.numbers} مسجلة لسيارة أخرى (رقم هيكل مختلف)`;
+      const ex=exId||exPl;
+      if(ex&&exId&&pkey(ex.plateLetters,ex.plateNumbers)!==k){data._plateFrom=plateTxt(ex)}
       res.desc=`${p.letters} ${p.numbers} ${data.make||ex?.make||''} ${data.model||ex?.model||''}`;
-      if(ex){const ch={};Object.entries(data).forEach(([f,v])=>{if(f==='_branch'){const b=S.branches.find(b=>b.name===v[0]);if(!b||ex.branchId!==b.id)ch._branch=v}else if(String(ex[f]??'')!==String(v))ch[f]=v});
-        res.target=ex.id;res.data=ch;res.st=Object.keys(ch).length?'upd':'dup';res.note=res.st==='upd'?'يُحدَّث: '+Object.keys(ch).map(f=>f==='_branch'?'الفرع':(def.f.find(x=>x[0]===f)||[,f])[1]).join('، '):'لا تغيير'}
-      else{const miss=[['model','الموديل'],['year','سنة الصنع'],['type','النوع'],['vin','رقم الهيكل'],['serialNo','الرقم التسلسلي']].filter(([k])=>!data[k]).map(x=>x[1]);if(miss.length)throw 'ناقص: '+miss.join('، ');if(data.odometer==null&&IS.map.odometer!=null)throw 'ناقص: العداد';res.st='new';res.data={status:'available',driverId:null,odometer:0,oilEveryKm:5000,lastOilKm:data.odometer||0,make:'',...data}}
+      if(ex){const ch={};Object.entries(data).forEach(([f,v])=>{if(f==='_plateFrom')return;if(f==='plateLetters'&&pkey(ex.plateLetters,'1')===pkey(v,'1'))return;if(f==='_branch'){const b=S.branches.find(b=>b.name===v[0]);if(!b||ex.branchId!==b.id)ch._branch=v}else if(String(ex[f]??'')!==String(v))ch[f]=v});
+        res.target=ex.id;res.data=ch;res.st=Object.keys(ch).length?'upd':'dup';res.note=res.st==='upd'?'يُحدَّث: '+Object.keys(ch).filter(f=>f!=='plateNumbers'&&f!=='plateLetters').map(f=>f==='_branch'?'الفرع':(def.f.find(x=>x[0]===f)||[,f])[1]).join('، '):'لا تغيير';
+        if(data._plateFrom){ch.plateHistory=[...(ex.plateHistory||[]),{letters:ex.plateLetters,numbers:String(ex.plateNumbers),until:today()}];res.note='تغيّرت اللوحة من '+data._plateFrom+' (نفس رقم الهيكل / التسلسلي)'+(Object.keys(ch).some(f=>!['plateLetters','plateNumbers','plateHistory'].includes(f))?' · '+res.note.replace(/^يُحدَّث: ?/,'يُحدَّث أيضاً: '):'')}}
+      else{const miss=[['model','الموديل'],['year','سنة الصنع'],['vin','رقم الهيكل'],['serialNo','الرقم التسلسلي']].filter(([k])=>!data[k]).map(x=>x[1]);if(miss.length)throw 'ناقص: '+miss.join('، ');if(data.odometer==null&&IS.map.odometer!=null)throw 'ناقص: العداد';res.st='new';if(!data.type)res.note='النوع غير محدد في الملف، أكمله من ملف السيارة';res.data={status:'available',driverId:null,odometer:0,oilEveryKm:5000,lastOilKm:data.odometer||0,make:'',...data}}
     }
     if(t==='drivers'){
       const name=String(o.name).trim();if(!name)throw 'الاسم فارغ';const emp=String(toLat(o.empNo)).trim();
@@ -2741,8 +3017,56 @@ function analyze(){
       res.desc=`${plateTxt(v)} · ${fmtD(date)} · ${MKINDS[kind]} · ${money(cost)}`;res.st=dup?'dup':'new';res.note=dup?'مسجل مسبقاً':'';
       res.data={vehicleId:v.id,kind,date,cost,odometer:toNum(o.odometer)||0,workshop:String(o.workshop||'').trim(),details:[String(o.details||'').trim(),kind==='other'?String(o.kind||'').trim():''].filter(Boolean).join(' · '),status:'done'};
     }
-    }catch(e){res.st='err';res.note=typeof e==='string'?e:'خطأ في السطر';res.desc=res.desc||Object.values(o).filter(x=>String(x).trim()).slice(0,3).join(' · ')}
+    if(t==='accidents'){
+      let v=findVehicle(o),newSold=null;
+      if(!v){const p=parsePlate(o.plate||'');if(!p.numbers||!p.letters)throw `اللوحة غير مقروءة (${o.plate||'—'})`;const k=pkey(p.letters,p.numbers);
+        v=SOLD.find(x=>pkey(x.plateLetters,x.plateNumbers)===k);
+        if(!v){if(!isAdmin())throw `السيارة غير مسجلة (${o.plate}) – يضيفها مدير النظام`;newSold={plateLetters:p.letters,plateNumbers:String(parseInt(p.numbers,10))};v={id:'',...newSold}}}
+      let date='';if(String(o.date).trim()){date=toDate(o.date,true);if(!date)throw `تاريخ غير مفهوم: ${o.date}`;if(date.length===10)date+='T00:00'}
+      const najm=String(toLat(o.najmNo)).trim(),tq=String(toLat(o.taqdeerNo)).trim();const k=najm||tq||[v.id,date].join('|');if(seen.has(k))throw 'حادث مكرر في الملف';seen.add(k);
+      const amt=toNum(o.amount)||0,raw=String(o.driver||'').trim();let drv=matchDriver(raw),how=drv?'السائق: '+dName(drv):'';
+      if(!drv&&date){const d2=driverAt(v.id,date);if(d2){drv=d2;how='السائق حسب محضر التسليم: '+dName(d2)}}
+      const insurer=String(o.insurer||'').trim(),claimNo=String(toLat(o.claimNo)).trim(),stage=(claimNo||insurer)?'submitted':'none';
+      const claim={stage,insurer,claimNo,claimAmount:amt,submittedAt:stage==='submitted'&&date?date.slice(0,10):''};
+      const desc=[String(o.description||'').trim(),raw&&!drv?'السائق في الملف: '+raw:''].filter(Boolean).join(' · ');
+      const data={vehicleId:v.id,date,driverId:drv||null,location:String(o.location||'').trim(),najmNo:najm,taqdeerNo:tq,action:String(o.action||'').trim(),fault:0,status:stage==='submitted'?'claim':'reported',injuries:false,description:desc,estCost:amt,repairCost:0,claim,claimNo,insurancePaid:0,driverCharge:0,photos:[]};
+      res.desc=`${plateTxt(v)} · ${date?fmtD(date.slice(0,10)):'بدون تاريخ'}${najm?' · '+najm:''}${amt?' · '+money(amt):''}`;
+      const ex=S.accidents.find(x=>(najm&&x.najmNo===najm)||(tq&&x.taqdeerNo===tq));
+      if(ex){const pd={};['date','driverId','location','najmNo','taqdeerNo','action','description'].forEach(f=>{if(!ex[f]&&data[f])pd[f]=data[f]});if(!(+ex.estCost)&&amt)pd.estCost=amt;
+        const ec=claimOf(ex);if(ec.stage==='none'&&stage!=='none'){pd.claim=claim;pd.claimNo=claimNo;if(ex.status==='reported')pd.status='claim'}
+        else if(ec.stage!=='none'){const nc={...ec};let ch=false;[['insurer',insurer],['claimNo',claimNo]].forEach(([f,x])=>{if(!nc[f]&&x){nc[f]=x;ch=true}});if(!(+nc.claimAmount)&&amt){nc.claimAmount=amt;ch=true}if(ch){pd.claim=nc;if(!ex.claimNo&&claimNo)pd.claimNo=claimNo}}
+        if(Object.keys(pd).length){res.st='upd';res.target=ex.id;res.data=pd;res.note='يُكمل الخانات الفاضية فقط: '+Object.keys(pd).length}else{res.st='dup';res.note='مسجل مسبقاً'}}
+      else{res.st='new';res.data=data;if(newSold){data._newSold=newSold;delete data.vehicleId}res.note=[newSold?'سيارة غير مسجلة: تُضاف تلقائياً في «المُباعة»':'',how,!date?'بدون تاريخ – أكمله من ملف الحادث':'',raw&&!drv?'لم يُعرف السائق «'+raw+'»':''].filter(Boolean).join(' · ')}
+    }
+    if(t==='insurance'){
+      const vin=String(o.vin||'').trim().toUpperCase(),ser=String(toLat(o.serialNo||'')).replace(/\D/g,'');
+      const v=findVehicle({plate:o.plate})||(vin&&S.vehicles.find(x=>String(x.vin||'').toUpperCase()===vin))||(ser&&S.vehicles.find(x=>String(x.serialNo||'')===ser))||null;
+      let nv=null;
+      if(!v){const p=parsePlate(o.plate||'');if(!p.numbers||!p.letters)throw `اللوحة غير مقروءة (${o.plate||'—'})`;if(!isAdmin())throw `السيارة غير مسجلة (${o.plate}) – يضيفها مدير النظام`;
+        const mk=String(o.make||'').trim(),md=String(o.model||'').trim();nv={plateLetters:p.letters,plateNumbers:String(parseInt(p.numbers,10)),make:MAKE_AR[mk.toUpperCase()]||mk,model:md,year:String(toNum(o.year)||o.year||''),vin,serialNo:ser,status:'available',driverId:null,odometer:0,oilEveryKm:5000,lastOilKm:0,notes:'أُضيفت من استيراد بيانات التأمين'};
+        const g=guessVType(md,mk);if(g)nv.type=g;else{const b={SEDAN:'سيدان',VAN:'فان',TRUCK:'شاحنة',SUV:'جيب / SUV',PICKUP:'بيك أب',BUS:'باص'}[String(o.body||'').trim().toUpperCase()];if(b&&VTYPES.includes(b))nv.type=b}}
+      if(nv){const to=toDate(o.to);if(!to)throw `تاريخ نهاية التأمين غير مفهوم: ${o.to||'فاضي'}`;const from=String(o.from).trim()?toDate(o.from):'';const pol=String(toLat(o.policyNo||'')).trim(),prem=toNum(o.premium)||0,type=insLob(o.lob),prov=String(o.provider||'').trim()||IS.provider||'';
+        const k='new|'+nv.plateLetters+nv.plateNumbers;if(seen.has(k))throw 'سطر مكرر في الملف';seen.add(k);
+        Object.assign(nv,{insuranceExp:to,insuranceFrom:from||'',insPolicyNo:pol,insType:type,insPremium:prem,insDeductible:toNum(o.deductible)||0,insuranceStatus:to>=today()?'ساري المفعول':'منتهي'},prov?{insProvider:prov}:{});
+        res.st='new';res.newVeh=nv;res.data={doc:'insurance',date:from||today(),cost:prem,newExp:to,provider:prov,ref:pol,notes:type?'تأمين '+type:'',source:'import'};
+        res.desc=`${nv.plateLetters} ${nv.plateNumbers} · ${nv.make} ${nv.model} · حتى ${fmtD(to)}${prem?' · '+money(prem):''}`;res.note='سيارة غير مسجلة: تُضاف للنظام مع تأمينها'+(nv.type?'':' · أكمل نوعها من ملف السيارة');throw null}
+      const to=toDate(o.to);if(!to)throw `تاريخ نهاية التأمين غير مفهوم: ${o.to||'فاضي'}`;const from=String(o.from).trim()?toDate(o.from):'';
+      const pol=String(toLat(o.policyNo||'')).trim(),prem=toNum(o.premium)||0,type=insLob(o.lob),prov=String(o.provider||'').trim()||IS.provider||'';
+      const k=v.id+'|'+pol+'|'+to;if(seen.has(k))throw 'سطر مكرر في الملف';seen.add(k);
+      const vp={insuranceFrom:from||'',insPolicyNo:pol,insType:type,insPremium:prem,insDeductible:toNum(o.deductible)||0,insuranceStatus:to>=today()?'ساري المفعول':'منتهي'};if(toNum(o.vehValue))vp.insVehValue=toNum(o.vehValue);if(prov)vp.insProvider=prov;
+      if(!v.insuranceExp||to>=v.insuranceExp)vp.insuranceExp=to;
+      {const p=parsePlate(o.plate||'');if(p.numbers&&p.letters&&pkey(p.letters,p.numbers)!==pkey(v.plateLetters,v.plateNumbers)&&!(v.plateHistory||[]).some(h=>pkey(h.letters,h.numbers)===pkey(p.letters,p.numbers))&&((vin&&String(v.vin||'').toUpperCase()===vin)||(ser&&String(v.serialNo||'')===ser))){
+        if(S.vehicles.some(x=>x.id!==v.id&&pkey(x.plateLetters,x.plateNumbers)===pkey(p.letters,p.numbers)))throw `اللوحة ${o.plate} مسجلة لسيارة أخرى`;
+        vp.plateLetters=p.letters;vp.plateNumbers=String(parseInt(p.numbers,10));res._plateFrom=plateTxt(v);vp.plateHistory=[...(v.plateHistory||[]),{letters:v.plateLetters,numbers:String(v.plateNumbers),until:today()}]}}
+      const ch={};Object.entries(vp).forEach(([f,x])=>{if(String(v[f]??'')!==String(x))ch[f]=x});
+      const hasR=S.renewals.some(r=>r.vehicleId===v.id&&r.doc==='insurance'&&r.newExp===to&&(!pol||r.ref===pol));
+      res.target=v.id;res.vpatch=ch;res.data=hasR?null:{vehicleId:v.id,doc:'insurance',date:from||today(),cost:prem,newExp:to,provider:prov,ref:pol,notes:type?'تأمين '+type:'',source:'import'};
+      res.desc=`${plateTxt(v)} · ${vName(v)} · حتى ${fmtD(to)}${prem?' · '+money(prem):''}`;
+      res.st=(Object.keys(ch).length||!hasR)?'upd':'dup';res.note=res.st==='dup'?'مسجل مسبقاً':[res._plateFrom?'تغيّرت اللوحة من '+res._plateFrom:'',ch.insuranceExp?'ينتهي '+fmtD(to)+' بدل '+(v.insuranceExp?fmtD(v.insuranceExp):'غير مسجل'):'',!hasR?'يُسجَّل التجديد'+(prem?' بقسط '+money(prem):''):'',pol?'وثيقة '+pol:''].filter(Boolean).join(' · ');
+    }
+    }catch(e){if(e!==null){res.st='err';res.note=typeof e==='string'?e:'خطأ في السطر';res.desc=res.desc||Object.values(o).filter(x=>String(x).trim()).slice(0,3).join(' · ')}}
     if(t==='fuel'&&res.st==='err'&&!String(res.o.plate||'').trim()&&!String(res.o.fuelCard||'').trim()&&!String(res.o.date||'').trim())return;
+    if(t==='accidents'&&res.st==='err'&&!String(res.o.plate||'').trim()&&!String(res.o.najmNo||'').trim()&&!String(res.o.date||'').trim())return;
     out.push(res);
   });
   return out;
@@ -2750,29 +3074,34 @@ function analyze(){
 function drawImport(){
   const def=IMP[IS.type];IS.res=analyze();const c={new:0,upd:0,dup:0,err:0};IS.res.forEach(r=>c[r.st]++);
   const ST={new:['جديد','p-ok'],upd:['تحديث','p-info'],dup:['مكرر / بلا تغيير','p-idle'],err:['خطأ','p-crit']};
-  $('#imp-body').innerHTML=`<div><div class="h3">مطابقة الأعمدة</div><div class="imp-map">${def.f.map(([k,l])=>`<div class="f"><label>${l}</label><select id="im-${k}" data-imk="${k}"><option value="">— لا يوجد —</option>${IS.headers.map((h,i)=>`<option value="${i}"${IS.map[k]===i?' selected':''}>${esc(h)}</option>`).join('')}</select></div>`).join('')}</div></div>
-    <div class="imp-sum">${Object.entries(c).map(([k,n])=>`<span class="pill ${ST[k][1]}">${ST[k][0]}: ${n}</span>`).join('')}<span class="sub">من ${IS.res.length} سطر</span></div>
+  $('#imp-body').innerHTML=`${IS.type==='insurance'?`<div class="f" style="max-width:340px;margin-bottom:10px"><label>شركة التأمين (إذا ما كانت في الملف)</label><input id="imp-prov" value="${esc(IS.provider||'')}" placeholder="مثال: التعاونية"></div>`:''}<div><div class="h3">مطابقة الأعمدة</div><div class="imp-map">${def.f.map(([k,l])=>`<div class="f"><label>${l}</label><select id="im-${k}" data-imk="${k}"><option value="">— لا يوجد —</option>${IS.headers.map((h,i)=>`<option value="${i}"${IS.map[k]===i?' selected':''}>${esc(h)}</option>`).join('')}</select></div>`).join('')}</div></div>
+    <div class="imp-sum">${Object.entries(c).map(([k,n])=>`<span class="pill ${ST[k][1]}">${ST[k][0]}: ${n}</span>`).join('')}<span class="sub">من ${IS.res.length} سطر</span></div>${(()=>{if(IS.type!=='vehicles'&&IS.type!=='insurance')return '';const inF=new Set(IS.res.filter(r=>r.target).map(r=>r.target));const miss=S.vehicles.filter(v=>v.status!=='sold'&&!inF.has(v.id));return miss.length?`<div class="banner" style="margin:8px 0"><div><b>${IS.type==='insurance'?'سيارات في النظام غير موجودة في ملف التأمين':'سيارات في النظام غير موجودة في الملف'} (${miss.length}):</b> ${miss.map(v=>esc(plateTxt(v))).join('، ')}. ${IS.type==='insurance'?'تأكد من تأمينها.':'لن تُحذف، وإذا بيعت سجّلها «مُباعة» من ملفها.'}</div></div>`:''})()}
     <div class="imp-tbl"><table><thead><tr><th>#</th><th>الحالة</th><th>السجل</th><th>ملاحظة</th></tr></thead><tbody>
     ${[...IS.res].sort((a,b)=>({err:0,new:1,upd:2,dup:3}[a.st]-{err:0,new:1,upd:2,dup:3}[b.st])).slice(0,400).map(r=>`<tr><td class="n">${r.i}</td><td><span class="pill ${ST[r.st][1]}">${ST[r.st][0]}</span></td><td>${esc(r.desc||'')}</td><td class="sub">${esc(r.note||'')}</td></tr>`).join('')}
     </tbody></table></div>`;
-  const go=$('#imp-go');const n=c.new+c.upd;go.disabled=!n||readOnly;go.textContent=n?`اعتماد الاستيراد (${n})`:'لا يوجد ما يُستورد';
+  const go=$('#imp-go');const n=c.new+c.upd;go.disabled=!IS.res.length||readOnly;go.textContent=n?`اعتماد الاستيراد (${n})`:'اعتماد (لا توجد تحديثات)';
+  {const pv=$('#imp-prov');if(pv)pv.onchange=()=>{IS.provider=pv.value.trim();drawImport()}}
   $('#imp-body').querySelectorAll('[data-imk]').forEach(s=>s.onchange=()=>{const k=s.dataset.imk;if(s.value==='')delete IS.map[k];else IS.map[k]=+s.value;drawImport()});
 }
 async function runImport(){
-  const todo=IS.res.filter(r=>r.st==='new'||r.st==='upd');if(!todo.length)return;
+  const todo=IS.res.filter(r=>r.st==='new'||r.st==='upd');const nDup=IS.res.filter(r=>r.st==='dup').length,nErr=IS.res.filter(r=>r.st==='err').length;
+  if(!todo.length){closeModal();toast(`تم الاستيراد · لا توجد تحديثات جديدة${nDup?` (${nDup} سجل مطابق للنظام)`:''}${nErr?` · ${nErr} سطر تعذرت قراءته`:''}`);return}
   const go=$('#imp-go');go.disabled=true;const pr=$('#imp-prog');let ok=0,fail=0;const brCache={};
   const branchId=async([name,city])=>{const k=name+'|'+city;if(brCache[k])return brCache[k];let b=S.branches.find(x=>x.name===name&&(!city||x.city===city))||S.branches.find(x=>x.name===name);
     if(!b){const id=await put('branches',null,{name,city:city||'',manager:'',phone:'',demo:false,updatedAt:new Date().toISOString()});brCache[k]=id;return id}brCache[k]=b.id;return b.id};
   const col=IS.type;const odoUp={};
   for(let i=0;i<todo.length;i++){const r=todo[i];pr.textContent=`جارٍ الحفظ ${i+1} من ${todo.length}…`;
     try{const d={...r.data};if(d._branch){d.branchId=await branchId(d._branch);delete d._branch}
+      if(d._newSold){const k=pkey(d._newSold.plateLetters,d._newSold.plateNumbers);if(!brCache['sold|'+k]){const ex=SOLD.find(x=>pkey(x.plateLetters,x.plateNumbers)===k);brCache['sold|'+k]=ex?ex.id:await put('vehicles',null,{...d._newSold,status:'sold',driverId:null,odometer:0,soldAt:'',notes:'أُضيفت تلقائياً من استيراد الحوادث (سيارة مُباعة)',demo:false,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()})}d.vehicleId=brCache['sold|'+k];delete d._newSold}
       d.updatedAt=new Date().toISOString();
+      if(col==='insurance'&&r.newVeh){const vid=await put('vehicles',null,{...r.newVeh,demo:false,createdAt:d.updatedAt,updatedAt:d.updatedAt});await put('renewals',null,{...d,vehicleId:vid,demo:false,createdAt:d.updatedAt});ok++;continue}
+      if(col==='insurance'){if(r.data){d.demo=false;d.createdAt=d.updatedAt;await put('renewals',null,d)}if(Object.keys(r.vpatch||{}).length)await patch('vehicles',r.target,{...r.vpatch,updatedAt:d.updatedAt});ok++;continue}
       if(r.st==='new'){d.demo=false;d.createdAt=d.updatedAt;await put(col,null,d)}else await patch(col,r.target,d);
       if((col==='fuel'||col==='maintenance')&&d.odometer)odoUp[d.vehicleId]=Math.max(odoUp[d.vehicleId]||0,d.odometer);
       ok++}catch(e){fail++;if(readOnly)break}}
   for(const [vid,o] of Object.entries(odoUp)){const v=vById(vid);if(v&&o>(+v.odometer||0))try{await patch('vehicles',vid,{odometer:o})}catch(e){}}
-  try{const m={};Object.entries(IS.map).forEach(([k,i])=>m[k]=IS.headers[i]);await put('settings','import_'+col,{map:m,updatedAt:new Date().toISOString()})}catch(e){}
-  closeModal();toast(`تم استيراد ${ok} سجل${fail?` · تعذر ${fail}`:''}`);
+  try{const m={};Object.entries(IS.map).forEach(([k,i])=>m[k]=IS.headers[i]);await put('settings','import_'+col,{map:m,...(col==='insurance'?{provider:IS.provider||''}:{}),updatedAt:new Date().toISOString()})}catch(e){}
+  closeModal();{const nN=todo.filter(r=>r.st==='new').length,nU=todo.length-nN;toast(`تم الاستيراد: ${nN?nN+' جديد':''}${nN&&nU?' · ':''}${nU?nU+' تحديث':''}${nDup?` · ${nDup} بلا تغيير`:''}${fail?` · تعذر ${fail}`:''}${nErr?` · ${nErr} سطر فيه خطأ`:''}`)}
 }
 async function importTemplate(){
   if(!dl){toast('التنزيل متاح عند فتح النظام من Claude');return}
@@ -2789,7 +3118,7 @@ async function importTemplate(){
 function csv(rows){return '﻿'+rows.map(r=>r.map(c=>{const s=String(c??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(',')).join('\r\n')}
 async function exportCSV(kind){
   let rows,name;
-  if(kind==='vehicles'){name='السيارات';rows=[['اللوحة','المدينة','الفرع','الصانع','الطراز','السنة','النوع','اللون','رقم الهيكل','بطاقة الوقود','الحالة','السائق','العداد','انتهاء الاستمارة','انتهاء التأمين','انتهاء الفحص','بطاقة التشغيل','انتهاء بطاقة التشغيل','آخر تغيير زيت']].concat(S.vehicles.map(v=>[plateTxt(v),brOf(v)?.city||'',brOf(v)?.name||'',v.make,v.model,v.year,v.type,v.color,v.vin,v.fuelCard||'',STATUS[v.status||'available'][0],v.driverId?dName(v.driverId):'',v.odometer,v.istimaraExp,v.insuranceExp,v.fahasExp,v.hasOpCard?(v.opCardNo||'نعم'):'',v.hasOpCard?v.opCardExp:'',v.lastOilKm]))}
+  if(kind==='vehicles'){name='السيارات';rows=[['اللوحة','المدينة','الفرع','الصانع','الطراز','السنة','النوع','اللون','رقم الهيكل','الرقم التسلسلي','بطاقة الوقود','الحالة','السائق','العداد','انتهاء الاستمارة','انتهاء التأمين','انتهاء الفحص','بطاقة التشغيل','انتهاء بطاقة التشغيل','آخر تغيير زيت']].concat(S.vehicles.map(v=>[plateTxt(v),brOf(v)?.city||'',brOf(v)?.name||'',v.make,v.model,v.year,v.type,v.color,v.vin,v.serialNo||'',v.fuelCard||'',STATUS[v.status||'available'][0],v.driverId?dName(v.driverId):'',v.odometer,v.istimaraExp,v.insuranceExp,v.fahasExp,v.hasOpCard?(v.opCardNo||'نعم'):'',v.hasOpCard?v.opCardExp:'',v.lastOilKm]))}
   if(kind==='drivers'){name='السائقون';rows=[['الاسم','الرقم الوظيفي','القسم','الجوال','رقم الرخصة','انتهاء الرخصة','الحالة']].concat(S.drivers.map(d=>[d.name,d.empNo,d.dept,d.phone,d.licenseNo,d.licenseExp,d.active===false?'موقوف':'نشط']))}
   if(kind==='handovers'){name='سجل العهد';rows=[['الحركة','اللوحة','السائق','التاريخ','العداد','الوقود من 8','المسافة','النواقص','الأضرار','موظف الحركة']].concat([...S.handovers].sort((a,b)=>String(b.at).localeCompare(String(a.at))).map(h=>[h.type==='out'?'تسليم':'استلام',plateTxt(vById(h.vehicleId)),dName(h.driverId),h.at,h.odometer,h.fuel,h.distance??'',CHECKS.filter(([k])=>h.checks&&h.checks[k]===false).map(c=>c[1]).join('، '),h.damages,h.by]))}
   if(kind==='maintenance'){name='الصيانة';rows=[['التاريخ','اللوحة','النوع','العداد','التكلفة','الورشة','التفاصيل','الحالة']].concat([...S.maintenance].sort(byDate).map(m=>[m.date,plateTxt(vById(m.vehicleId)),MKINDS[m.kind]||m.kind,m.odometer,m.cost,m.workshop,m.details,m.status==='open'?'في الورشة':'منتهية']))}
@@ -2850,7 +3179,7 @@ document.addEventListener('click',e=>{
     case 'msg-unref':MSGUI.ref=null;render();break;
     case 'msg-ref':openRef({col:b.dataset.col,id:b.dataset.id});break;
     case 'msg-about':msgAbout(b.dataset.col,id,b.dataset.to);break;
-    case 'u-rm':if(isAdmin())confirmBox('حذف هذا المستخدم؟ يفقد صلاحية الدخول للنظام فوراً.','حذف',()=>del('invites',id));break;
+    case 'u-rm':if(isAdmin())confirmBox('حذف هذا المستخدم؟ يفقد صلاحية الدخول للنظام فوراً.','حذف',async()=>{const iv=S.invites.find(x=>x.id===id)||{};for(const k of [iv.eKey,iv.uKey])if(k){try{await del('logins',k)}catch(e){}}await del('invites',id)});break;
     case 'u-add':setRole(id,{role:'viewer'}).then(()=>{$('#u-res').innerHTML=''});break;
     case 'u-del':confirmBox('إلغاء صلاحية هذا المستخدم؟ يرجع «مسؤول اطلاع» فقط.','إلغاء الصلاحية',()=>del('roles',id));break;
     case 'rtype':UI.rtype=id;render();break;
@@ -2858,6 +3187,19 @@ document.addEventListener('click',e=>{
     case 'menu-close':$('#side').classList.remove('open');break;
     case 'backup':exportBackup();break;
     case 'aud-reload':AUD=null;render();break;
+    case 'mode':{const toD=myRole()!=='driver';try{localStorage.setItem('fleet-mode',toD?'driver':'')}catch(e){}location.hash=toD?'#driver':'#dashboard';render();break}
+    case 'ai-read':aiPick(id);break;
+    case 'ai-dmg':aiDamage();break;
+    case 'ai-dmg-note':{const n=$('#f-damages')||$('#f-notes'),st=$('#ai-dmg');if(n&&st){n.value=(n.value?n.value+'\n':'')+st.dataset.note;toast(t('أُضيف للملاحظات'))}break}
+    case 'ai-sug':aiAsk(b.textContent);break;
+    case 'ai-clear':UI.aih=[];render();break;
+    case 'acc-email':accIdForm('email');break;
+    case 'acc-user':accIdForm('user');break;
+    case 'acc-pass':accPassForm();break;
+    case 'dash-vf':UI.vf=b.dataset.id;location.hash='#vehicles';break;
+    case 'theme':themePicker();break;
+    case 'theme-set':try{localStorage.setItem('fleet-theme',b.dataset.th)}catch(e){}applyTheme();themePicker();break;
+    case 'fs-set':try{localStorage.setItem('fleet-fs',b.dataset.fs)}catch(e){}applyTheme();themePicker();break;
     case 'logout':confirmBox('تسجيل الخروج من النظام؟','خروج',()=>window.__fbSignOut&&window.__fbSignOut());break;
     case 'copy-link':{const i=$('#inv-link');if(i){i.select();try{navigator.clipboard.writeText(i.value)}catch(err){}toast('تم نسخ الرابط')}}break;
     case 'import-data':if(isAdmin())importForm();break;
@@ -2928,6 +3270,7 @@ document.addEventListener('click',e=>{
     case 'hr-send':if(isAdmin()&&W())hrSendNow();break;
     case 'my-nid':if(isAdmin())myNidForm();break;
     case 'v-sell':if(isAdmin()&&W())sellForm(id);break;
+    case 'v-merge':if(isAdmin()&&W())vMergeDups().catch(e=>toast('تعذر الدمج: '+(e.message||e)));break;
     case 'v-unsell':if(isAdmin()&&W())unsell(id);break;
     case 'f-del':confirmBox('حذف سجل التعبئة؟','حذف',()=>del('fuel',id));break;
     case 'x-new':if(W())violForm();break;

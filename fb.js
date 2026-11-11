@@ -22,20 +22,28 @@ function swPost(msg) { try { navigator.serviceWorker && navigator.serviceWorker.
 
 /* ---------- واجهة الدخول ---------- */
 const AUTH_CSS = `
-#auth{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:radial-gradient(1200px 700px at 80% 10%,#13755a 0%,#0E5A44 45%,#0a3d2f 100%);font-family:var(--f-body,"IBM Plex Sans Arabic",sans-serif)}
+#auth{position:fixed;inset:0;z-index:50;overflow:auto;background:var(--surface,#fff);color:var(--ink,#16302A);font-family:var(--f-body,"IBM Plex Sans Arabic",sans-serif)}
 #auth[hidden]{display:none}
-#auth .card{width:min(420px,100%);background:var(--surface,#fff);color:var(--ink,#15201B);border-radius:18px;padding:26px 24px;box-shadow:0 30px 70px rgba(0,0,0,.35);display:grid;gap:14px}
-#auth .lg{display:flex;align-items:center;gap:12px}
-#auth .lg b{font:700 20px var(--f-display,"Readex Pro",sans-serif)}
-#auth .lg small{display:block;color:var(--muted,#5A6862);font-size:13px}
-#auth .mk{border:2px solid var(--acc,#0E5A44);color:var(--acc,#0E5A44);border-radius:7px;padding:3px 8px;font:600 12px "IBM Plex Mono",monospace;letter-spacing:.08em}
-#auth h2{margin:4px 0 0;font:600 18px var(--f-display,"Readex Pro",sans-serif)}
-#auth label{display:grid;gap:5px;font-size:13px;color:var(--muted,#5A6862)}
-#auth input{font:inherit;font-size:15px;padding:11px 12px;border:1px solid var(--line,#D6DDD9);border-radius:10px;background:var(--surface-2,#F6F8F7);color:inherit}
-#auth input:focus{outline:2px solid var(--acc,#0E5A44);outline-offset:1px}
-#auth button.pri{font:600 15px var(--f-display,"Readex Pro",sans-serif);padding:12px;border:0;border-radius:10px;background:var(--acc,#0E5A44);color:#fff;cursor:pointer}
+#auth .aw{min-height:100%;display:grid;grid-template-columns:minmax(0,1fr) min(560px,100%)}
+#auth .aside{background:#173B33;color:#E9E2D2;padding:56px 64px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+#auth .amk{display:flex;gap:14px;align-items:center}#auth .amk i{width:52px;height:52px;border-radius:14px;background:#EDE6D6;color:#173B33;display:grid;place-items:center;font:600 22px var(--f-display,"Alexandria",sans-serif);font-style:normal;overflow:hidden}#auth .amk i img{width:100%;height:100%;object-fit:contain;background:#fff;padding:4px;box-sizing:border-box}
+#auth .amk b{display:block;font:500 19px var(--f-display,"Alexandria",sans-serif);color:#fff}#auth .amk small{color:#AFC3BA;font-size:14px}
+#auth .ah{margin:auto 0 16px;font:500 40px/1.5 var(--f-display,"Alexandria",sans-serif);color:#fff;max-width:560px}
+#auth .ap{margin:0;color:#B9CCC3;font-size:17px;line-height:1.8;max-width:520px}#auth .aside hr{border:0;width:64px;height:2px;background:#A88653;margin:28px 0 0}
+#auth .card{background:var(--surface,#fff);padding:48px 60px;display:flex;flex-direction:column;gap:14px;min-height:100vh;box-sizing:border-box}
+#auth .card>.lang-pick{justify-content:flex-start}
+#auth .card .body{margin:auto 0;display:grid;gap:14px;width:100%;max-width:440px}
+#auth .lg{display:none;align-items:center;gap:12px}#auth .lg i{width:42px;height:42px;border-radius:12px;background:#173B33;color:#EDE6D6;display:grid;place-items:center;font:600 19px var(--f-display,"Alexandria",sans-serif);font-style:normal;overflow:hidden}#auth .lg i img{width:100%;height:100%;object-fit:contain;background:#fff;padding:3px;box-sizing:border-box}
+#auth .lg b{font:500 17px var(--f-display,"Alexandria",sans-serif)}#auth .lg small{display:block;color:var(--muted,#6F7B75);font-size:13px}
+#auth h2{margin:0;font:500 30px var(--f-display,"Alexandria",sans-serif)}
+#auth .sub2{margin:-6px 0 10px;color:var(--muted,#6F7B75);font-size:15px;line-height:1.7}
+#auth label{display:grid;gap:7px;font-size:14px;font-weight:500;color:var(--ink,#16302A);position:relative}
+#auth input{font:inherit;font-size:16px;height:52px;padding:0 16px;border:1px solid #D3D9D4;border-radius:12px;background:var(--surface,#fff);color:inherit;box-sizing:border-box;width:100%}
+#auth input:focus{outline:0;border-color:#173B33;box-shadow:0 0 0 3px #DCE6E1}
+#auth .kind{position:absolute;left:14px;bottom:15px;font-size:12.5px;color:var(--muted,#6F7B75);font-weight:400;pointer-events:none}
+#auth button.pri{font:500 16px var(--f-body,"IBM Plex Sans Arabic",sans-serif);height:54px;border:0;border-radius:12px;background:#173B33;color:#fff;cursor:pointer}
 #auth button.pri:disabled{opacity:.6}
-#auth .lnk{background:none;border:0;color:var(--acc,#0E5A44);font:inherit;font-size:14px;cursor:pointer;padding:2px}
+#auth .lnk{background:none;border:0;color:#173B33;font:inherit;font-size:14px;font-weight:600;cursor:pointer;padding:2px}
 #auth .row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 #auth .err{color:#B42318;font-size:14px;min-height:1em}
 #auth .ok{color:#0E5A44;font-size:14px}
@@ -99,6 +107,7 @@ const AUTH_CSS = `
   #auth.land .lp-ba{grid-template-columns:1fr}#auth.land .lp-sec{padding:52px 0}#auth.land .lp-t{font-size:26px}}
 @media (max-width:560px){#auth.land .lp-feats,#auth.land .lp-steps{grid-template-columns:1fr}#auth.land .lp-top .lp-w{min-height:56px}#auth.land .lp-brand b{font-size:15px}
   #auth.land .lp-top nav{gap:8px}#auth.land .lp-top .lang-pick{display:none}#auth.land .lp-mpick{display:block}#auth.land .lp-btn{padding:7px 12px;font-size:14px}#auth.land .lp-btn.gold{display:none}#auth.land .lp-cta .lp-btn.gold{display:inline-block}
+#auth .foot{margin-top:auto;padding-top:22px;border-top:1px solid var(--line,#E1E5E0);color:var(--muted,#6F7B75);font-size:14px;line-height:1.7}
   #auth.land .lp-copy h1{font-size:26px}}`;
 const ERR = {
   'auth/invalid-credential': 'الإيميل أو كلمة المرور غير صحيحة', 'auth/wrong-password': 'كلمة المرور غير صحيحة', 'auth/user-not-found': 'لا يوجد حساب بهذا الإيميل',
@@ -112,6 +121,11 @@ export const phoneEmail = (phone, code) => `966${normPhone(phone).slice(1)}.${co
 const isPhoneAcct = e => String(e || '').toLowerCase().endsWith('@' + PHONE_DOMAIN);
 const phoneOf = e => { const m = String(e || '').match(/^966(\d+)\./); return m ? '0' + m[1] : ''; };
 window.__phoneEmail = phoneEmail; window.__normPhone = normPhone; window.__phoneOf = phoneOf;
+export async function loginKey(kind, v) { const d = new TextEncoder().encode(String(v || '').trim().toLowerCase()); const h = await crypto.subtle.digest('SHA-256', d); return kind + ':' + [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32); }
+window.__loginKey = loginKey;
+const USER_RE = /^(?=.*[a-z])[a-z0-9._]{3,30}$/;
+window.__userRe = USER_RE;
+function idKind(v) { v = String(v || '').trim(); if (!v) return ''; if (v.includes('@')) return 'email'; if (/^[+\d\s٠-٩()-]+$/.test(v)) return 'phone'; return 'user'; }
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function authRoot() {
   let r = document.getElementById('auth');
@@ -219,43 +233,58 @@ export async function start() {
   catch (e) { fs = F.getFirestore(app); }
   const SUPER = String(SUPER_ADMIN_EMAIL || '').toLowerCase();
   let CID = null, COMPANY = null;
-  const P = c => `companies/${CID}/${c}`;
+  const P = c => c === "logins" ? "logins" : `companies/${CID}/${c}`;
 
   A.onIdTokenChanged(auth, async u => { if (u && CID) swPost({ type: 'token', token: await u.getIdToken(), project: FIREBASE_CONFIG.projectId, cid: CID }); });
   navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', async e => {
     if (e.data && e.data.type === 'need-token' && auth.currentUser && CID) swPost({ type: 'token', token: await auth.currentUser.getIdToken(), project: FIREBASE_CONFIG.projectId, cid: CID });
   });
   window.__fbIdToken = async () => auth.currentUser ? auth.currentUser.getIdToken() : null;
-  window.__fbSignOut = async () => { try { (await caches.keys()).forEach(k => caches.delete(k)); } catch (e) {} await A.signOut(auth); location.reload(); };
+  window.__changePassword = async (cur, nw) => { const u = auth.currentUser; if (!u) throw new Error('no user'); await A.reauthenticateWithCredential(u, A.EmailAuthProvider.credential(u.email, cur)); await A.updatePassword(u, nw); };
+  window.__fbSignOut = async () => { try { (await caches.keys()).forEach(k => caches.delete(k)); } catch (e) {} try { localStorage.removeItem('fleet-brand'); } catch (e) {} await A.signOut(auth); location.reload(); };
 
   /* ----- شاشات الدخول ----- */
   function showLogin(msg) {
     lastShow = () => showLogin(msg);
-    card(`<h2>${T('تسجيل الدخول')}</h2>
-      <form id="af" style="display:grid;gap:12px">
-      <label>${T('رقم الجوال')}<input id="ae" type="text" inputmode="tel" dir="ltr" placeholder="05xxxxxxxx" autocomplete="username" required></label>
+    card(`<h2>${T('تسجيل الدخول')}</h2><p class="sub2">${T('ادخل بأي من بياناتك: رقم الجوال أو الإيميل أو اسم المستخدم.')}</p>
+      <form id="af" style="display:grid;gap:16px">
+      <label>${T('رقم الجوال أو الإيميل أو اسم المستخدم')}<input id="ae" type="text" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" required><span class="kind" id="akind"></span></label>
       <label>${T('كلمة المرور')}<input id="ap" type="password" dir="ltr" autocomplete="current-password" required></label>
+      <div class="row"><span></span><button type="button" class="lnk" id="a-rst">${T('نسيت كلمة المرور؟')}</button></div>
       <div class="err" id="aerr">${esc(msg || '')}</div>
       <button class="pri" id="ab">${T('دخول')}</button></form>
-      <div class="row"><button class="lnk" id="a-new">${T('مستخدم جديد؟ فعّل حسابك')}</button><button class="lnk" id="a-rst">${T('نسيت كلمة المرور')}</button></div>
+      <div class="row"><button class="lnk" id="a-new">${T('مستخدم جديد؟ فعّل حسابك')}</button></div>
       <div class="row" style="border-top:1px solid var(--line,#D6DDD9);padding-top:12px"><span style="font-size:14px">${T('شركة جديدة؟')}</span><button class="lnk" id="a-co">${T('سجّل شركتك')}</button></div>`);
-    const f = document.getElementById('af');
+    const f = document.getElementById('af'); const kd = document.getElementById('akind');
+    const KL = { phone: T('رقم جوال'), email: T('إيميل'), user: T('اسم مستخدم') };
+    f.ae.oninput = () => { kd.textContent = KL[idKind(f.ae.value)] || ''; };
     f.onsubmit = async e => { e.preventDefault(); const b = document.getElementById('ab'); b.disabled = true;
-      const id = f.ae.value.trim(); const er = document.getElementById('aerr');
+      const id = f.ae.value.trim(); const er = document.getElementById('aerr'); er.textContent = '';
+      const fail = m => { er.textContent = m; b.disabled = false; };
       try {
-        let email = id;
-        if (!id.includes('@')) {
-          const ph = normPhone(id); if (!/^05\d{8}$/.test(ph)) { er.textContent = T('رقم الجوال يبدأ بـ 05 ويتكون من 10 أرقام'); b.disabled = false; return; }
+        let email = ''; const k = idKind(id);
+        if (k === 'phone') {
+          const ph = normPhone(id); if (!/^05\d{8}$/.test(ph)) return fail(T('رقم الجوال يبدأ بـ 05 ويتكون من 10 أرقام'));
           const s = await F.getDoc(F.doc(fs, 'logins', ph));
-          if (!s.exists()) { er.textContent = T('هذا الرقم غير مفعّل بعد. افتح رابط الدعوة الذي وصلك من مدير النظام لتفعيل حسابك.'); b.disabled = false; return; }
+          if (!s.exists()) return fail(T('هذا الرقم غير مفعّل بعد. افتح رابط الدعوة الذي وصلك من مدير النظام لتفعيل حسابك.'));
+          email = s.data().email;
+        } else if (k === 'email') {
+          let s = null; try { s = await F.getDoc(F.doc(fs, 'logins', await loginKey('e', id))); } catch (x) {}
+          email = s && s.exists() ? s.data().email : id;
+        } else {
+          const u = id.toLowerCase().replace(/^@/, '');
+          let s = null; if (USER_RE.test(u)) { try { s = await F.getDoc(F.doc(fs, 'logins', await loginKey('u', u))); } catch (x) {} }
+          if (!s || !s.exists()) return fail(T('اسم المستخدم غير موجود. تأكد منه أو ادخل برقم الجوال.'));
           email = s.data().email;
         }
         await A.signInWithEmailAndPassword(auth, email, f.ap.value);
-      } catch (err) { er.textContent = err.code === 'auth/invalid-credential' ? T('رقم الجوال أو كلمة المرور غير صحيحة') : (window.I18N && window.I18N.ui !== 'ar' ? T('تعذر الدخول، حاول مرة أخرى') : (ERR[err.code] || 'تعذر الدخول، حاول مرة أخرى')); b.disabled = false; } };
+      } catch (err) { fail(err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' ? T('بيانات الدخول أو كلمة المرور غير صحيحة') : (window.I18N && window.I18N.ui !== 'ar' ? T('تعذر الدخول، حاول مرة أخرى') : (ERR[err.code] || 'تعذر الدخول، حاول مرة أخرى'))); } };
     setTimeout(() => document.getElementById('ae').focus(), 50);
     document.getElementById('a-new').onclick = () => showActivate();
     document.getElementById('a-co').onclick = () => showCompanySignup();
-    document.getElementById('a-rst').onclick = () => { const v = document.getElementById('ae').value; v.includes('@') ? showReset(v) : showForgotPhone(); };
+    document.getElementById('a-rst').onclick = async () => { const v = document.getElementById('ae').value.trim();
+      if (idKind(v) === 'email') { let s = null; try { s = await F.getDoc(F.doc(fs, 'logins', await loginKey('e', v))); } catch (x) {} if (!s || !s.exists()) return showReset(v); }
+      showForgotPhone(); };
   }
   function showForgotPhone() {
     lastShow = showForgotPhone;
@@ -381,7 +410,7 @@ export async function start() {
       <div class="err" id="cerr"></div><button class="pri" id="cb">إنشاء الحساب</button></form>
       <div class="row"><button class="lnk" id="c-back">لدي حساب – تسجيل الدخول</button></div>`);
     const f = document.getElementById('cf'); const er = document.getElementById('cerr');
-    setTimeout(() => document.getElementById('cn').focus(), 50);
+    setTimeout(() => { const c = document.getElementById('cn'); if (c) c.focus(); }, 50);
     f.onsubmit = async e => { e.preventDefault(); const b = document.getElementById('cb'); b.disabled = true; er.textContent = '';
       const name = document.getElementById('cn').value.trim(), uname = document.getElementById('cu').value.trim();
       const phone = document.getElementById('cph').value.trim() ? normPhone(document.getElementById('cph').value) : '';
@@ -612,7 +641,7 @@ export async function start() {
           try { await F.setDoc(F.doc(fs, 'members', ne), { companyId: CID, at: new Date().toISOString() }); }
           catch (e) { const x = new Error('هذا المستخدم مسجل في شركة أخرى على المنصة'); x.code = 'member-conflict'; throw x; }
         }
-        if (ne) await F.setDoc(F.doc(fs, P('access'), ne), { role: data.role || 'viewer', driverId: data.driverId || null, branchId: data.branchId || null, name: data.name || '', phone: data.phone ? normPhone(data.phone) : null, inviteId: id, updatedAt: new Date().toISOString() });
+        if (ne) await F.setDoc(F.doc(fs, P('access'), ne), { role: data.role || 'viewer', alsoDriver: !!(data.alsoDriver && data.driverId), driverId: data.driverId || null, branchId: data.branchId || null, name: data.name || '', phone: data.phone ? normPhone(data.phone) : null, inviteId: id, updatedAt: new Date().toISOString() });
       } catch (e) { console.warn('access', e); if (e.code === 'member-conflict') { window.toast && window.toast(e.message); } }
     }
     const docApi = (col, id) => {

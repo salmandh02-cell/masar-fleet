@@ -41,6 +41,11 @@ service cloud.firestore {
     function isAdmin(cid) { return role(cid) == 'admin'; }
     function isStaff(cid) { return role(cid) in ['admin', 'fleet']; }
     function isDriver(cid) { return role(cid) == 'driver'; }
+    // يقود سيارة: السائق، أو مستخدم بدور آخر مضاف له «مستخدم المركبة»
+    function drives(cid) { return isDriver(cid) || (member(cid) && hasAcc(cid) && acc(cid).get('alsoDriver', false) == true && acc(cid).get('driverId', null) != null); }
+    function myDrv(cid) { return hasAcc(cid) ? acc(cid).get('driverId', null) : null; }
+    // لا يحرر أحد محضر تسليم أو استلام لنفسه
+    function notSelf(cid, d) { return d.get('driverId', null) == null || myDrv(cid) == null || d.get('driverId', null) != myDrv(cid); }
     function isBranch(cid) { return role(cid) == 'branch'; }
     function myBranch(cid) { return acc(cid).branchId; }
     function vehBranch(cid, vid) { return get(/databases/$(database)/documents/companies/$(cid)/vehicles/$(vid)).data.get('branchId', null); }
@@ -83,6 +88,15 @@ service cloud.firestore {
     // ---------- ربط رقم الجوال بالحساب (يُقرأ قبل الدخول) ----------
     match /logins/{phone} {
       allow get: if true;
+      // الدخول بالإيميل أو اسم المستخدم: المفتاح بصمة SHA-256، ويكتبه صاحب الحساب أو مدير شركته
+      allow create, update: if phone.matches('^[eu]:[0-9a-f]{64}$')
+        && request.resource.data.keys().hasOnly(['email', 'at', 'companyId'])
+        && member(request.resource.data.companyId)
+        && (request.resource.data.email == myEmail()
+            || (isAdmin(request.resource.data.companyId) && exists(memPath(request.resource.data.email))
+                && get(memPath(request.resource.data.email)).data.companyId == request.resource.data.companyId))
+        && (resource == null || resource.data.email == myEmail() || isAdmin(resource.data.get('companyId', '')));
+      allow delete: if phone.matches('^[eu]:.*') && (resource.data.email == myEmail() || isAdmin(resource.data.get('companyId', '')));
       allow create, update: if request.resource.data.keys().hasOnly(['email', 'phone', 'at', 'companyId'])
         && hasAcc(request.resource.data.companyId) && member(request.resource.data.companyId)
         && request.resource.data.email == myEmail()
@@ -116,10 +130,13 @@ service cloud.firestore {
           || (platCan('data') && col in ['vehicles', 'drivers', 'access', 'maintenance', 'fuel', 'violations', 'handovers', 'inspections', 'branches', 'settings']);
         allow create: if isStaff(cid) && !(col in ['settings', 'invites', 'access', 'roles', 'audit', 'seen', 'blobs', 'logins', 'threads', 'pushsubs', 'ids'])
           && (isAdmin(cid) || !(col == 'handovers' && 'ack' in request.resource.data))
+          && (col != 'handovers' || notSelf(cid, request.resource.data))
           && (!(col == 'handovers' && 'issuer' in request.resource.data) || request.resource.data.issuer.uid == request.auth.uid);
         allow update: if isStaff(cid) && !(col in ['settings', 'invites', 'access', 'roles', 'audit', 'seen', 'blobs', 'logins', 'threads', 'pushsubs', 'ids'])
           && (isAdmin(cid) || !(col == 'handovers' && (request.resource.data.get('ack', null) != resource.data.get('ack', null) || request.resource.data.get('issuer', null) != resource.data.get('issuer', null))))
-          && (isAdmin(cid) || !(col == 'vehicles' && (resource.data.get('status', '') == 'sold' || request.resource.data.get('status', '') == 'sold')));
+          && (isAdmin(cid) || !(col == 'vehicles' && (resource.data.get('status', '') == 'sold' || request.resource.data.get('status', '') == 'sold')))
+          && (col != 'handovers' || request.resource.data.get('ack', null) == resource.data.get('ack', null) || request.resource.data.get('ack', null) == null
+              || request.resource.data.ack.get('uid', '') != resource.data.get('issuer', {}).get('uid', ''));
         allow delete: if isAdmin(cid) && !(col in ['audit', 'access']);
       }
       // عدد السيارات لكل شركة يظهر في لوحة المالك (للفوترة لاحقاً)
@@ -127,7 +144,12 @@ service cloud.firestore {
 
       // الإعدادات والمستخدمون: مدير النظام فقط
       match /settings/{id} { allow write: if isAdmin(cid); }
-      match /invites/{id} { allow write: if isAdmin(cid); }
+      match /invites/{id} {
+        allow write: if isAdmin(cid);
+        // صفحة «حسابي»: المستخدم يعدّل إيميله واسم المستخدم فقط
+        allow update: if member(cid) && hasAcc(cid) && acc(cid).get('inviteId', '') == id
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['contactEmail', 'username', 'eKey', 'uKey', 'updatedAt']);
+      }
       match /roles/{id}   { allow write: if isAdmin(cid); }
       match /access/{email} {
         allow read: if signedIn() && (email == myEmail() || isAdmin(cid));
@@ -165,19 +187,22 @@ service cloud.firestore {
       }
 
       // السائق: يسجل الفحص الأسبوعي، ويحدّث قراءة العداد فقط
-      match /inspections/{id} { allow create: if isDriver(cid); }
+      match /inspections/{id} { allow create: if drives(cid); }
       // التوقيع الإلكتروني: السائق يوقّع محاضره فقط، ولا يغيّر غير خانة التوقيع
       match /handovers/{id} {
-        allow update: if isDriver(cid)
+        allow update: if drives(cid)
           && resource.data.driverId == acc(cid).driverId
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ack'])
-          && request.resource.data.ack.uid == request.auth.uid;
+          && request.resource.data.ack.uid == request.auth.uid
+          // لا يوقّع أحد محضراً حرره بنفسه
+          && resource.data.get('issuer', {}).get('uid', '') != request.auth.uid;
         // مشرف الفرع: ينشئ محاضر التسليم والاستلام لسيارات فرعه فقط
         allow create: if isBranch(cid) && myBranch(cid) != null && vehBranch(cid, request.resource.data.vehicleId) == myBranch(cid)
-          && !('ack' in request.resource.data) && request.resource.data.issuer.uid == request.auth.uid;
+          && !('ack' in request.resource.data) && request.resource.data.issuer.uid == request.auth.uid
+          && notSelf(cid, request.resource.data);
       }
       match /vehicles/{id} {
-        allow update: if isDriver(cid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['odometer']);
+        allow update: if drives(cid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['odometer']);
         allow update: if isBranch(cid) && myBranch(cid) != null && resource.data.get('branchId', null) == myBranch(cid) && resource.data.get('status', '') != 'sold'
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'driverId', 'odometer'])
           && request.resource.data.status in ['assigned', 'available'];
