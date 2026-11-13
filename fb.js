@@ -48,9 +48,9 @@ const AUTH_CSS = `
 #auth .err{color:#B42318;font-size:14px;min-height:1em}
 #auth .ok{color:#0E5A44;font-size:14px}
 #auth p{margin:0;line-height:1.7;font-size:14px}
-.lang-pick{display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
-.lang-pick button{font:500 13px "IBM Plex Sans Arabic",system-ui,sans-serif;padding:6px 12px;min-height:34px;border-radius:17px;border:1px solid var(--line,#D6DDD9);background:transparent;color:inherit;cursor:pointer}
-.lang-pick button.on{background:var(--acc,#0E5A44);border-color:var(--acc,#0E5A44);color:#fff}
+.lang-pick{display:flex;justify-content:flex-end}
+.lang-pick .lang-tg{width:40px;height:40px;min-height:40px;padding:0;border-radius:50%;display:grid;place-items:center;font:600 13px "IBM Plex Sans Arabic",system-ui,sans-serif;letter-spacing:.04em;direction:ltr;border:1.5px solid var(--acc,#0E5A44);background:transparent;color:var(--acc,#0E5A44);cursor:pointer;transition:background .2s,color .2s}
+.lang-pick .lang-tg:hover{background:var(--acc,#0E5A44);color:#fff}
 #auth.land{display:block;place-items:normal;overflow-y:auto;padding:0;background:#F5F3EE;color:#15201B;scroll-behavior:smooth}
 #auth.land .lp-w{max-width:1180px;margin:0 auto;padding:0 20px}
 #auth.land .lp-top{position:sticky;top:0;z-index:5;background:#0B3F30;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -63,8 +63,8 @@ const AUTH_CSS = `
 #auth.land .lp-top nav{display:flex;align-items:center;gap:16px}
 #auth.land .lp-top nav>a{color:rgba(255,255,255,.8);text-decoration:none;font-size:15px}
 #auth.land .lp-top nav>a:hover{color:#fff}
-#auth.land .lp-top .lang-pick button{border-color:rgba(255,255,255,.3);color:#fff;min-height:30px;padding:4px 10px}
-#auth.land .lp-top .lang-pick button.on{background:rgba(255,255,255,.18);border-color:transparent}
+#auth.land .lp-top .lang-pick .lang-tg{border-color:rgba(255,255,255,.45);color:#fff;width:36px;height:36px;min-height:36px}
+#auth.land .lp-top .lang-pick .lang-tg:hover{background:rgba(255,255,255,.18)}
 #auth.land .lp-btn{font:600 15px var(--f-body,"IBM Plex Sans Arabic",sans-serif);padding:9px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;cursor:pointer;white-space:nowrap}
 #auth.land .lp-btn.gold{background:#C9A227;border-color:#C9A227;color:#1b1405}
 #auth.land .lp-hero{position:relative;color:#fff;padding:64px 0 72px;min-height:620px;background:linear-gradient(270deg,rgba(6,42,32,.94) 0%,rgba(6,42,32,.82) 42%,rgba(6,42,32,.45) 100%),#0B3F30 url(hero-fleet.svg) center/cover no-repeat}
@@ -113,7 +113,7 @@ const AUTH_CSS = `
   #auth.land .lp-copy p{font-size:16px;margin-bottom:0}#auth.land .lp-chips{display:none}#auth.land .lp-kick{margin-bottom:12px}
   #auth.land .lp-ba{grid-template-columns:1fr}#auth.land .lp-sec{padding:52px 0}#auth.land .lp-t{font-size:26px}}
 @media (max-width:560px){#auth.land .lp-feats,#auth.land .lp-steps{grid-template-columns:1fr}#auth.land .lp-top .lp-w{min-height:56px}#auth.land .lp-brand b{font-size:15px}
-  #auth.land .lp-top nav{gap:8px}#auth.land .lp-top .lang-pick{display:none}#auth.land .lp-mpick{display:block}#auth.land .lp-btn{padding:7px 12px;font-size:14px}#auth.land .lp-btn.gold{display:none}#auth.land .lp-cta .lp-btn.gold{display:inline-block}
+  #auth.land .lp-top nav{gap:8px}#auth.land .lp-btn{padding:7px 12px;font-size:14px}#auth.land .lp-btn.gold{display:none}#auth.land .lp-cta .lp-btn.gold{display:inline-block}
 #auth .foot{margin-top:auto;padding-top:22px;border-top:1px solid var(--line,#E1E5E0);color:var(--muted,#6F7B75);font-size:14px;line-height:1.7}
   #auth.land .lp-copy h1{font-size:26px}}`;
 const ERR = {

@@ -231,7 +231,7 @@
       document.documentElement.lang = ui; document.documentElement.dir = d;
       const a = document.getElementById('app'); if (a) { a.dir = d; a.lang = ui; }
       const au = document.getElementById('auth'); if (au) au.dir = d; },
-    picker(act) { return '<div class="lang-pick" role="group" aria-label="' + t('اللغة') + '">' + Object.entries(LANGS).map(([k, v]) => '<button type="button" class="' + (k === lang ? 'on' : '') + '" data-lang="' + k + '"' + (act ? ' data-act="' + act + '" data-id="' + k + '"' : '') + ' lang="' + k + '">' + v + '</button>').join('') + '</div>'; }
+    picker(act) { const ks = Object.keys(LANGS), nx = ks[(ks.indexOf(lang) + 1) % ks.length]; return '<div class="lang-pick"><button type="button" class="lang-tg" data-lang="' + nx + '"' + (act ? ' data-act="' + act + '" data-id="' + nx + '"' : '') + ' title="' + LANGS[nx] + '" aria-label="' + t('اللغة') + ': ' + LANGS[lang] + ' → ' + LANGS[nx] + '"><span>' + (lang || 'ar').toUpperCase() + '</span></button></div>'; }
   };
   window.t = t;
 })();

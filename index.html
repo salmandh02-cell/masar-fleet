@@ -590,9 +590,9 @@ body.drvmode .srch-btn{display:none}
 .sign-ok{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);line-height:1.7}
 .sign-ok input{margin-top:5px;width:20px;height:20px;flex:none}
 [hidden]{display:none!important}
-.lang-pick{display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
-.lang-pick button{font:500 13px var(--f-body,"IBM Plex Sans Arabic"),system-ui,sans-serif;padding:6px 12px;min-height:36px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
-.lang-pick button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.lang-pick{display:flex;justify-content:flex-end}
+.lang-pick .lang-tg{width:40px;height:40px;padding:0;border-radius:50%;display:grid;place-items:center;font:600 13px var(--f-body,"IBM Plex Sans Arabic"),system-ui,sans-serif;letter-spacing:.04em;direction:ltr;border:1.5px solid var(--acc);background:var(--surface);color:var(--acc);cursor:pointer}
+.lang-pick .lang-tg:hover{background:var(--acc);color:#fff}
 /* ملصق QR */
 .qrs{width:368px;height:512px;background:#fff;color:#14231c;border:2px solid #0B6B4F;border-radius:22px;overflow:hidden;display:grid;grid-template-rows:auto 1fr auto;font-family:var(--f-display),system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.12);--plate-bg:#fff;--plate-ink:#111;--plate-line:#1B1B1B}
 .qrs-h{background:linear-gradient(135deg,#0B6B4F,#0E8A63);color:#fff;padding:16px 18px 14px;text-align:center;position:relative}
