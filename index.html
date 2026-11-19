@@ -987,8 +987,19 @@ async function boot(){
     db.collection(c).onSnapshot(snap=>{const rows=snap.docs.map(d=>({id:d.id,...d.data()}));if(c==='vehicles'){ALLV=rows;applyScope()}else if(c==='handovers'){ALLH=rows;applyScope()}else S[c]=rows;ODO_IDX=null;loaded[c]=true;schedule()},
       err=>{setSync(false,'انقطع الاتصال – أعد تحميل الصفحة')});
   }
-  startMessaging();initPush();
+  startMessaging();initPush();annBoot();
 }
+/* إعلان المنصة لكل الشركات (platform/public.announce) */
+function annBoot(n){n=n||0;if(!PLT()||!PLT().pub){if(n<20)setTimeout(()=>annBoot(n+1),700);return}
+  PLT().pub().then(p=>{const a=p&&p.announce;if(!a||!a.on||!a.text||(a.until&&a.until<new Date().toISOString().slice(0,10)))return;
+    const k='ann-'+(a.id||a.at||'');try{if(localStorage.getItem(k))return}catch(e){}
+    const e=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const C={info:['#E2ECF8','#2B5C9E'],warn:['#FBEFD9','#A66A0E'],promo:['#FBF5E8','#9A7636']}[a.kind]||['#E2ECF8','#2B5C9E'];
+    const d=document.createElement('div');d.id='plat-ann';d.setAttribute('role','status');
+    d.style.cssText=`display:flex;gap:10px;align-items:flex-start;background:${C[0]};color:#1A1F36;border-bottom:2px solid ${C[1]};padding:10px 16px;font:14px/1.6 "IBM Plex Sans Arabic",system-ui,sans-serif;position:relative;z-index:60`;
+    d.innerHTML=`<b style="color:${C[1]};white-space:nowrap">${e(a.title||'إعلان من المنصة')}</b><span style="flex:1">${e(a.text)}</span><button aria-label="إخفاء" style="border:0;background:transparent;font-size:18px;line-height:1;cursor:pointer;color:#1A1F36;padding:0 4px">✕</button>`;
+    d.querySelector('button').onclick=()=>{try{localStorage.setItem(k,'1')}catch(x){}d.remove()};
+    document.body.prepend(d)}).catch(()=>{})}
 
 /* ---------- push notifications ---------- */
 const PUSH_PUBLIC='BOrIcCMkeIBxvAz1HnPQD6FFVpMyBH7EVi7frgi61TBDguAHLH3uKxn1cEfOSfC6FcpCh7yXIqh9Pj6qZNyHE1c';
