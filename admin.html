@@ -295,6 +295,12 @@ dialog input,dialog select,dialog textarea,.form-grid input,.form-grid textarea{
 @media (max-width:640px){.stat4 b{font-size:24px}.who .hide-m{display:none}}
 
 /* الدفعة الثانية */
+.actabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;margin-top:-6px}
+.actabs button{all:unset;cursor:pointer;padding:9px 12px;font-size:13.5px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}.actabs button.on{color:var(--ink);border-bottom-color:var(--gold)}
+.coa{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;padding:14px}
+.coa-g{border:1px solid var(--line);border-radius:10px;overflow:hidden}.coa-h{display:flex;justify-content:space-between;padding:9px 12px;background:var(--surface-2);font-size:13.5px}
+.coa-a{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:7px 12px;border-top:1px solid var(--line);font-size:13.5px}.coa-a .lnk{font-size:12px}
+.mini-list.is>div{padding:8px 18px}.mini-list.is>div.h{background:var(--surface-2);font-weight:600}.mini-list.is>div.tot{background:var(--gold-soft)}
 .vtog{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2,var(--ink));padding:0 6px;cursor:pointer;white-space:nowrap}
 .sw2{width:34px;height:20px;border-radius:10px;background:var(--line);position:relative;flex:none;transition:.15s}.sw2::after{content:"";position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:.15s}.sw2.on{background:var(--accent)}.sw2.on::after{right:16px}
 main>section,main>div{min-width:0}
@@ -1396,68 +1402,214 @@ async function renderNews() {
   const off = $('#nwOff'); if (off) off.onclick = async () => { try { await F.setDoc(F.doc(fs, 'platform', 'public'), { announce: { ...a, on: false } }, { merge: true }); PUB.announce = { ...a, on: false }; toast('أُوقف الإعلان'); plog('إيقاف إعلان الشركات', a.title || ''); renderNews(); } catch (x) { toast('تعذر: ' + (x.code || x.message)); } };
 }
 
-/* ---------- 6) المحاسبة الداخلية (platform/books) ---------- */
-let BOOKS = null, AC_P = 'm0';
-const EXP_CAT = ['الاستضافة والخوادم', 'الاشتراكات والبرمجيات', 'الرواتب والأجور', 'التسويق والإعلانات', 'رسوم بوابة الدفع والبنك', 'الرسوم الحكومية', 'الإيجار والمكتب', 'الاستشارات والخدمات المهنية', 'أخرى'];
+/* ---------- 6) نظام المحاسبة الداخلي (platform/books) ---------- */
+// المستند الواحد يحمل: دليل الحسابات، الفروع، الموظفين، المسيّرات، المصروفات الثابتة، والقيود (expenses)
+let BOOKS = null, AC_P = 'm0', AC_V = 'over', AC_F = { kind: '', acc: '', br: '', q: '' };
+const AGRP = { pay: 'الرواتب والأجور', branch: 'الفروع والمقرات والسكن', ops: 'التشغيل والتقنية', mkt: 'التسويق والمبيعات', gov: 'الرسوم الحكومية والزكاة', fin: 'الرسوم البنكية والمالية', other: 'مصروفات أخرى', inc: 'إيرادات أخرى' };
+const ACC0 = { pay: ['الراتب الأساسي', 'بدل السكن', 'بدل النقل', 'بدلات أخرى ومكافآت', 'التأمينات الاجتماعية (GOSI)', 'التأمين الطبي', 'الإقامات والتأشيرات ورخص العمل', 'تذاكر السفر', 'مكافأة نهاية الخدمة'],
+  branch: ['إيجار المقر والفروع', 'سكن الموظفين', 'الكهرباء والماء', 'الإنترنت والاتصالات', 'الصيانة والنظافة', 'الأثاث والمستلزمات المكتبية'],
+  ops: ['الاستضافة والخوادم', 'الاشتراكات والبرمجيات', 'الذكاء الاصطناعي', 'الأجهزة والمعدات', 'الاستشارات والخدمات المهنية', 'المواصلات والوقود'],
+  mkt: ['الإعلانات الرقمية', 'العمولات', 'المعارض والمطبوعات', 'الضيافة والهدايا'], gov: ['السجل التجاري والغرفة', 'البلدية والرخص', 'الزكاة', 'رسوم حكومية أخرى'],
+  fin: ['رسوم بوابة الدفع', 'الرسوم البنكية'], other: ['مصروفات متنوعة'], inc: ['إيرادات خدمات واستشارات', 'إيرادات متنوعة'] };
+const PAYC = [['basic', 'الراتب الأساسي'], ['housing', 'بدل السكن'], ['transport', 'بدل النقل'], ['other', 'بدلات أخرى ومكافآت']];
+const METH = ['تحويل بنكي', 'نقداً', 'بطاقة', 'خصم مباشر'];
 const AC_PER = () => { const t = today(), y = +t.slice(0, 4), m = +t.slice(5, 7); const q0 = Math.floor((m - 1) / 3) * 3 + 1; const pad = n => String(n).padStart(2, '0');
   const last = (yy, mm) => new Date(Date.UTC(yy, mm, 0)).toISOString().slice(0, 10);
   const pm = m === 1 ? [y - 1, 12] : [y, m - 1]; const pq = q0 === 1 ? [y - 1, 10] : [y, q0 - 3];
   return { m0: ['هذا الشهر', `${y}-${pad(m)}-01`, last(y, m)], m1: ['الشهر الماضي', `${pm[0]}-${pad(pm[1])}-01`, last(pm[0], pm[1])],
-    q0: ['هذا الربع', `${y}-${pad(q0)}-01`, last(y, q0 + 2)], q1: ['الربع الماضي (لإقرار الضريبة)', `${pq[0]}-${pad(pq[1])}-01`, last(pq[0], pq[1] + 2)],
+    q0: ['هذا الربع', `${y}-${pad(q0)}-01`, last(y, q0 + 2)], q1: ['الربع الماضي', `${pq[0]}-${pad(pq[1])}-01`, last(pq[0], pq[1] + 2)],
     y0: ['هذه السنة', `${y}-01-01`, `${y}-12-31`], y1: ['السنة الماضية', `${y - 1}-01-01`, `${y - 1}-12-31`] }; };
-async function loadBooks() { try { const s = await F.getDoc(F.doc(fs, 'platform', 'books')); BOOKS = s.exists() ? s.data() : {}; } catch (e) { BOOKS = {}; toast('تعذر تحميل الدفاتر'); } BOOKS.expenses = BOOKS.expenses || []; }
-async function saveBooks(msg) { try { await F.setDoc(F.doc(fs, 'platform', 'books'), { expenses: BOOKS.expenses, updatedAt: nowIso() }, { merge: true }); if (msg) toast(msg); return true; } catch (e) { toast('تعذر الحفظ: ' + (e.code || e.message)); return false; } }
+const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+async function loadBooks() {
+  try { const s = await F.getDoc(F.doc(fs, 'platform', 'books')); BOOKS = s.exists() ? s.data() : {}; } catch (e) { BOOKS = {}; toast('تعذر تحميل الدفاتر'); }
+  const B = BOOKS; B.expenses = B.expenses || []; B.branches = B.branches || []; B.employees = B.employees || []; B.recurring = B.recurring || []; B.payrolls = B.payrolls || {};
+  if (!B.accounts || !B.accounts.length) B.accounts = Object.entries(ACC0).flatMap(([g, L]) => L.map((n, i) => ({ id: g + (i + 1), name: n, grp: g })));
+  if (!B.branches.length) B.branches = [{ id: 'hq', name: 'المقر الرئيسي', city: '' }];
+  // قيود أقدم مسجلة باسم البند فقط
+  B.expenses.forEach(x => { if (!x.acc) { const a = B.accounts.find(a => a.name === x.cat) || B.accounts.find(a => x.cat && a.name.includes(String(x.cat).split(' ')[0])); x.acc = a ? a.id : 'other1'; } if (!x.kind) x.kind = 'exp'; if (!x.branch) x.branch = 'hq'; });
+}
+async function saveBooks(msg) {
+  const B = BOOKS; try { await F.setDoc(F.doc(fs, 'platform', 'books'), { expenses: B.expenses, accounts: B.accounts, branches: B.branches, employees: B.employees, recurring: B.recurring, payrolls: B.payrolls, updatedAt: nowIso() }, { merge: true }); if (msg) toast(msg); return true; }
+  catch (e) { toast('تعذر الحفظ: ' + (e.code || e.message)); return false; }
+}
+const accOf = id => BOOKS.accounts.find(a => a.id === id) || { id, name: 'غير مصنف', grp: 'other' };
+const brOf = id => BOOKS.branches.find(b => b.id === id) || { id, name: 'عام' };
+const ecost = x => +x.amount + (vatOn() ? 0 : +x.vat || 0);
+const accSel = (cur, kind) => { const gs = kind === 'inc' ? ['inc'] : Object.keys(AGRP).filter(g => g !== 'inc'); return gs.map(g => `<optgroup label="${AGRP[g]}">${BOOKS.accounts.filter(a => a.grp === g).map(a => `<option value="${a.id}" ${a.id === cur ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}</optgroup>`).join(''); };
+const brSel = cur => BOOKS.branches.map(b => `<option value="${b.id}" ${b.id === cur ? 'selected' : ''}>${esc(b.name)}</option>`).join('');
+const gosiOf = e => r2(Math.min(45000, (+e.basic || 0) + (+e.housing || 0)) * (e.saudi ? 11.75 : 2) / 100);
+const grossOf = e => PAYC.reduce((t, [k]) => t + (+e[k] || 0), 0);
+const fld = 'style="font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:inherit"';
+
+function acData() {
+  const P = AC_PER(); const [pl, from, to] = P[AC_P]; const inP = d => d && d.slice(0, 10) >= from && d.slice(0, 10) <= to;
+  const inv = INVS.filter(i => i.status === 'paid' && inP(i.paidAt || i.issueDate)); const E = BOOKS.expenses.filter(x => inP(x.date));
+  const exp = E.filter(x => x.kind !== 'inc'), oinc = E.filter(x => x.kind === 'inc');
+  const subRev = sum(inv, i => i.subtotal), othRev = sum(oinc, x => x.amount), rev = subRev + othRev, cost = sum(exp, ecost);
+  const outVat = sum(inv, i => i.vat) + sum(oinc, x => x.vat), inVat = sum(exp, x => x.vat);
+  return { pl, from, to, inv, exp, oinc, subRev, othRev, rev, cost, outVat, inVat, profit: rev - cost, vatDue: outVat - inVat };
+}
 async function renderAccounting() {
   const box = $('#t-accounting');
   if (BOOKS === null) { box.innerHTML = '<div class="panel"><div class="empty">جارٍ التحميل…</div></div>'; await loadBooks(); }
-  const P = AC_PER(); const [pl, from, to] = P[AC_P]; const inP = d => d && d.slice(0, 10) >= from && d.slice(0, 10) <= to;
-  const inc = INVS.filter(i => i.status === 'paid' && inP(i.paidAt || i.issueDate)); const exp = BOOKS.expenses.filter(x => inP(x.date));
-  const rev = sum(inc, i => i.subtotal), outVat = sum(inc, i => i.vat), cost = sum(exp, x => +x.amount + (vatOn() ? 0 : +x.vat || 0)), vt = vatOn() ? ' (قبل الضريبة)' : '', inVat = sum(exp, x => x.vat);
-  const profit = rev - cost, vatDue = outVat - inVat; const margin = rev ? Math.round(profit / rev * 100) : null;
-  const ecost = x => +x.amount + (vatOn() ? 0 : +x.vat || 0); const byCat = EXP_CAT.map(c => [c, sum(exp.filter(x => x.cat === c), ecost)]).filter(([, v]) => v).sort((a, b) => b[1] - a[1]); const cmax = Math.max(1, ...byCat.map(x => x[1]));
-  const ledger = [...inc.map(i => ({ d: String(i.paidAt || i.issueDate).slice(0, 10), t: 'in', desc: `${i.number} · ${i.companyName}`, a: +i.subtotal || 0, v: +i.vat || 0 })),
-    ...exp.map(x => ({ d: x.date, t: 'out', id: x.id, desc: `${x.cat}${x.desc ? ' · ' + x.desc : ''}${x.vendor ? ' · ' + x.vendor : ''}`, a: +x.amount || 0, v: +x.vat || 0 }))].sort((a, b) => b.d.localeCompare(a.d));
-  box.innerHTML = `<div class="head" style="margin-top:-6px"><div class="seg" id="acSeg">${Object.entries(P).map(([k, [l]]) => `<button data-ap="${k}" class="${k === AC_P ? 'on' : ''}">${l}</button>`).join('')}</div>
-      <div class="acts"><label class="vtog" title="عند الإيقاف: الفواتير الجديدة بدون ضريبة، ولا يظهر ملخص الإقرار"><span class="sw2 ${vatOn() ? 'on' : ''}" data-ac="vat"></span>ضريبة القيمة المضافة ${vatOn() ? vatRate() + '%' : 'غير مفعّلة'}</label><button class="btn" data-ac="csv">تصدير Excel (CSV)</button><button class="btn pri" data-ac="add">تسجيل مصروف</button></div></div>
-    <small style="color:var(--muted);margin-top:-8px">${pl}: من ${from} إلى ${to}</small>
-    <div class="kpis"><div class="kpi"><b>${money(rev)}</b><span>الإيرادات${vt}</span></div><div class="kpi"><b>${money(cost)}</b><span>المصروفات${vt}</span></div>
-      <div class="kpi ${profit < 0 ? 'hot' : ''}"><b style="color:${profit < 0 ? 'var(--crit)' : 'var(--ok)'}">${money(profit)}</b><span>صافي الربح${margin === null ? '' : ` · هامش ${margin}%`}</span></div>
-      ${vatOn() ? `<div class="kpi"><b>${money(vatDue)}</b><span>ضريبة مستحقة للهيئة</span></div>` : `<div class="kpi"><b>${inc.length}</b><span>فواتير محصّلة</span></div>`}</div>
-    <div class="g2c">${!vatOn() ? `<div class="panel"><div class="ph"><h3>ضريبة القيمة المضافة غير مفعّلة</h3><span class="pill p-off">غير مسجّل</span></div><div class="roles" style="font-size:14px">المنشأة غير مسجلة في ضريبة القيمة المضافة حالياً، فالفواتير الجديدة تصدر «فاتورة» بدون ضريبة ولا رمز QR، والضريبة التي تدفعها للموردين تُحسب ضمن تكلفة المصروف.<br><br>عند التسجيل في الهيئة (إلزامي إذا تجاوزت الإيرادات 375,000 ريال خلال 12 شهراً)، أدخل الرقم الضريبي في الإعدادات ثم فعّل الزر أعلاه.</div></div>` : `<div class="panel"><div class="ph"><h3>ملخص إقرار ضريبة القيمة المضافة</h3><small>${pl}</small></div><div class="mini-list">
-        <div><span>المبيعات الخاضعة للضريبة</span><b>${money(rev)}</b></div><div><span>ضريبة المخرجات (المحصّلة من الشركات)</span><b>${money(outVat)}</b></div>
-        <div><span>المشتريات والمصروفات الخاضعة للضريبة</span><b>${money(sum(exp.filter(x => +x.vat), x => x.amount))}</b></div><div><span>ضريبة المدخلات (المدفوعة للموردين)</span><b>${money(inVat)}</b></div>
-        <div style="background:var(--gold-soft)"><span><b>صافي الضريبة ${vatDue >= 0 ? 'المستحقة' : 'المستردة'}</b></span><b>${money(Math.abs(vatDue))}</b></div></div>
-        <div class="roles">الأرقام من الفواتير المدفوعة في المنصة والمصروفات المسجلة هنا. راجعها مع محاسبك قبل تقديم الإقرار في بوابة الهيئة.</div></div>`}
-      <div class="panel"><div class="ph"><h3>المصروفات حسب البند</h3><small>${exp.length} مصروف</small></div>${byCat.length ? `<div class="mini-list">${byCat.map(([c, v]) => `<div class="cat"><span>${esc(c)}</span><span class="cbar"><i style="width:${v / cmax * 100}%"></i></span><b>${money(v)}</b></div>`).join('')}</div>` : '<div class="empty">لا توجد مصروفات في هذه الفترة</div>'}</div></div>
-    <div class="panel"><div class="ph"><h3>دفتر اليومية</h3><small>${ledger.length} قيد</small></div><div class="tw"><table><thead><tr><th>التاريخ</th><th>النوع</th><th>البيان</th><th>المبلغ</th>${vatOn() ? '<th>الضريبة</th>' : ''}<th></th></tr></thead><tbody>
-      ${ledger.length ? ledger.map(r => `<tr><td>${esc(r.d)}</td><td>${r.t === 'in' ? '<span class="pill p-ok">إيراد</span>' : '<span class="pill p-crit">مصروف</span>'}</td><td>${esc(r.desc)}</td><td><b>${r.t === 'out' ? '−' : ''}${money(vatOn() ? r.a : r.a + r.v)}</b></td>${vatOn() ? `<td>${money(r.v)}</td>` : ''}<td>${r.t === 'out' ? `<button class="btn sm bad" data-ac="del" data-id="${esc(r.id)}">حذف</button>` : ''}</td></tr>`).join('') : '<tr><td colspan="6" class="empty">لا توجد قيود في هذه الفترة</td></tr>'}</tbody></table></div></div>`;
-  box.onclick = e => { const p = e.target.closest('[data-ap]'); if (p) { AC_P = p.dataset.ap; return renderAccounting(); }
-    const b = e.target.closest('[data-ac]'); if (!b) return; const a = b.dataset.ac;
-    if (a === 'add') return expenseDialog();
-    if (a === 'vat') { const on = !vatOn();
-      return dialog(on ? `<h3>تفعيل ضريبة القيمة المضافة</h3><p style="margin:0;font-size:14px">الفواتير الجديدة ستصدر «فاتورة ضريبية مبسطة» بضريبة ${SET.vatRate === '' || SET.vatRate == null ? 15 : SET.vatRate}% ورمز QR.${SET.vatNumber ? '' : '<br><b style="color:var(--crit)">أدخل الرقم الضريبي في الإعدادات أولاً.</b>'}</p>`
-        : `<h3>إيقاف ضريبة القيمة المضافة</h3><p style="margin:0;font-size:14px">الفواتير الجديدة ستصدر «فاتورة» بدون ضريبة وبدون رمز QR. الفواتير السابقة لا تتغير.</p>`, async () => {
-        try { await F.setDoc(F.doc(fs, 'platform', 'settings'), { vatRegistered: on, updatedAt: nowIso() }, { merge: true }); SET.vatRegistered = on; toast(on ? 'فُعّلت الضريبة' : 'أُوقفت الضريبة'); plog(on ? 'تفعيل ضريبة القيمة المضافة' : 'إيقاف ضريبة القيمة المضافة', ''); renderAccounting(); }
-        catch (x) { toast('تعذر الحفظ: ' + (x.code || x.message)); } }, on ? 'تفعيل' : 'إيقاف'); }
-    if (a === 'csv') { const rows = [['التاريخ', 'النوع', 'البيان', 'المبلغ قبل الضريبة', 'الضريبة', 'الإجمالي'], ...ledger.map(r => [r.d, r.t === 'in' ? 'إيراد' : 'مصروف', r.desc, r2(r.a), r2(r.v), r2(r.a + r.v)])];
-      const csv = '﻿' + rows.map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(',')).join('\r\n'); const u = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-      const l = document.createElement('a'); l.href = u; l.download = `masar-books-${from}_${to}.csv`; l.click(); setTimeout(() => URL.revokeObjectURL(u), 2000); return plog('تصدير الدفاتر', pl); }
-    if (a === 'del') { const x = BOOKS.expenses.find(y => y.id === b.dataset.id); if (!x) return;
-      dialog(`<h3>حذف المصروف؟</h3><div class="sum">${esc(x.date)} · ${esc(x.cat)}<br>${money(x.amount)} ريال + ضريبة ${money(x.vat)}</div>`, async () => { BOOKS.expenses = BOOKS.expenses.filter(y => y.id !== x.id); if (await saveBooks('تم حذف المصروف')) { plog('حذف مصروف', x.cat, `${x.amount} ريال · ${x.date}`); renderAccounting(); } }, 'حذف'); } };
+  const P = AC_PER(); const D = acData();
+  const VIEWS = [['over', 'نظرة عامة'], ['led', 'القيود'], ['pay', 'الرواتب'], ['br', 'الفروع'], ['rec', 'المصروفات الثابتة'], ['coa', 'دليل الحسابات'], ['rep', 'التقارير']];
+  box.innerHTML = `<div class="actabs" id="acTabs">${VIEWS.map(([k, l]) => `<button data-av="${k}" class="${k === AC_V ? 'on' : ''}">${l}</button>`).join('')}</div>
+    <div class="head" style="margin-top:-4px"><div class="seg" id="acSeg">${Object.entries(P).map(([k, [l]]) => `<button data-ap="${k}" class="${k === AC_P ? 'on' : ''}">${l}</button>`).join('')}</div>
+      <div class="acts"><label class="vtog" title="عند الإيقاف: الفواتير الجديدة بدون ضريبة، ولا يظهر ملخص الإقرار"><span class="sw2 ${vatOn() ? 'on' : ''}" data-ac="vat"></span>الضريبة ${vatOn() ? vatRate() + '%' : 'غير مفعّلة'}</label>
+      <button class="btn" data-ac="inc">تسجيل إيراد</button><button class="btn pri" data-ac="add">تسجيل مصروف</button></div></div>
+    <small style="color:var(--muted);margin-top:-8px">${D.pl}: من ${D.from} إلى ${D.to}</small>
+    <div id="acBody" style="display:grid;gap:16px">${AV[AC_V](D)}</div>`;
+  box.onclick = acClick; box.oninput = e => { if (e.target.dataset.lf) { AC_F[e.target.dataset.lf] = e.target.value; $('#ledT').innerHTML = ledRows(acData()); } };
 }
-function expenseDialog() {
-  const f = dialog(`<h3>تسجيل مصروف</h3><div class="g2"><label>التاريخ<input name="date" type="date" value="${today()}" required></label><label>البند<select name="cat">${EXP_CAT.map(c => `<option>${c}</option>`).join('')}</select></label></div>
-    <label>البيان<input name="desc" placeholder="مثال: اشتراك Netlify لشهر نوفمبر"></label><label>المورد (اختياري)<input name="vendor"></label>
-    ${vatOn() ? `<div class="g2"><label>المبلغ قبل الضريبة (ريال)<input name="amount" type="number" min="0" step="0.01" required></label><label>الضريبة المدفوعة (ريال)<input name="vat" type="number" min="0" step="0.01" value="0"></label></div>
-    <label class="chk"><input type="checkbox" name="auto" checked> احسب الضريبة 15% تلقائياً (ألغِ التحديد إذا كان المورد غير مسجل في الضريبة أو من خارج المملكة)</label>`
-    : `<label>المبلغ المدفوع (ريال)<input name="amount" type="number" min="0" step="0.01" required></label>`}`, async fd => {
-    const x = { id: 'e' + Date.now().toString(36), date: fd.get('date'), cat: fd.get('cat'), desc: String(fd.get('desc') || '').trim(), vendor: String(fd.get('vendor') || '').trim(), amount: r2(fd.get('amount')), vat: vatOn() ? r2(fd.get('vat')) : 0, by: ME.email, at: nowIso() };
-    if (!(x.amount > 0)) return toast('أدخل المبلغ');
-    if (BOOKS === null) await loadBooks(); BOOKS.expenses.push(x);
-    if (await saveBooks('تم تسجيل المصروف ✓')) { plog('تسجيل مصروف', x.cat, `${x.amount} ريال · ${x.date}`); if (TAB === 'accounting') renderAccounting(); } else BOOKS.expenses.pop(); }, 'حفظ');
-  if (!f.auto) return;
-  const auto = () => { if (f.auto.checked) f.vat.value = r2((+f.amount.value || 0) * 15 / 100); f.vat.readOnly = f.auto.checked; };
+const kpi = (v, l, c) => `<div class="kpi"><b ${c ? `style="color:${c}"` : ''}>${v}</b><span>${l}</span></div>`;
+const bars = (L, col) => { const mx = Math.max(1, ...L.map(x => x[1])); return L.length ? `<div class="mini-list">${L.map(([n, v, s]) => `<div class="cat"><span>${esc(n)}${s ? ` <small>${esc(s)}</small>` : ''}</span><span class="cbar"><i style="width:${v / mx * 100}%;${col ? 'background:' + col : ''}"></i></span><b>${money(v)}</b></div>`).join('')}</div>` : '<div class="empty">لا توجد مصروفات في هذه الفترة</div>'; };
+const byGrp = exp => Object.keys(AGRP).filter(g => g !== 'inc').map(g => [AGRP[g], sum(exp.filter(x => accOf(x.acc).grp === g), ecost)]).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
+const byBr = exp => BOOKS.branches.map(b => [b.name, sum(exp.filter(x => (x.branch || 'hq') === b.id), ecost), b.city]).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
+const vt = () => vatOn() ? ' (قبل الضريبة)' : '';
+const AV = {
+  over: D => { const margin = D.rev ? Math.round(D.profit / D.rev * 100) : null; const mp = ymOf(today()); const due = BOOKS.employees.filter(e => e.active !== false).length && !BOOKS.payrolls[mp];
+    const recDue = BOOKS.recurring.filter(r => r.on !== false && !BOOKS.expenses.some(x => x.src === `rec:${r.id}:${mp}`)).length;
+    return `${due || recDue ? `<div class="banner warn"><span class="big">!</span><div style="flex:1"><b>مستحقات هذا الشهر لم تُرحّل</b><small>${[due ? 'مسيّر رواتب ' + ymLabel(mp) : '', recDue ? recDue + ' مصروف ثابت' : ''].filter(Boolean).join(' · ')}</small></div>${due ? '<button class="btn" data-av="pay">مسيّر الرواتب</button>' : ''}${recDue ? '<button class="btn pri" data-ac="rec-post">ترحيل المصروفات الثابتة</button>' : ''}</div>` : ''}
+    <div class="kpis">${kpi(money(D.rev), 'الإيرادات' + vt())}${kpi(money(D.cost), 'المصروفات' + vt())}${kpi(money(D.profit), 'صافي الربح' + (margin === null ? '' : ` · هامش ${margin}%`), D.profit < 0 ? 'var(--crit)' : 'var(--ok)')}
+      ${vatOn() ? kpi(money(D.vatDue), 'ضريبة مستحقة للهيئة') : kpi(BOOKS.employees.filter(e => e.active !== false).length, 'موظفون على المسيّر')}</div>
+    <div class="g2c"><div class="panel"><div class="ph"><h3>المصروفات حسب المجموعة</h3><small>${D.exp.length} قيد</small></div>${bars(byGrp(D.exp))}</div>
+      <div class="panel"><div class="ph"><h3>التكلفة حسب الفرع</h3><button class="lnk" data-av="br">الفروع</button></div>${bars(byBr(D.exp), 'var(--gold)')}</div></div>
+    ${vatOn() ? `<div class="panel"><div class="ph"><h3>ملخص إقرار ضريبة القيمة المضافة</h3><small>${D.pl}</small></div><div class="mini-list">
+        <div><span>المبيعات الخاضعة للضريبة</span><b>${money(D.rev)}</b></div><div><span>ضريبة المخرجات</span><b>${money(D.outVat)}</b></div>
+        <div><span>المشتريات الخاضعة للضريبة</span><b>${money(sum(D.exp.filter(x => +x.vat), x => x.amount))}</b></div><div><span>ضريبة المدخلات</span><b>${money(D.inVat)}</b></div>
+        <div style="background:var(--gold-soft)"><span><b>صافي الضريبة ${D.vatDue >= 0 ? 'المستحقة' : 'المستردة'}</b></span><b>${money(Math.abs(D.vatDue))}</b></div></div>
+        <div class="roles">راجع الأرقام مع محاسبك قبل تقديم الإقرار في بوابة الهيئة.</div></div>`
+      : `<div class="panel"><div class="ph"><h3>ضريبة القيمة المضافة غير مفعّلة</h3><span class="pill p-off">غير مسجّل</span></div><div class="roles" style="font-size:14px">الفواتير الجديدة تصدر «فاتورة» بدون ضريبة ولا رمز QR، وأي ضريبة تدفعها للموردين تُحسب ضمن تكلفة المصروف. عند التسجيل في الهيئة (إلزامي إذا تجاوزت الإيرادات 375,000 ريال خلال 12 شهراً) أدخل الرقم الضريبي في الإعدادات ثم فعّل الزر.</div></div>`}`; },
+  led: D => `<div class="panel"><div class="bar"><input type="search" data-lf="q" placeholder="بحث في البيان أو المورد" value="${esc(AC_F.q)}">
+      <select data-lf="kind"><option value="">كل القيود</option><option value="inv" ${AC_F.kind === 'inv' ? 'selected' : ''}>فواتير الاشتراكات</option><option value="inc" ${AC_F.kind === 'inc' ? 'selected' : ''}>إيرادات أخرى</option><option value="exp" ${AC_F.kind === 'exp' ? 'selected' : ''}>مصروفات</option></select>
+      <select data-lf="acc"><option value="">كل الحسابات</option>${accSel(AC_F.acc).replace(/<optgroup label="([^"]+)">/g, '<optgroup label="$1">')}${`<optgroup label="${AGRP.inc}">${BOOKS.accounts.filter(a => a.grp === 'inc').map(a => `<option value="${a.id}" ${a.id === AC_F.acc ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}</optgroup>`}</select>
+      <select data-lf="br"><option value="">كل الفروع</option>${brSel(AC_F.br)}</select><button class="btn" data-ac="csv">تصدير Excel</button></div>
+    <div class="tw"><table><thead><tr><th>التاريخ</th><th>النوع</th><th>الحساب</th><th>الفرع</th><th>البيان</th><th>المبلغ</th>${vatOn() ? '<th>الضريبة</th>' : ''}<th></th></tr></thead><tbody id="ledT">${ledRows(D)}</tbody></table></div></div>`,
+  pay: () => { const L = BOOKS.employees; const act = L.filter(e => e.active !== false); const mp = ymOf(today()); const done = BOOKS.payrolls[mp];
+    const tot = sum(act, grossOf), gosi = sum(act, gosiOf);
+    return `<div class="kpis">${kpi(act.length, 'موظفون فعّالون')}${kpi(money(tot), 'إجمالي الرواتب الشهرية')}${kpi(money(sum(act, e => e.housing)), 'منها بدل السكن')}${kpi(money(gosi), 'التأمينات على المنشأة (تقديري)')}</div>
+    <div class="panel"><div class="bar"><h3 style="flex:1">مسيّر رواتب ${ymLabel(mp)} ${done ? `<span class="pill p-ok">رُحّل ${esc(fmt(done.at))}</span>` : '<span class="pill p-warn">لم يُرحّل</span>'}</h3>
+      <button class="btn" data-ac="emp-new">إضافة موظف</button>${done ? `<button class="btn bad" data-ac="pay-undo" data-m="${mp}">إلغاء الترحيل</button>` : `<button class="btn pri" data-ac="pay-run" data-m="${mp}" ${act.length ? '' : 'disabled'}>ترحيل رواتب الشهر</button>`}</div>
+    <div class="tw"><table><thead><tr><th>الموظف</th><th>الفرع</th><th>الأساسي</th><th>السكن</th><th>النقل</th><th>أخرى</th><th>الإجمالي</th><th>التأمينات</th><th></th></tr></thead><tbody>
+      ${L.length ? L.map(e => `<tr style="${e.active === false ? 'opacity:.5' : ''}"><td><b>${esc(e.name)}</b><small>${esc(e.job || '')}${e.saudi ? ' · سعودي' : ''}${e.active === false ? ' · موقوف' : ''}</small></td><td>${esc(brOf(e.branch).name)}</td>
+        <td>${money(e.basic)}</td><td>${money(e.housing)}</td><td>${money(e.transport)}</td><td>${money(e.other)}</td><td><b>${money(grossOf(e))}</b></td><td>${money(gosiOf(e))}</td><td><button class="btn sm" data-ac="emp-edit" data-id="${e.id}">تعديل</button></td></tr>`).join('')
+        : '<tr><td colspan="9" class="empty">أضف موظفيك، ثم رحّل رواتب كل شهر بضغطة واحدة: تُسجَّل الرواتب والسكن والنقل والتأمينات كقيود على فرع كل موظف.</td></tr>'}</tbody></table></div>
+    <div class="roles">التأمينات تقديرية: 11.75% للسعودي و2% لغير السعودي من الأساسي والسكن (حد أعلى 45,000). عدّلها من القيود إن اختلفت فاتورة التأمينات.</div></div>
+    ${Object.keys(BOOKS.payrolls).length ? `<div class="panel"><div class="ph"><h3>المسيّرات السابقة</h3></div><div class="mini-list">${Object.entries(BOOKS.payrolls).sort((a, b) => b[0].localeCompare(a[0])).map(([m, p]) => `<div><span>${ymLabel(m)} ${m.slice(0, 4)} <small>${p.n} موظف</small></span><b>${money(p.total)}</b></div>`).join('')}</div></div>` : ''}`; },
+  br: D => `<div class="panel"><div class="bar"><h3 style="flex:1">الفروع ومراكز التكلفة</h3><button class="btn pri" data-ac="br-new">إضافة فرع</button></div>
+    <div class="tw"><table><thead><tr><th>الفرع</th><th>المدينة</th><th>الموظفون</th><th>الرواتب</th><th>الإيجار والسكن</th><th>تكاليف أخرى</th><th>إجمالي الفترة</th><th></th></tr></thead><tbody>
+    ${BOOKS.branches.map(b => { const E = D.exp.filter(x => (x.branch || 'hq') === b.id); const g = k => sum(E.filter(x => accOf(x.acc).grp === k), ecost); const pay = g('pay'), bra = g('branch'), all = sum(E, ecost);
+      return `<tr><td><b>${esc(b.name)}</b></td><td>${esc(b.city || '—')}</td><td>${BOOKS.employees.filter(e => e.branch === b.id && e.active !== false).length}</td><td>${money(pay)}</td><td>${money(bra)}</td><td>${money(all - pay - bra)}</td><td><b>${money(all)}</b></td><td><button class="btn sm" data-ac="br-edit" data-id="${b.id}">تعديل</button></td></tr>`; }).join('')}</tbody></table></div></div>`,
+  rec: () => { const mp = ymOf(today()); return `<div class="panel"><div class="bar"><h3 style="flex:1">المصروفات الثابتة الشهرية <small style="color:var(--muted);font-weight:400">إيجارات، سكن، اشتراكات، إنترنت…</small></h3><button class="btn" data-ac="rec-new">إضافة</button><button class="btn pri" data-ac="rec-post">ترحيل مصروفات ${ymLabel(mp)}</button></div>
+    <div class="tw"><table><thead><tr><th>البيان</th><th>الحساب</th><th>الفرع</th><th>المبلغ الشهري</th><th>يوم الاستحقاق</th><th>${ymLabel(mp)}</th><th></th></tr></thead><tbody>
+    ${BOOKS.recurring.length ? BOOKS.recurring.map(r => `<tr style="${r.on === false ? 'opacity:.5' : ''}"><td><b>${esc(r.desc || accOf(r.acc).name)}</b><small>${esc(r.vendor || '')}</small></td><td>${esc(accOf(r.acc).name)}</td><td>${esc(brOf(r.branch).name)}</td><td>${money(r.amount)}${+r.vat ? ` <small>+ ضريبة ${money(r.vat)}</small>` : ''}</td><td>${esc(r.day || 1)}</td>
+      <td>${BOOKS.expenses.some(x => x.src === `rec:${r.id}:${mp}`) ? '<span class="pill p-ok">مُرحّل</span>' : r.on === false ? '<span class="pill p-off">موقوف</span>' : '<span class="pill p-warn">لم يُرحّل</span>'}</td><td><button class="btn sm" data-ac="rec-edit" data-id="${r.id}">تعديل</button></td></tr>`).join('')
+      : '<tr><td colspan="7" class="empty">أضف المصروفات المتكررة (إيجار الفرع، سكن الموظفين، الاستضافة…) ثم رحّلها كل شهر بضغطة واحدة.</td></tr>'}</tbody></table></div></div>`; },
+  coa: D => `<div class="panel"><div class="bar"><h3 style="flex:1">دليل الحسابات</h3><button class="btn pri" data-ac="acc-new">إضافة حساب</button></div>
+    <div class="coa">${Object.entries(AGRP).map(([g, gl]) => { const A = BOOKS.accounts.filter(a => a.grp === g); const src = g === 'inc' ? D.oinc : D.exp; const gt = sum(src.filter(x => accOf(x.acc).grp === g), ecost);
+      return `<div class="coa-g"><div class="coa-h"><b>${gl}</b><span>${money(gt)}</span></div>${A.map(a => `<div class="coa-a"><span>${esc(a.name)}</span><span>${money(sum(src.filter(x => x.acc === a.id), ecost))}</span><button class="lnk" data-ac="acc-edit" data-id="${a.id}">تعديل</button></div>`).join('')}</div>`; }).join('')}</div>
+    <div class="roles">المبالغ للفترة المختارة. تقدر تضيف حسابات جديدة أو تعيد تسميتها، والقيود السابقة تبقى مرتبطة بها.</div></div>`,
+  rep: D => { const ms = Array.from({ length: 12 }, (_, i) => ymAdd(ymOf(today()), i - 11)); const pm = paidByMonth();
+    const row = m => { const E = BOOKS.expenses.filter(x => ymOf(x.date) === m); const r = (pm[m] || 0) + sum(E.filter(x => x.kind === 'inc'), x => x.amount); const c = sum(E.filter(x => x.kind !== 'inc'), ecost); return [m, r, c, r - c]; };
+    const R = ms.map(row);
+    return `<div class="panel"><div class="ph"><h3>قائمة الدخل</h3><small>${D.pl}</small></div><div class="mini-list is">
+      <div class="h"><span>الإيرادات</span><b>${money(D.rev)}</b></div><div><span>اشتراكات الشركات</span><span>${money(D.subRev)}</span></div><div><span>إيرادات أخرى</span><span>${money(D.othRev)}</span></div>
+      <div class="h"><span>المصروفات</span><b>(${money(D.cost)})</b></div>${byGrp(D.exp).map(([n, v]) => `<div><span>${esc(n)}</span><span>(${money(v)})</span></div>`).join('') || '<div><small>لا توجد مصروفات</small></div>'}
+      <div class="h tot"><span>صافي ${D.profit >= 0 ? 'الربح' : 'الخسارة'}</span><b style="color:${D.profit < 0 ? 'var(--crit)' : 'var(--ok)'}">${money(D.profit)}</b></div></div></div>
+    <div class="panel"><div class="ph"><h3>الأداء الشهري</h3><small>آخر 12 شهراً</small></div><div class="tw"><table><thead><tr><th>الشهر</th><th>الإيرادات</th><th>المصروفات</th><th>صافي الربح</th></tr></thead><tbody>
+      ${R.slice().reverse().map(([m, r, c, p]) => `<tr><td>${ymLabel(m)} ${m.slice(0, 4)}</td><td>${money(r)}</td><td>${money(c)}</td><td><b style="color:${p < 0 ? 'var(--crit)' : 'var(--ok)'}">${money(p)}</b></td></tr>`).join('')}
+      <tr><td><b>الإجمالي</b></td><td><b>${money(sum(R, x => x[1]))}</b></td><td><b>${money(sum(R, x => x[2]))}</b></td><td><b>${money(sum(R, x => x[3]))}</b></td></tr></tbody></table></div></div>
+    <div class="panel"><div class="ph"><h3>المصروفات حسب الحساب</h3><button class="btn sm" data-ac="csv">تصدير Excel</button></div>${bars(BOOKS.accounts.filter(a => a.grp !== 'inc').map(a => [a.name, sum(D.exp.filter(x => x.acc === a.id), ecost), AGRP[a.grp]]).filter(x => x[1]).sort((a, b) => b[1] - a[1]))}</div>`; }
+};
+function ledList(D) {
+  return [...D.inv.map(i => ({ d: String(i.paidAt || i.issueDate).slice(0, 10), t: 'inv', acc: '', br: '', desc: `${i.number} · ${i.companyName}`, a: +i.subtotal || 0, v: +i.vat || 0 })),
+    ...[...D.exp, ...D.oinc].map(x => ({ d: x.date, t: x.kind === 'inc' ? 'inc' : 'exp', id: x.id, src: x.src, acc: x.acc, br: x.branch || 'hq', desc: [x.desc, x.vendor, x.method].filter(Boolean).join(' · '), a: +x.amount || 0, v: +x.vat || 0 }))]
+    .filter(r => (!AC_F.kind || r.t === AC_F.kind) && (!AC_F.acc || r.acc === AC_F.acc) && (!AC_F.br || r.br === AC_F.br) && (!AC_F.q || (r.desc + ' ' + (r.acc ? accOf(r.acc).name : '')).toLowerCase().includes(AC_F.q.toLowerCase())))
+    .sort((a, b) => b.d.localeCompare(a.d));
+}
+function ledRows(D) {
+  const L = ledList(D); const T = { inv: ['اشتراك', 'p-ok'], inc: ['إيراد', 'p-info'], exp: ['مصروف', 'p-crit'] };
+  return L.length ? L.map(r => `<tr><td>${esc(r.d)}</td><td><span class="pill ${T[r.t][1]}">${T[r.t][0]}</span></td><td>${r.acc ? esc(accOf(r.acc).name) : 'اشتراكات الشركات'}</td><td>${r.br ? esc(brOf(r.br).name) : '—'}</td><td>${esc(r.desc)}${r.src ? ' <small>تلقائي</small>' : ''}</td>
+    <td><b>${r.t === 'exp' ? '−' : ''}${money(vatOn() ? r.a : r.a + r.v)}</b></td>${vatOn() ? `<td>${money(r.v)}</td>` : ''}<td>${r.id ? `<div class="acts"><button class="btn sm" data-ac="ent-edit" data-id="${r.id}">تعديل</button><button class="btn sm bad" data-ac="del" data-id="${r.id}">حذف</button></div>` : ''}</td></tr>`).join('')
+    + `<tr><td colspan="5"><b>الإجمالي (${L.length} قيد)</b></td><td><b>${money(sum(L, r => (r.t === 'exp' ? -1 : 1) * (vatOn() ? r.a : r.a + r.v)))}</b></td>${vatOn() ? '<td></td>' : ''}<td></td></tr>`
+    : `<tr><td colspan="${vatOn() ? 8 : 7}" class="empty">لا توجد قيود</td></tr>`;
+}
+async function acClick(e) {
+  const v = e.target.closest('[data-av]'); if (v) { AC_V = v.dataset.av; return renderAccounting(); }
+  const p = e.target.closest('[data-ap]'); if (p) { AC_P = p.dataset.ap; return renderAccounting(); }
+  const b = e.target.closest('[data-ac]'); if (!b) return; const a = b.dataset.ac, id = b.dataset.id; const B = BOOKS;
+  if (a === 'add') return entryDialog(null, 'exp'); if (a === 'inc') return entryDialog(null, 'inc');
+  if (a === 'ent-edit') return entryDialog(B.expenses.find(x => x.id === id));
+  if (a === 'del') { const x = B.expenses.find(y => y.id === id); if (!x) return;
+    return dialog(`<h3>حذف القيد؟</h3><div class="sum">${esc(x.date)} · ${esc(accOf(x.acc).name)}<br>${money(x.amount)} ريال${+x.vat ? ' + ضريبة ' + money(x.vat) : ''}</div>`, async () => { B.expenses = B.expenses.filter(y => y.id !== x.id); if (await saveBooks('تم حذف القيد')) { plog('حذف قيد', accOf(x.acc).name, `${x.amount} ريال · ${x.date}`); renderAccounting(); } }, 'حذف'); }
+  if (a === 'csv') { const L = ledList(acData()); const rows = [['التاريخ', 'النوع', 'الحساب', 'المجموعة', 'الفرع', 'البيان', 'المبلغ قبل الضريبة', 'الضريبة', 'الإجمالي'], ...L.map(r => [r.d, { inv: 'اشتراك', inc: 'إيراد', exp: 'مصروف' }[r.t], r.acc ? accOf(r.acc).name : 'اشتراكات الشركات', r.acc ? AGRP[accOf(r.acc).grp] : 'الإيرادات', r.br ? brOf(r.br).name : '', r.desc, r2(r.a), r2(r.v), r2(r.a + r.v)])];
+    const csv = '﻿' + rows.map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(',')).join('\r\n'); const u = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const D = acData(); const l = document.createElement('a'); l.href = u; l.download = `masar-books-${D.from}_${D.to}.csv`; l.click(); setTimeout(() => URL.revokeObjectURL(u), 2000); return plog('تصدير الدفاتر', D.pl); }
+  if (a === 'vat') { const on = !vatOn();
+    return dialog(on ? `<h3>تفعيل ضريبة القيمة المضافة</h3><p style="margin:0;font-size:14px">الفواتير الجديدة ستصدر «فاتورة ضريبية مبسطة» بضريبة ${SET.vatRate === '' || SET.vatRate == null ? 15 : SET.vatRate}% ورمز QR.${SET.vatNumber ? '' : '<br><b style="color:var(--crit)">أدخل الرقم الضريبي في الإعدادات أولاً.</b>'}</p>`
+      : `<h3>إيقاف ضريبة القيمة المضافة</h3><p style="margin:0;font-size:14px">الفواتير الجديدة ستصدر «فاتورة» بدون ضريبة وبدون رمز QR. الفواتير السابقة لا تتغير.</p>`, async () => {
+      try { await F.setDoc(F.doc(fs, 'platform', 'settings'), { vatRegistered: on, updatedAt: nowIso() }, { merge: true }); SET.vatRegistered = on; toast(on ? 'فُعّلت الضريبة' : 'أُوقفت الضريبة'); plog(on ? 'تفعيل ضريبة القيمة المضافة' : 'إيقاف ضريبة القيمة المضافة', ''); renderAccounting(); }
+      catch (x) { toast('تعذر الحفظ: ' + (x.code || x.message)); } }, on ? 'تفعيل' : 'إيقاف'); }
+  if (a === 'emp-new' || a === 'emp-edit') return empDialog(B.employees.find(x => x.id === id));
+  if (a === 'pay-run') { const m = b.dataset.m; const act = B.employees.filter(x => x.active !== false); const date = m + '-' + String(Math.min(28, +(SET.payDay || 27))).padStart(2, '0');
+    return dialog(`<h3>ترحيل رواتب ${ymLabel(m)}</h3><div class="sum"><div>${act.length} موظف</div><div>الرواتب والبدلات: <b>${money(sum(act, grossOf))}</b></div><div>التأمينات على المنشأة: <b>${money(sum(act, gosiOf))}</b></div></div><label>تاريخ القيد<input type="date" name="d" value="${date}"></label>`, async fd => {
+      const d = fd.get('d'); const src = 'pay:' + m; const out = [];
+      act.forEach(x => { PAYC.forEach(([k, l]) => { if (+x[k]) out.push({ id: uid('p'), kind: 'exp', date: d, acc: (B.accounts.find(a => a.name === l) || {}).id || 'pay1', branch: x.branch || 'hq', desc: `${l} · ${x.name}`, amount: r2(x[k]), vat: 0, method: 'تحويل بنكي', src, by: ME.email, at: nowIso() }); });
+        const g = gosiOf(x); if (g) out.push({ id: uid('p'), kind: 'exp', date: d, acc: (B.accounts.find(a => a.name.startsWith('التأمينات')) || {}).id || 'pay5', branch: x.branch || 'hq', desc: `التأمينات · ${x.name}`, amount: g, vat: 0, src, by: ME.email, at: nowIso() }); });
+      B.expenses.push(...out); B.payrolls[m] = { at: nowIso(), by: ME.email, n: act.length, total: r2(sum(out, x => x.amount)) };
+      if (await saveBooks('رُحّلت رواتب الشهر ✓')) { plog('ترحيل مسيّر رواتب', ymLabel(m), `${act.length} موظف · ${B.payrolls[m].total} ريال`); renderAccounting(); } else { B.expenses = B.expenses.filter(x => x.src !== src); delete B.payrolls[m]; } }, 'ترحيل'); }
+  if (a === 'pay-undo') { const m = b.dataset.m; return dialog(`<h3>إلغاء ترحيل رواتب ${ymLabel(m)}؟</h3><p style="margin:0;font-size:14px">تُحذف قيود هذا المسيّر، وتقدر ترحّله من جديد بعد تعديل الرواتب.</p>`, async () => {
+      B.expenses = B.expenses.filter(x => x.src !== 'pay:' + m); delete B.payrolls[m]; if (await saveBooks('أُلغي الترحيل')) { plog('إلغاء مسيّر رواتب', ymLabel(m)); renderAccounting(); } }, 'إلغاء الترحيل'); }
+  if (a === 'br-new' || a === 'br-edit') { const x = B.branches.find(y => y.id === id);
+    return dialog(`<h3>${x ? 'تعديل الفرع' : 'فرع جديد'}</h3><label>اسم الفرع<input name="n" required value="${esc(x ? x.name : '')}" placeholder="مثال: فرع جدة"></label><label>المدينة<input name="c" value="${esc(x ? x.city || '' : '')}"></label>`, async fd => {
+      if (x) Object.assign(x, { name: fd.get('n').trim(), city: fd.get('c').trim() }); else B.branches.push({ id: uid('b'), name: fd.get('n').trim(), city: fd.get('c').trim() });
+      if (await saveBooks('تم الحفظ')) { plog(x ? 'تعديل فرع' : 'إضافة فرع', fd.get('n')); renderAccounting(); } }, 'حفظ'); }
+  if (a === 'rec-new' || a === 'rec-edit') return recDialog(B.recurring.find(y => y.id === id));
+  if (a === 'rec-post') { const m = ymOf(today()); const L = B.recurring.filter(r => r.on !== false && !B.expenses.some(x => x.src === `rec:${r.id}:${m}`)); if (!L.length) return toast('كل المصروفات الثابتة مُرحّلة لهذا الشهر');
+    const out = L.map(r => ({ id: uid('r'), kind: 'exp', date: `${m}-${String(Math.min(28, +r.day || 1)).padStart(2, '0')}`, acc: r.acc, branch: r.branch, desc: r.desc, vendor: r.vendor || '', amount: r2(r.amount), vat: vatOn() ? r2(r.vat) : 0, method: r.method || '', src: `rec:${r.id}:${m}`, by: ME.email, at: nowIso() }));
+    B.expenses.push(...out); if (await saveBooks(`رُحّل ${out.length} مصروف ثابت ✓`)) { plog('ترحيل المصروفات الثابتة', ymLabel(m), `${out.length} قيد · ${r2(sum(out, x => x.amount))} ريال`); renderAccounting(); } else B.expenses = B.expenses.filter(x => !out.includes(x)); return; }
+  if (a === 'acc-new' || a === 'acc-edit') { const x = B.accounts.find(y => y.id === id);
+    return dialog(`<h3>${x ? 'تعديل حساب' : 'حساب جديد'}</h3><label>اسم الحساب<input name="n" required value="${esc(x ? x.name : '')}"></label><label>المجموعة<select name="g">${Object.entries(AGRP).map(([g, l]) => `<option value="${g}" ${x && x.grp === g ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`, async fd => {
+      if (x) Object.assign(x, { name: fd.get('n').trim(), grp: fd.get('g') }); else B.accounts.push({ id: uid('a'), name: fd.get('n').trim(), grp: fd.get('g') });
+      if (await saveBooks('تم الحفظ')) { plog(x ? 'تعديل حساب' : 'إضافة حساب', fd.get('n')); renderAccounting(); } }, 'حفظ'); }
+}
+function entryDialog(x, kind) {
+  kind = x ? (x.kind || 'exp') : kind; const inc = kind === 'inc';
+  const f = dialog(`<h3>${x ? 'تعديل قيد' : inc ? 'تسجيل إيراد' : 'تسجيل مصروف'}</h3><div class="g2"><label>التاريخ<input name="date" type="date" value="${esc(x ? x.date : today())}" required></label><label>الحساب<select name="acc" required>${x ? '' : '<option value="">اختر الحساب…</option>'}${accSel(x ? x.acc : '', kind)}</select></label></div>
+    <div class="g2"><label>الفرع / مركز التكلفة<select name="branch">${brSel(x ? x.branch : 'hq')}</select></label><label>طريقة ${inc ? 'التحصيل' : 'الدفع'}<select name="method">${METH.map(m => `<option ${x && x.method === m ? 'selected' : ''}>${m}</option>`).join('')}</select></label></div>
+    <label>البيان<input name="desc" value="${esc(x ? x.desc || '' : '')}" placeholder="${inc ? 'مثال: استشارة لشركة …' : 'مثال: إيجار فرع جدة لشهر نوفمبر'}"></label><label>${inc ? 'العميل' : 'المورد'} (اختياري)<input name="vendor" value="${esc(x ? x.vendor || '' : '')}"></label>
+    ${vatOn() ? `<div class="g2"><label>المبلغ قبل الضريبة (ريال)<input name="amount" type="number" min="0" step="0.01" required value="${x ? esc(x.amount) : ''}"></label><label>الضريبة (ريال)<input name="vat" type="number" min="0" step="0.01" value="${x ? esc(x.vat || 0) : 0}"></label></div>
+    <label class="chk"><input type="checkbox" name="auto" ${x ? '' : 'checked'}> احسب الضريبة 15% تلقائياً</label>` : `<label>المبلغ (ريال)<input name="amount" type="number" min="0" step="0.01" required value="${x ? esc(r2(+x.amount + (+x.vat || 0))) : ''}"></label>`}`, async fd => {
+    const d = { date: fd.get('date'), acc: fd.get('acc'), branch: fd.get('branch'), method: fd.get('method'), desc: String(fd.get('desc') || '').trim(), vendor: String(fd.get('vendor') || '').trim(), amount: r2(fd.get('amount')), vat: vatOn() ? r2(fd.get('vat')) : 0 };
+    if (!(d.amount > 0)) return toast('أدخل المبلغ');
+    if (BOOKS === null) await loadBooks();
+    if (x) Object.assign(x, d, { editedBy: ME.email, editedAt: nowIso() }); else BOOKS.expenses.push({ id: uid('e'), kind, ...d, by: ME.email, at: nowIso() });
+    if (await saveBooks(x ? 'تم تعديل القيد' : inc ? 'تم تسجيل الإيراد ✓' : 'تم تسجيل المصروف ✓')) { plog(x ? 'تعديل قيد' : inc ? 'تسجيل إيراد' : 'تسجيل مصروف', accOf(d.acc).name, `${d.amount} ريال · ${d.date}`); if (TAB === 'accounting') renderAccounting(); } }, 'حفظ');
+  if (!f.auto) return; const auto = () => { if (f.auto.checked) f.vat.value = r2((+f.amount.value || 0) * 15 / 100); f.vat.readOnly = f.auto.checked; };
   f.amount.oninput = auto; f.auto.onchange = auto; auto();
+}
+const expenseDialog = () => (BOOKS === null ? loadBooks() : Promise.resolve()).then(() => entryDialog(null, 'exp'));
+function empDialog(x) {
+  const n = k => x ? esc(x[k] || 0) : '';
+  dialog(`<h3>${x ? 'تعديل موظف' : 'موظف جديد'}</h3><div class="g2"><label>الاسم<input name="name" required value="${esc(x ? x.name : '')}"></label><label>المسمى الوظيفي<input name="job" value="${esc(x ? x.job || '' : '')}"></label></div>
+    <div class="g2"><label>الفرع<select name="branch">${brSel(x ? x.branch : 'hq')}</select></label><label>تاريخ المباشرة<input name="start" type="date" value="${esc(x ? x.start || '' : '')}"></label></div>
+    <div class="g2"><label>الراتب الأساسي<input name="basic" type="number" min="0" step="0.01" required value="${n('basic')}"></label><label>بدل السكن<input name="housing" type="number" min="0" step="0.01" value="${n('housing')}"></label></div>
+    <div class="g2"><label>بدل النقل<input name="transport" type="number" min="0" step="0.01" value="${n('transport')}"></label><label>بدلات أخرى<input name="other" type="number" min="0" step="0.01" value="${n('other')}"></label></div>
+    <label class="chk"><input type="checkbox" name="saudi" ${x && x.saudi ? 'checked' : ''}> سعودي الجنسية (لحساب التأمينات)</label>${x ? `<label class="chk"><input type="checkbox" name="active" ${x.active !== false ? 'checked' : ''}> على المسيّر (ألغِ التحديد عند ترك العمل)</label>` : ''}`, async fd => {
+    const d = { name: fd.get('name').trim(), job: fd.get('job').trim(), branch: fd.get('branch'), start: fd.get('start'), basic: r2(fd.get('basic')), housing: r2(fd.get('housing')), transport: r2(fd.get('transport')), other: r2(fd.get('other')), saudi: !!fd.get('saudi') };
+    if (x) Object.assign(x, d, { active: !!fd.get('active') }); else BOOKS.employees.push({ id: uid('m'), ...d, active: true });
+    if (await saveBooks('تم حفظ الموظف')) { plog(x ? 'تعديل موظف' : 'إضافة موظف', d.name); renderAccounting(); } }, 'حفظ');
+}
+function recDialog(x) {
+  dialog(`<h3>${x ? 'تعديل مصروف ثابت' : 'مصروف ثابت شهري'}</h3><label>البيان<input name="desc" required value="${esc(x ? x.desc : '')}" placeholder="مثال: إيجار سكن الموظفين – الرياض"></label>
+    <div class="g2"><label>الحساب<select name="acc">${accSel(x ? x.acc : 'branch1', 'exp')}</select></label><label>الفرع<select name="branch">${brSel(x ? x.branch : 'hq')}</select></label></div>
+    <div class="g2"><label>المبلغ الشهري${vatOn() ? ' قبل الضريبة' : ''}<input name="amount" type="number" min="0" step="0.01" required value="${x ? esc(x.amount) : ''}"></label>${vatOn() ? `<label>الضريبة الشهرية<input name="vat" type="number" min="0" step="0.01" value="${x ? esc(x.vat || 0) : 0}"></label>` : '<span></span>'}</div>
+    <div class="g2"><label>المورد / المؤجر<input name="vendor" value="${esc(x ? x.vendor || '' : '')}"></label><label>يوم الاستحقاق في الشهر<input name="day" type="number" min="1" max="28" value="${x ? esc(x.day || 1) : 1}"></label></div>
+    ${x ? `<label class="chk"><input type="checkbox" name="on" ${x.on !== false ? 'checked' : ''}> فعّال</label>` : ''}`, async fd => {
+    const d = { desc: fd.get('desc').trim(), acc: fd.get('acc'), branch: fd.get('branch'), amount: r2(fd.get('amount')), vat: vatOn() ? r2(fd.get('vat')) : 0, vendor: fd.get('vendor').trim(), day: +fd.get('day') || 1 };
+    if (x) Object.assign(x, d, { on: !!fd.get('on') }); else BOOKS.recurring.push({ id: uid('c'), ...d, on: true });
+    if (await saveBooks('تم الحفظ')) { plog(x ? 'تعديل مصروف ثابت' : 'إضافة مصروف ثابت', d.desc); renderAccounting(); } }, 'حفظ');
 }
 </script>
 </body>
