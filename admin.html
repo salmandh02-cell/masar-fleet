@@ -295,6 +295,8 @@ dialog input,dialog select,dialog textarea,.form-grid input,.form-grid textarea{
 @media (max-width:640px){.stat4 b{font-size:24px}.who .hide-m{display:none}}
 
 /* الدفعة الثانية */
+.vtog{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2,var(--ink));padding:0 6px;cursor:pointer;white-space:nowrap}
+.sw2{width:34px;height:20px;border-radius:10px;background:var(--line);position:relative;flex:none;transition:.15s}.sw2::after{content:"";position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:.15s}.sw2.on{background:var(--accent)}.sw2.on::after{right:16px}
 main>section,main>div{min-width:0}
 .kbar{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin:0 2px 12px;color:var(--muted);font-size:13px;cursor:pointer;background:var(--surface)}
 .kbar:hover{border-color:var(--muted)}.kbar svg.i{width:15px;height:15px}.kbar kbd,.ck-in kbd{margin-inline-start:auto;font:500 11px var(--f-mono);color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
@@ -785,7 +787,8 @@ function closeFile() { $('#file').hidden = true; FILE_ID = null; }
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#file').hidden && !$('#dlg').open) closeFile(); });
 
 /* ---------- الفواتير ---------- */
-const vatRate = () => (SET.vatRate === '' || SET.vatRate == null ? 15 : +SET.vatRate);
+const vatOn = () => SET.vatRegistered !== false;
+const vatRate = () => (!vatOn() ? 0 : SET.vatRate === '' || SET.vatRate == null ? 15 : +SET.vatRate);
 function renderInv() {
   const q = $('#iq').value.trim().toLowerCase(), f = $('#ifs').value;
   const list = INVS.filter(i => (f === 'all' || istOf(i) === f) && (!q || [i.number, i.companyName, i.customerNo, i.buyer && i.buyer.vatNumber].some(x => String(x || '').toLowerCase().includes(q))));
@@ -1409,28 +1412,33 @@ async function renderAccounting() {
   if (BOOKS === null) { box.innerHTML = '<div class="panel"><div class="empty">جارٍ التحميل…</div></div>'; await loadBooks(); }
   const P = AC_PER(); const [pl, from, to] = P[AC_P]; const inP = d => d && d.slice(0, 10) >= from && d.slice(0, 10) <= to;
   const inc = INVS.filter(i => i.status === 'paid' && inP(i.paidAt || i.issueDate)); const exp = BOOKS.expenses.filter(x => inP(x.date));
-  const rev = sum(inc, i => i.subtotal), outVat = sum(inc, i => i.vat), cost = sum(exp, x => x.amount), inVat = sum(exp, x => x.vat);
+  const rev = sum(inc, i => i.subtotal), outVat = sum(inc, i => i.vat), cost = sum(exp, x => +x.amount + (vatOn() ? 0 : +x.vat || 0)), vt = vatOn() ? ' (قبل الضريبة)' : '', inVat = sum(exp, x => x.vat);
   const profit = rev - cost, vatDue = outVat - inVat; const margin = rev ? Math.round(profit / rev * 100) : null;
-  const byCat = EXP_CAT.map(c => [c, sum(exp.filter(x => x.cat === c), x => x.amount)]).filter(([, v]) => v).sort((a, b) => b[1] - a[1]); const cmax = Math.max(1, ...byCat.map(x => x[1]));
+  const ecost = x => +x.amount + (vatOn() ? 0 : +x.vat || 0); const byCat = EXP_CAT.map(c => [c, sum(exp.filter(x => x.cat === c), ecost)]).filter(([, v]) => v).sort((a, b) => b[1] - a[1]); const cmax = Math.max(1, ...byCat.map(x => x[1]));
   const ledger = [...inc.map(i => ({ d: String(i.paidAt || i.issueDate).slice(0, 10), t: 'in', desc: `${i.number} · ${i.companyName}`, a: +i.subtotal || 0, v: +i.vat || 0 })),
     ...exp.map(x => ({ d: x.date, t: 'out', id: x.id, desc: `${x.cat}${x.desc ? ' · ' + x.desc : ''}${x.vendor ? ' · ' + x.vendor : ''}`, a: +x.amount || 0, v: +x.vat || 0 }))].sort((a, b) => b.d.localeCompare(a.d));
   box.innerHTML = `<div class="head" style="margin-top:-6px"><div class="seg" id="acSeg">${Object.entries(P).map(([k, [l]]) => `<button data-ap="${k}" class="${k === AC_P ? 'on' : ''}">${l}</button>`).join('')}</div>
-      <div class="acts"><button class="btn" data-ac="csv">تصدير Excel (CSV)</button><button class="btn pri" data-ac="add">تسجيل مصروف</button></div></div>
+      <div class="acts"><label class="vtog" title="عند الإيقاف: الفواتير الجديدة بدون ضريبة، ولا يظهر ملخص الإقرار"><span class="sw2 ${vatOn() ? 'on' : ''}" data-ac="vat"></span>ضريبة القيمة المضافة ${vatOn() ? vatRate() + '%' : 'غير مفعّلة'}</label><button class="btn" data-ac="csv">تصدير Excel (CSV)</button><button class="btn pri" data-ac="add">تسجيل مصروف</button></div></div>
     <small style="color:var(--muted);margin-top:-8px">${pl}: من ${from} إلى ${to}</small>
-    <div class="kpis"><div class="kpi"><b>${money(rev)}</b><span>الإيرادات (قبل الضريبة)</span></div><div class="kpi"><b>${money(cost)}</b><span>المصروفات (قبل الضريبة)</span></div>
+    <div class="kpis"><div class="kpi"><b>${money(rev)}</b><span>الإيرادات${vt}</span></div><div class="kpi"><b>${money(cost)}</b><span>المصروفات${vt}</span></div>
       <div class="kpi ${profit < 0 ? 'hot' : ''}"><b style="color:${profit < 0 ? 'var(--crit)' : 'var(--ok)'}">${money(profit)}</b><span>صافي الربح${margin === null ? '' : ` · هامش ${margin}%`}</span></div>
-      <div class="kpi"><b>${money(vatDue)}</b><span>ضريبة مستحقة للهيئة</span></div></div>
-    <div class="g2c"><div class="panel"><div class="ph"><h3>ملخص إقرار ضريبة القيمة المضافة</h3><small>${pl}</small></div><div class="mini-list">
+      ${vatOn() ? `<div class="kpi"><b>${money(vatDue)}</b><span>ضريبة مستحقة للهيئة</span></div>` : `<div class="kpi"><b>${inc.length}</b><span>فواتير محصّلة</span></div>`}</div>
+    <div class="g2c">${!vatOn() ? `<div class="panel"><div class="ph"><h3>ضريبة القيمة المضافة غير مفعّلة</h3><span class="pill p-off">غير مسجّل</span></div><div class="roles" style="font-size:14px">المنشأة غير مسجلة في ضريبة القيمة المضافة حالياً، فالفواتير الجديدة تصدر «فاتورة» بدون ضريبة ولا رمز QR، والضريبة التي تدفعها للموردين تُحسب ضمن تكلفة المصروف.<br><br>عند التسجيل في الهيئة (إلزامي إذا تجاوزت الإيرادات 375,000 ريال خلال 12 شهراً)، أدخل الرقم الضريبي في الإعدادات ثم فعّل الزر أعلاه.</div></div>` : `<div class="panel"><div class="ph"><h3>ملخص إقرار ضريبة القيمة المضافة</h3><small>${pl}</small></div><div class="mini-list">
         <div><span>المبيعات الخاضعة للضريبة</span><b>${money(rev)}</b></div><div><span>ضريبة المخرجات (المحصّلة من الشركات)</span><b>${money(outVat)}</b></div>
         <div><span>المشتريات والمصروفات الخاضعة للضريبة</span><b>${money(sum(exp.filter(x => +x.vat), x => x.amount))}</b></div><div><span>ضريبة المدخلات (المدفوعة للموردين)</span><b>${money(inVat)}</b></div>
         <div style="background:var(--gold-soft)"><span><b>صافي الضريبة ${vatDue >= 0 ? 'المستحقة' : 'المستردة'}</b></span><b>${money(Math.abs(vatDue))}</b></div></div>
-        <div class="roles">الأرقام من الفواتير المدفوعة في المنصة والمصروفات المسجلة هنا. راجعها مع محاسبك قبل تقديم الإقرار في بوابة الهيئة.</div></div>
+        <div class="roles">الأرقام من الفواتير المدفوعة في المنصة والمصروفات المسجلة هنا. راجعها مع محاسبك قبل تقديم الإقرار في بوابة الهيئة.</div></div>`}
       <div class="panel"><div class="ph"><h3>المصروفات حسب البند</h3><small>${exp.length} مصروف</small></div>${byCat.length ? `<div class="mini-list">${byCat.map(([c, v]) => `<div class="cat"><span>${esc(c)}</span><span class="cbar"><i style="width:${v / cmax * 100}%"></i></span><b>${money(v)}</b></div>`).join('')}</div>` : '<div class="empty">لا توجد مصروفات في هذه الفترة</div>'}</div></div>
-    <div class="panel"><div class="ph"><h3>دفتر اليومية</h3><small>${ledger.length} قيد</small></div><div class="tw"><table><thead><tr><th>التاريخ</th><th>النوع</th><th>البيان</th><th>المبلغ</th><th>الضريبة</th><th></th></tr></thead><tbody>
-      ${ledger.length ? ledger.map(r => `<tr><td>${esc(r.d)}</td><td>${r.t === 'in' ? '<span class="pill p-ok">إيراد</span>' : '<span class="pill p-crit">مصروف</span>'}</td><td>${esc(r.desc)}</td><td><b>${r.t === 'out' ? '−' : ''}${money(r.a)}</b></td><td>${money(r.v)}</td><td>${r.t === 'out' ? `<button class="btn sm bad" data-ac="del" data-id="${esc(r.id)}">حذف</button>` : ''}</td></tr>`).join('') : '<tr><td colspan="6" class="empty">لا توجد قيود في هذه الفترة</td></tr>'}</tbody></table></div></div>`;
+    <div class="panel"><div class="ph"><h3>دفتر اليومية</h3><small>${ledger.length} قيد</small></div><div class="tw"><table><thead><tr><th>التاريخ</th><th>النوع</th><th>البيان</th><th>المبلغ</th>${vatOn() ? '<th>الضريبة</th>' : ''}<th></th></tr></thead><tbody>
+      ${ledger.length ? ledger.map(r => `<tr><td>${esc(r.d)}</td><td>${r.t === 'in' ? '<span class="pill p-ok">إيراد</span>' : '<span class="pill p-crit">مصروف</span>'}</td><td>${esc(r.desc)}</td><td><b>${r.t === 'out' ? '−' : ''}${money(vatOn() ? r.a : r.a + r.v)}</b></td>${vatOn() ? `<td>${money(r.v)}</td>` : ''}<td>${r.t === 'out' ? `<button class="btn sm bad" data-ac="del" data-id="${esc(r.id)}">حذف</button>` : ''}</td></tr>`).join('') : '<tr><td colspan="6" class="empty">لا توجد قيود في هذه الفترة</td></tr>'}</tbody></table></div></div>`;
   box.onclick = e => { const p = e.target.closest('[data-ap]'); if (p) { AC_P = p.dataset.ap; return renderAccounting(); }
     const b = e.target.closest('[data-ac]'); if (!b) return; const a = b.dataset.ac;
     if (a === 'add') return expenseDialog();
+    if (a === 'vat') { const on = !vatOn();
+      return dialog(on ? `<h3>تفعيل ضريبة القيمة المضافة</h3><p style="margin:0;font-size:14px">الفواتير الجديدة ستصدر «فاتورة ضريبية مبسطة» بضريبة ${SET.vatRate === '' || SET.vatRate == null ? 15 : SET.vatRate}% ورمز QR.${SET.vatNumber ? '' : '<br><b style="color:var(--crit)">أدخل الرقم الضريبي في الإعدادات أولاً.</b>'}</p>`
+        : `<h3>إيقاف ضريبة القيمة المضافة</h3><p style="margin:0;font-size:14px">الفواتير الجديدة ستصدر «فاتورة» بدون ضريبة وبدون رمز QR. الفواتير السابقة لا تتغير.</p>`, async () => {
+        try { await F.setDoc(F.doc(fs, 'platform', 'settings'), { vatRegistered: on, updatedAt: nowIso() }, { merge: true }); SET.vatRegistered = on; toast(on ? 'فُعّلت الضريبة' : 'أُوقفت الضريبة'); plog(on ? 'تفعيل ضريبة القيمة المضافة' : 'إيقاف ضريبة القيمة المضافة', ''); renderAccounting(); }
+        catch (x) { toast('تعذر الحفظ: ' + (x.code || x.message)); } }, on ? 'تفعيل' : 'إيقاف'); }
     if (a === 'csv') { const rows = [['التاريخ', 'النوع', 'البيان', 'المبلغ قبل الضريبة', 'الضريبة', 'الإجمالي'], ...ledger.map(r => [r.d, r.t === 'in' ? 'إيراد' : 'مصروف', r.desc, r2(r.a), r2(r.v), r2(r.a + r.v)])];
       const csv = '﻿' + rows.map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(',')).join('\r\n'); const u = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
       const l = document.createElement('a'); l.href = u; l.download = `masar-books-${from}_${to}.csv`; l.click(); setTimeout(() => URL.revokeObjectURL(u), 2000); return plog('تصدير الدفاتر', pl); }
@@ -1440,13 +1448,15 @@ async function renderAccounting() {
 function expenseDialog() {
   const f = dialog(`<h3>تسجيل مصروف</h3><div class="g2"><label>التاريخ<input name="date" type="date" value="${today()}" required></label><label>البند<select name="cat">${EXP_CAT.map(c => `<option>${c}</option>`).join('')}</select></label></div>
     <label>البيان<input name="desc" placeholder="مثال: اشتراك Netlify لشهر نوفمبر"></label><label>المورد (اختياري)<input name="vendor"></label>
-    <div class="g2"><label>المبلغ قبل الضريبة (ريال)<input name="amount" type="number" min="0" step="0.01" required></label><label>الضريبة المدفوعة (ريال)<input name="vat" type="number" min="0" step="0.01" value="0"></label></div>
-    <label class="chk"><input type="checkbox" name="auto" checked> احسب الضريبة 15% تلقائياً (ألغِ التحديد إذا كان المورد غير مسجل في الضريبة أو من خارج المملكة)</label>`, async fd => {
-    const x = { id: 'e' + Date.now().toString(36), date: fd.get('date'), cat: fd.get('cat'), desc: String(fd.get('desc') || '').trim(), vendor: String(fd.get('vendor') || '').trim(), amount: r2(fd.get('amount')), vat: r2(fd.get('vat')), by: ME.email, at: nowIso() };
+    ${vatOn() ? `<div class="g2"><label>المبلغ قبل الضريبة (ريال)<input name="amount" type="number" min="0" step="0.01" required></label><label>الضريبة المدفوعة (ريال)<input name="vat" type="number" min="0" step="0.01" value="0"></label></div>
+    <label class="chk"><input type="checkbox" name="auto" checked> احسب الضريبة 15% تلقائياً (ألغِ التحديد إذا كان المورد غير مسجل في الضريبة أو من خارج المملكة)</label>`
+    : `<label>المبلغ المدفوع (ريال)<input name="amount" type="number" min="0" step="0.01" required></label>`}`, async fd => {
+    const x = { id: 'e' + Date.now().toString(36), date: fd.get('date'), cat: fd.get('cat'), desc: String(fd.get('desc') || '').trim(), vendor: String(fd.get('vendor') || '').trim(), amount: r2(fd.get('amount')), vat: vatOn() ? r2(fd.get('vat')) : 0, by: ME.email, at: nowIso() };
     if (!(x.amount > 0)) return toast('أدخل المبلغ');
     if (BOOKS === null) await loadBooks(); BOOKS.expenses.push(x);
     if (await saveBooks('تم تسجيل المصروف ✓')) { plog('تسجيل مصروف', x.cat, `${x.amount} ريال · ${x.date}`); if (TAB === 'accounting') renderAccounting(); } else BOOKS.expenses.pop(); }, 'حفظ');
-  const auto = () => { if (f.auto.checked) f.vat.value = r2((+f.amount.value || 0) * vatRate() / 100); f.vat.readOnly = f.auto.checked; };
+  if (!f.auto) return;
+  const auto = () => { if (f.auto.checked) f.vat.value = r2((+f.amount.value || 0) * 15 / 100); f.vat.readOnly = f.auto.checked; };
   f.amount.oninput = auto; f.auto.onchange = auto; auto();
 }
 </script>
