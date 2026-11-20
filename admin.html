@@ -334,6 +334,58 @@ body.va{overflow:hidden}
 .mini-list .cat{display:grid;grid-template-columns:minmax(0,1.3fr) 1fr auto;align-items:center;gap:12px}
 .cbar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}.cbar i{display:block;height:100%;background:var(--crit);opacity:.75;border-radius:3px}
 @media (max-width:640px){.rv-g{gap:4px;height:140px}.rv-x span{font-size:10.5px}.va-body{padding:16px 14px 60px}}
+/* مكتب الموظفين الأذكياء */
+.of-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.of-hero b{display:block;font:600 16px var(--f-display)}.of-hero small{color:var(--muted);font-size:13px}
+.of-hs{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)}.of-hs b{color:var(--ink);font:600 18px var(--f-display);margin-inline-end:4px}
+.of-team{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.of-card{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"av nm" "st st" "job job";gap:8px 10px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);transition:border-color .15s,box-shadow .15s}
+.of-card:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.of-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.of-card.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.of-card .of-av{grid-area:av}.of-nm{grid-area:nm;min-width:0}.of-nm b{display:block;font:600 15px var(--f-display)}.of-nm small{color:var(--muted);font-size:12.5px}
+.of-job{grid-area:job;color:var(--muted);font-size:12.5px;line-height:1.5}
+.of-st{grid-area:st;justify-self:start;font-size:12px;padding:2px 9px;border-radius:999px;background:var(--warn-soft);color:var(--warn)}
+.of-st.idle{background:var(--ok-soft);color:var(--ok)}.of-st.busy{background:var(--info-soft);color:var(--info)}
+.of-av{position:relative;width:38px;height:38px;border-radius:12px;display:inline-grid;place-items:center;font:600 16px var(--f-display);flex:none}
+.of-av.big{width:44px;height:44px;font-size:18px}
+.of-av i{position:absolute;inset-inline-end:-3px;bottom:-3px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:1px solid var(--line)}
+.of-av i::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--brass,#A88653)}
+.t-info{background:var(--info-soft);color:var(--info)}.t-ok{background:var(--ok-soft);color:var(--ok)}.t-warn{background:var(--warn-soft);color:var(--warn)}.t-violet{background:var(--violet-soft);color:var(--violet)}.t-crit{background:var(--crit-soft);color:var(--crit)}
+.of-main{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}
+.of-chat{display:flex;flex-direction:column;min-height:560px}
+.of-chat .ph{flex-wrap:nowrap;gap:10px}
+.of-msgs{flex:1;overflow:auto;max-height:520px;padding:14px 16px;display:grid;gap:10px;align-content:start}
+.of-m{max-width:88%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+.of-m.me{justify-self:start;background:var(--accent);color:var(--accent-ink);border-end-start-radius:4px;white-space:pre-wrap}
+.of-m.ai{justify-self:end;background:var(--surface-2);border:1px solid var(--line);border-end-end-radius:4px}
+.of-m.err{background:var(--crit-soft);color:var(--crit);border-color:transparent}
+.of-m p{margin:0 0 6px}.of-m p:last-child{margin:0}.of-m ul{margin:4px 0 8px;padding-inline-start:18px}.of-m h4{margin:8px 0 4px;font:600 14px var(--f-display)}
+.of-t{border-collapse:collapse;font-size:12.5px;margin:6px 0;width:100%}.of-t td{border:1px solid var(--line);padding:4px 7px}.of-t tr:first-child td{font-weight:600;background:var(--surface)}
+.of-dl{all:unset;cursor:pointer;display:inline-block;margin-top:8px;font-size:12.5px;color:var(--accent);font-weight:500}
+.of-hello{display:grid;justify-items:center;text-align:center;gap:10px;padding:40px 20px;color:var(--muted)}.of-hello p{margin:0;max-width:360px}
+.typing{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:ofDot 1.2s infinite}.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s;margin-inline-end:6px}
+@keyframes ofDot{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.typing i{animation:none;opacity:.6}}
+.of-sug{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 8px}
+.of-sug button{font:inherit;font-size:12.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:4px 11px;cursor:pointer}
+.of-sug button:hover{background:var(--surface-2)}
+.of-in{display:flex;gap:8px;padding:10px 16px 16px;border-top:1px solid var(--line);align-items:flex-end}
+.of-in textarea{flex:1;font:inherit;resize:vertical;min-height:44px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+.of-in .btn{height:44px}
+.of-drafts{display:grid;gap:10px;padding:12px 16px 16px;max-height:680px;overflow:auto}
+.of-d{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:10px;background:var(--surface)}
+.of-d.done{opacity:.7}
+.of-d header{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start}
+.of-d header b{font-weight:600;font-size:14px}.of-d header small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.of-ed{width:100%;font:inherit;font-size:13.5px;line-height:1.7;resize:vertical;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink)}
+.of-body{white-space:pre-wrap;font-size:13.5px;color:var(--muted);max-height:120px;overflow:auto}
+.of-acts{display:flex;gap:6px;flex-wrap:wrap}.of-warn{color:var(--crit)}
+.of-foot{color:var(--muted);font-size:12px;margin:0}
+@media (max-width:1200px){.of-team{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:1000px){.of-main{grid-template-columns:1fr}}
+@media (max-width:640px){.of-team{grid-template-columns:1fr 1fr}.of-job{display:none}.of-msgs{max-height:60vh}.of-chat{min-height:0}.of-m{max-width:96%}}
 </style>
 </head>
 <body>
@@ -399,6 +451,7 @@ body.va{overflow:hidden}
     <section id="t-accounting" hidden style="display:grid;gap:16px"></section>
     <section id="t-coupons" hidden></section>
     <section id="t-news" hidden></section>
+    <section id="t-office" hidden style="display:grid;gap:16px"></section>
   </main>
   </div>
  </div>
@@ -411,7 +464,7 @@ body.va{overflow:hidden}
 <div id="toast"></div>
 <script src="qr.js"></script>
 <script type="module">
-import { FIREBASE_CONFIG, SUPER_ADMIN_EMAIL, TRIAL_DAYS, PUSH_PUBLIC } from './config.js';
+import { FIREBASE_CONFIG, SUPER_ADMIN_EMAIL, TRIAL_DAYS, PUSH_PUBLIC, APP_NAME } from './config.js';
 import { printInvoice } from './invoice.js';
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2';
 const [{ initializeApp }, A, F] = await Promise.all([import(`${FB}/firebase-app.js`), import(`${FB}/firebase-auth.js`), import(`${FB}/firebase-firestore.js`)]);
@@ -552,7 +605,7 @@ const IC = { home: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>', inbox:
   pulse: '<path d="M3 12h4l2-6 4 12 2-6h6"/>', card: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>', chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
   help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><circle cx="12" cy="17" r=".6"/>', heart: '<path d="M12 20s-8-4.7-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6.3-8 11-8 11z"/><path d="M6 12h3l1.5-2 2 4 1.5-2H18"/>',
   log: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 15h7M9 7h4"/>', users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.3-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .6 3.2 2.4 3.6 5.2"/>',
-  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>', menu: '<path d="M4 7h16M4 12h16M4 17h16"/>', book: '<path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M4 17a3 3 0 0 1 3-3h11M8 8h6"/>', tag: '<path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.2"/>', mega: '<path d="M3 11v2l13 6V5zM16 8a4 4 0 0 1 0 8"/>', eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>', sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>' };
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>', menu: '<path d="M4 7h16M4 12h16M4 17h16"/>', book: '<path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M4 17a3 3 0 0 1 3-3h11M8 8h6"/>', tag: '<path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.2"/>', mega: '<path d="M3 11v2l13 6V5zM16 8a4 4 0 0 1 0 8"/>', bot: '<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M9.5 17h5"/><circle cx="12" cy="3.5" r="1"/>', eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>', sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>' };
 const svg = k => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[k] || ''}</svg>`;
 const canHealth = () => ME.super || ME.role === 'manager';
 const TABS = {
@@ -560,10 +613,11 @@ const TABS = {
   activity: ['النشاط والمخاطر', 'pulse', 'استخدام كل شركة للنظام، والشركات المهددة بعدم التجديد'], invoices: ['الفواتير', 'card', 'الفواتير والتحصيل وإيصالات التحويل'], reports: ['التقارير', 'chart', 'الإيراد المتكرر والتحصيل واستخدام الذكاء الاصطناعي'],
   support: ['تذاكر الدعم', 'help', 'طلبات الدعم الفني من الشركات'], health: ['صحة النظام', 'heart', 'حالة الخدمات والمهام المجدولة والأعطال'], log: ['سجل النشاط', 'log', 'كل إجراء قام به فريق المنصة'],
   team: ['فريق المنصة', 'users', 'موظفو شركة النظام وصلاحياتهم'], settings: ['الإعدادات', 'gear', 'بيانات البائع والأسعار والباقات والنسخ الاحتياطي'],
-  accounting: ['المحاسبة', 'book', 'الإيرادات والمصروفات والأرباح وملخص إقرار الضريبة'], coupons: ['الكوبونات', 'tag', 'أكواد الخصم وتطبيقها على الفواتير'], news: ['الإعلانات', 'mega', 'رسائل تظهر داخل تطبيق كل الشركات'] };
-const BADGE = { requests: 'reqBadge', support: 'tkBadge', invoices: 'rcBadge', home: 'decBadge', health: 'hBadge' };
+  accounting: ['المحاسبة', 'book', 'الإيرادات والمصروفات والأرباح وملخص إقرار الضريبة'], coupons: ['الكوبونات', 'tag', 'أكواد الخصم وتطبيقها على الفواتير'], news: ['الإعلانات', 'mega', 'رسائل تظهر داخل تطبيق كل الشركات'],
+  office: ['مكتب الموظفين', 'bot', 'موظفون بالذكاء الاصطناعي يجهزون الردود والتقارير والمسودات، وأنت تعتمد'] };
+const BADGE = { office: 'ofBadge', requests: 'reqBadge', support: 'tkBadge', invoices: 'rcBadge', home: 'decBadge', health: 'hBadge' };
 function navGroups() {
-  const g = [[null, ['home']], ['العملاء', ['requests', 'companies', 'activity']], ['المالية', ['invoices', ...(ME.super || can('invoices') ? ['reports'] : []), ...(ME.super ? ['accounting', 'coupons'] : [])]], ['الدعم', ['support']],
+  const g = [[null, ['home', ...(ME.super ? ['office'] : [])]], ['العملاء', ['requests', 'companies', 'activity']], ['المالية', ['invoices', ...(ME.super || can('invoices') ? ['reports'] : []), ...(ME.super ? ['accounting', 'coupons'] : [])]], ['الدعم', ['support']],
     ['المنصة', [...(canHealth() ? ['health'] : []), ...(can('log') ? ['log'] : []), ...(ME.super ? ['news', 'team', 'settings'] : [])]]];
   return g.filter(([, it]) => it.length);
 }
@@ -586,8 +640,8 @@ function show(t) {
   $('#t-home').hidden = t !== 'home'; $('#t-activity').hidden = t !== 'activity'; $('#t-health').hidden = t !== 'health';
   $('#t-companies').hidden = !['requests', 'companies'].includes(t); $('#t-invoices').hidden = t !== 'invoices'; $('#t-team').hidden = t !== 'team'; $('#t-settings').hidden = t !== 'settings';
   $('#t-support').hidden = t !== 'support'; $('#t-reports').hidden = t !== 'reports'; $('#t-log').hidden = t !== 'log'; $('#kpis').hidden = !['requests', 'companies', 'invoices'].includes(t);
-  ['accounting', 'coupons', 'news'].forEach(k => { $('#t-' + k).hidden = t !== k; });
-  if (t === 'accounting') renderAccounting(); if (t === 'coupons') renderCoupons(); if (t === 'news') renderNews();
+  ['accounting', 'coupons', 'news', 'office'].forEach(k => { $('#t-' + k).hidden = t !== k; });
+  if (t === 'accounting') renderAccounting(); if (t === 'coupons') renderCoupons(); if (t === 'news') renderNews(); if (t === 'office') renderOffice();
   history.replaceState(null, '', '#' + t);
   if (t === 'support') renderTk(); if (t === 'reports') renderReports(); if (t === 'log') loadLog();
   if (t === 'requests') $('#fs').value = 'reqs'; else if (t === 'companies' && $('#fs').value === 'reqs') $('#fs').value = 'all';
@@ -1401,6 +1455,198 @@ async function renderNews() {
     catch (x) { toast('تعذر النشر: ' + (x.code || x.message)); } };
   const off = $('#nwOff'); if (off) off.onclick = async () => { try { await F.setDoc(F.doc(fs, 'platform', 'public'), { announce: { ...a, on: false } }, { merge: true }); PUB.announce = { ...a, on: false }; toast('أُوقف الإعلان'); plog('إيقاف إعلان الشركات', a.title || ''); renderNews(); } catch (x) { toast('تعذر: ' + (x.code || x.message)); } };
 }
+
+/* ---------- 7) مكتب الموظفين الأذكياء (platform/office) ---------- */
+// خمسة موظفين بالذكاء الاصطناعي. كل موظف يقرأ ملخصاً من بيانات المنصة المحمّلة في اللوحة، ويرد ويكتب مسودات
+// المسودات لا تُرسل إلا بضغطة من المالك. المستند platform/office يحفظ المسودات والمحادثات وتخصيص الموظفين والاستهلاك
+const OF_EMPS = {
+  support: { name: 'سارة', role: 'الدعم الفني', ic: 'help', tint: 'info', job: 'تقرأ تذاكر الشركات وتكتب مسودات الردود',
+    sug: ['اكتب ردوداً لكل التذاكر المفتوحة', 'ما أكثر مشكلة تتكرر عند العملاء؟', 'أي تذكرة تأخرنا في الرد عليها؟'] },
+  sales: { name: 'خالد', role: 'المبيعات', ic: 'building', tint: 'ok', job: 'يتابع طلبات التسجيل والتجارب ويكتب رسائل المتابعة',
+    sug: ['من الشركات الأقرب للاشتراك هذا الأسبوع؟', 'اكتب رسائل متابعة للتجارب التي تنتهي قريباً', 'اقترح عرضاً للشركات المنتهية غير المجددة'] },
+  accountant: { name: 'نورة', role: 'المحاسبة', ic: 'book', tint: 'warn', job: 'تراجع الفواتير والتحصيل والمصروفات وتكتب تذكيرات السداد',
+    sug: ['لخّص الوضع المالي هذا الشهر', 'اكتب تذكيرات للفواتير المتأخرة', 'هل في المصروفات شيء غير معتاد؟'] },
+  marketing: { name: 'فهد', role: 'التسويق', ic: 'mega', tint: 'violet', job: 'يكتب منشورات وإعلانات ورسائل حملات للمنصة',
+    sug: ['اكتب 3 منشورات لينكدإن لهذا الأسبوع', 'اكتب نص إعلان قصير لشركات التأجير', 'اقترح خطة محتوى لشهر كامل'] },
+  ops: { name: 'ريم', role: 'تحليل العمليات', ic: 'pulse', tint: 'crit', job: 'ترصد الشركات الخاملة والمعرضة للإلغاء وتقترح الإجراء',
+    sug: ['من الشركات المعرضة لعدم التجديد ولماذا؟', 'أي شركة تحتاج تدريباً؟', 'لخّص استخدام النظام هذا الأسبوع'] }
+};
+const OF_KIND = { ticket: ['رد على تذكرة', 'p-info'], message: ['رسالة لعميل', 'p-ok'], note: ['ملاحظة في ملف الشركة', 'p-off'], post: ['محتوى تسويقي', 'p-pending'], task: ['مهمة مقترحة', 'p-warn'], report: ['تقرير', 'p-off'] };
+let OFC = null, OF_EMP = 'support', OF_F = 'new', OF_BUSY = {};
+const ofEmp = k => ({ ...OF_EMPS[k], ...((OFC && OFC.persona && OFC.persona[k]) || {}) });
+async function loadOffice() {
+  try { const s = await F.getDoc(F.doc(fs, 'platform', 'office')); OFC = s.exists() ? s.data() : {}; } catch (e) { OFC = {}; toast('تعذر تحميل المكتب'); }
+  OFC.drafts = OFC.drafts || []; OFC.chats = OFC.chats || {}; OFC.persona = OFC.persona || {}; OFC.usage = OFC.usage || {};
+}
+// المستند الواحد محدود بحجم 1MB: نُبقي آخر 16 رسالة لكل موظف، وآخر 120 مسودة (المعلّقة أولاً)
+async function saveOffice() {
+  const keep = [...OFC.drafts.filter(d => d.status === 'new'), ...OFC.drafts.filter(d => d.status !== 'new')].slice(0, 120); OFC.drafts = OFC.drafts.filter(d => keep.includes(d));
+  Object.keys(OFC.chats).forEach(k => { OFC.chats[k] = OFC.chats[k].slice(-16); });
+  const days = Object.keys(OFC.usage).sort().slice(-60); OFC.usage = Object.fromEntries(days.map(d => [d, OFC.usage[d]]));
+  try { await F.setDoc(F.doc(fs, 'platform', 'office'), { drafts: OFC.drafts, chats: OFC.chats, persona: OFC.persona, usage: OFC.usage, updatedAt: nowIso() }); return true; }
+  catch (e) { toast('تعذر حفظ المكتب: ' + (e.code || e.message)); return false; }
+}
+
+// ما يراه كل موظف: ملخص مضغوط من البيانات المحمّلة، بدون أرقام هويات أو كلمات مرور
+const cut = (s, n) => String(s || '').replace(/\s+/g, ' ').trim().slice(0, n);
+async function ofData(emp) {
+  const t = today(); const live = COS.filter(c => !isOpen(c));
+  const head = { المنصة: APP_NAME_OF(), اليوم: t, الشركات_المشتركة: live.length, المفعلة: live.filter(c => stOf(c) === 'active').length, في_التجربة: live.filter(c => stOf(c) === 'trial').length, طلبات_معلقة: COS.filter(c => c.status === 'pending').length };
+  const plans = PLANS().filter(p => p.active !== false).map(p => ({ الباقة: p.name, سعر_السيارة_شهرياً: p.pricePerVehicle, الحد_الأدنى_الشهري: p.minMonthly, حد_السيارات: p.maxVehicles || 'بلا حد', المزايا: cut(p.features, 300) }));
+  const coRow = c => { const st = STATS[c.id] || {}; const p = c.profile || {}; const r = riskOf(c);
+    return { id: c.id, الاسم: c.name, الحالة: ST[stOf(c)] ? ST[stOf(c)][0] : stOf(c), المدينة: p.city || '', حجم_الأسطول_المعلن: p.fleetSize || '', المسؤول: p.contactName || c.ownerName || '', الباقة: planName(c),
+      سجل_في: fmt(c.createdAt), اعتمد_في: fmt(c.approvedAt), تنتهي_التجربة: c.status === 'trial' ? fmt(c.trialEnds) : '', مدفوع_حتى: c.paidUntil || '', الأيام_المتبقية: daysLeft(c.status === 'trial' ? c.trialEnds : c.paidUntil),
+      السيارات: st.vehicles ?? c.vehicles ?? '', المستخدمون: st.users ?? '', آخر_نشاط: fmt(st.lastSeen), المخاطر: r.why.join('، ') }; };
+  let d = { عام: head };
+  if (emp === 'support') {
+    if (!TKS.length) await loadTk();
+    const act = TKS.filter(x => x.status !== 'closed').slice(0, 15);
+    const rows = await Promise.all(act.map(async x => { let msgs = []; try { const s = await F.getDocs(F.collection(fs, 'tickets', x.id, 'msgs')); msgs = s.docs.map(m => m.data()).sort((a, b) => String(a.at).localeCompare(String(b.at))); } catch (e) {}
+      return { id: x.id, الشركة: x.companyName, شركة_id: x.cid || '', التصنيف: TK_CAT[x.category] || x.category || '', الحالة: TKS_ST[x.status] ? TKS_ST[x.status][0] : x.status, الموضوع: x.subject, فُتحت: fmt(x.createdAt), آخر_تحديث: String(x.lastAt || '').slice(0, 16),
+        الرسائل: [{ من: 'العميل', نص: cut(x.body, 1200) }, ...msgs.slice(-8).map(m => ({ من: m.side === 'plat' ? 'فريق المنصة' : 'العميل', نص: cut(m.text, 800) }))] }; }));
+    d.تذاكر_مفتوحة = rows; d.تذاكر_مغلقة_حديثاً = TKS.filter(x => x.status === 'closed').slice(0, 15).map(x => ({ الموضوع: x.subject, التصنيف: TK_CAT[x.category] || '' }));
+  }
+  if (emp === 'sales') {
+    d.الباقات = plans;
+    d.طلبات_التسجيل = COS.filter(c => c.status === 'pending').map(coRow);
+    d.شركات_التجربة = live.filter(c => stOf(c) === 'trial').map(coRow);
+    d.منتهية_غير_مجددة = live.filter(c => stOf(c) === 'expired').map(coRow);
+    d.المفعلة_القريبة_من_التجديد = live.filter(c => stOf(c) === 'active' && (daysLeft(c.paidUntil) ?? 99) <= 30).map(coRow);
+  }
+  if (emp === 'accountant') {
+    if (BOOKS === null) await loadBooks();
+    const B = BOOKS || {}; const from = new Date(Date.now() - 100 * 864e5).toISOString().slice(0, 10);
+    d.تسجيل_الضريبة = SET.vatRegistered === false ? 'غير مسجل' : 'مسجل';
+    d.فواتير_غير_مدفوعة = INVS.filter(i => i.status === 'unpaid').map(i => ({ الرقم: i.number, الشركة: i.companyName, شركة_id: i.cid, المبلغ: i.total, صدرت: fmt(i.issueDate), الاستحقاق: fmt(i.dueDate), الحالة: IST[istOf(i)][0], إيصال_مرفوع: i.receiptId ? 'نعم' : 'لا' }));
+    const months = {}; INVS.filter(i => i.status === 'paid').forEach(i => { const m = String(i.paidAt || i.issueDate || '').slice(0, 7); if (m) months[m] = r2of((months[m] || 0) + (+i.total || 0)); });
+    d.التحصيل_الشهري = Object.fromEntries(Object.entries(months).sort().slice(-6));
+    const ex = {}; (B.expenses || []).filter(x => String(x.date) >= from).forEach(x => { const k = `${String(x.date).slice(0, 7)} · ${x.kind === 'inc' ? 'إيراد' : 'مصروف'} · ${accOf(x.acc).name}`; ex[k] = r2of((ex[k] || 0) + (+x.amount || 0)); });
+    d.المصروفات_والإيرادات_الأخرى_آخر_3_أشهر = ex;
+    d.أكبر_القيود_الأخيرة = (B.expenses || []).filter(x => String(x.date) >= from).sort((a, b) => (+b.amount || 0) - (+a.amount || 0)).slice(0, 15).map(x => ({ التاريخ: x.date, البند: accOf(x.acc).name, الوصف: cut(x.desc, 80), المبلغ: x.amount }));
+    d.الموظفون_على_المسير = (B.employees || []).filter(e => e.active !== false).length;
+    d.المسيرات = Object.fromEntries(Object.entries(B.payrolls || {}).sort().slice(-4).map(([m, p]) => [m, p && p.total != null ? p.total : 'معتمد']));
+  }
+  if (emp === 'marketing') {
+    const vs = live.reduce((t, c) => t + (+(STATS[c.id] || {}).vehicles || 0), 0); const cities = {}; live.forEach(c => { const x = (c.profile || {}).city; if (x) cities[x] = (cities[x] || 0) + 1; });
+    d.الباقات = plans; d.أرقام_عامة = { سيارات_تُدار_على_المنصة: vs, مدن_العملاء: cities };
+    d.مزايا_النظام = ['ملف كامل لكل سيارة وأرشيف وثائقها وتنبيه قبل انتهائها', 'محاضر تسليم واستلام بتوقيع إلكتروني وصور', 'فحص دوري بالصور وجدول فحص لكل شركة', 'الصيانة والوقود مع كشف التلاعب والهدر', 'المخالفات والحوادث والمطالبات', 'الفروع ومشرفو الفروع', 'كشف خصومات الموارد البشرية بالبريد', 'تطبيق للسائق بالعربية والإنجليزية والأردية', 'قراءة المستندات بالتصوير ومساعد ذكي', 'تقارير PDF وتنبيهات وإشعارات فورية'];
+  }
+  if (emp === 'ops') {
+    d.الشركات = live.map(coRow);
+    d.آخر_تحديث_للإحصاءات = STATS_AT || '';
+  }
+  return JSON.stringify(d, null, 1);
+}
+const r2of = n => Math.round((+n || 0) * 100) / 100;
+const APP_NAME_OF = () => APP_NAME || 'مسار';
+
+async function ofAsk(emp, task, message) {
+  if (OF_BUSY[emp]) return; OF_BUSY[emp] = true; const E = ofEmp(emp);
+  const chat = OFC.chats[emp] = OFC.chats[emp] || [];
+  chat.push({ role: 'user', content: task === 'brief' ? 'جهّز تقرير اليوم' : message, at: nowIso() }); renderOffice();
+  try {
+    const data = await ofData(emp); const tk = await auth.currentUser.getIdToken();
+    const r = await fetch('/.netlify/functions/office', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tk },
+      body: JSON.stringify({ emp, task, message, data, history: chat.slice(0, -1).slice(-10).map(m => ({ role: m.role, content: m.content })), persona: { name: E.name + ' (' + E.role + ')', extra: E.extra || '' } }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.message || (r.status === 404 ? 'دالة المكتب غير منشورة بعد' : j.error || ('خطأ ' + r.status)));
+    const ids = (j.drafts || []).map(x => { const id = uid('d'); OFC.drafts.unshift({ id, emp, ...x, status: 'new', at: nowIso() }); return id; });
+    chat.push({ role: 'assistant', content: (j.reply || '') + (j.cut ? '\n\n(انقطع الرد لطوله، اطلب التكملة)' : ''), drafts: ids.length, at: nowIso() });
+    const day = today(); const u = OFC.usage[day] = OFC.usage[day] || { n: 0, in: 0, out: 0 }; u.n++; u.in += (j.usage || {}).in || 0; u.out += (j.usage || {}).out || 0;
+    await saveOffice(); plog('مكتب الموظفين: ' + (task === 'brief' ? 'تقرير اليوم' : 'طلب'), E.name + ' · ' + E.role, ids.length ? `${ids.length} مسودة` : '');
+    if (ids.length) toast(`${E.name} كتب ${ids.length} مسودة بانتظار اعتمادك`);
+  } catch (e) { chat.push({ role: 'assistant', content: '⚠️ ' + e.message, err: true, at: nowIso() }); }
+  OF_BUSY[emp] = false; renderOffice();
+}
+
+function ofMd(md) { const lines = esc(md).split('\n'); let o = '', inL = false, inT = false; const inl = x => x.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  for (const l of lines) {
+    if (/^\s*\|/.test(l)) { if (/^\s*\|[\s:|-]+\|\s*$/.test(l)) continue; const c = l.trim().replace(/^\||\|$/g, '').split('|').map(x => inl(x.trim())); o += (inT ? '' : '<table class="of-t">') + '<tr>' + c.map(x => `<td>${x}</td>`).join('') + '</tr>'; inT = true; continue; }
+    if (inT) { o += '</table>'; inT = false; }
+    if (/^\s*([-*•]|\d+[.)])\s+/.test(l)) { if (!inL) { o += '<ul>'; inL = true; } o += `<li>${inl(l.replace(/^\s*([-*•]|\d+[.)])\s+/, ''))}</li>`; continue; }
+    if (inL) { o += '</ul>'; inL = false; }
+    if (/^#{1,4}\s/.test(l)) { o += `<h4>${inl(l.replace(/^#+\s/, ''))}</h4>`; continue; }
+    if (l.trim()) o += `<p>${inl(l)}</p>`;
+  }
+  return o + (inT ? '</table>' : '') + (inL ? '</ul>' : ''); }
+const ofAv = (k, big) => { const E = ofEmp(k); return `<span class="of-av t-${OF_EMPS[k].tint}${big ? ' big' : ''}">${esc(String(E.name || '؟').trim().charAt(0))}<i></i></span>`; };
+const waNum = s => { let d = String(s || '').replace(/\D/g, ''); if (d.startsWith('00')) d = d.slice(2); if (d.startsWith('05')) d = '966' + d.slice(1); else if (d.length === 9 && d.startsWith('5')) d = '966' + d; return d.length >= 11 ? d : ''; };
+
+async function renderOffice() {
+  const box = $('#t-office');
+  if (OFC === null) { box.innerHTML = '<div class="panel"><div class="empty">جارٍ فتح المكتب…</div></div>'; await loadOffice(); }
+  const pend = k => OFC.drafts.filter(d => d.emp === k && d.status === 'new').length;
+  const u = OFC.usage[today()] || { n: 0 }; const allNew = OFC.drafts.filter(d => d.status === 'new').length;
+  const E = ofEmp(OF_EMP); const chat = OFC.chats[OF_EMP] || [];
+  const list = OFC.drafts.filter(d => (OF_F === 'all' || (OF_F === 'new' ? d.status === 'new' : d.emp === OF_F)));
+  box.innerHTML = `
+  <div class="of-hero"><div><b>${allNew ? `${allNew} مسودة بانتظار اعتمادك` : 'لا شيء بانتظارك الآن'}</b><small>الموظفون يقرؤون بيانات المنصة ويكتبون المسودات، ولا يُرسل شيء لأي عميل إلا بضغطة منك.</small></div>
+    <div class="of-hs"><span><b>${u.n}</b> مهمة اليوم</span><button class="btn sm" id="ofAll">تقرير اليوم من الجميع</button></div></div>
+  <div class="of-team">${Object.keys(OF_EMPS).map(k => { const e = ofEmp(k); const n = pend(k); return `<button class="of-card${k === OF_EMP ? ' on' : ''}" data-oe="${k}">
+    ${ofAv(k)}<span class="of-nm"><b>${esc(e.name)}</b><small>${esc(e.role)}</small></span>${OF_BUSY[k] ? '<span class="of-st busy">يعمل الآن</span>' : n ? `<span class="of-st">${n} مسودة</span>` : '<span class="of-st idle">متاح</span>'}
+    <span class="of-job">${esc(e.job)}</span></button>`; }).join('')}</div>
+  <div class="of-main">
+    <div class="panel of-chat"><div class="ph">${ofAv(OF_EMP, 1)}<div style="flex:1;min-width:0"><h3 style="margin:0">${esc(E.name)} · ${esc(E.role)}</h3><small>${esc(E.job)}</small></div>
+      <button class="btn sm" id="ofBrief" ${OF_BUSY[OF_EMP] ? 'disabled' : ''}>تقرير اليوم</button><button class="ib" id="ofSet" title="تخصيص الموظف" aria-label="تخصيص الموظف">${svg('gear')}</button>${chat.length ? `<button class="ib" id="ofClr" title="محادثة جديدة" aria-label="محادثة جديدة">${svg('log')}</button>` : ''}</div>
+      <div class="of-msgs" id="ofMsgs">${chat.length ? chat.map(m => `<div class="of-m ${m.role === 'user' ? 'me' : 'ai'}${m.err ? ' err' : ''}">${m.role === 'user' ? esc(m.content) : ofMd(m.content)}${m.drafts ? `<button class="of-dl" data-of-f="${OF_EMP}">${m.drafts} مسودة ← صندوق المسودات</button>` : ''}</div>`).join('')
+        : `<div class="of-hello">${ofAv(OF_EMP, 1)}<p>أهلاً، أنا ${esc(E.name)} من ${esc(E.role)}. اطلب مني أي مهمة، أو اضغط «تقرير اليوم».</p></div>`}
+        ${OF_BUSY[OF_EMP] ? `<div class="of-m ai typing"><i></i><i></i><i></i> ${esc(E.name)} يقرأ البيانات ويكتب…</div>` : ''}</div>
+      <div class="of-sug">${OF_EMPS[OF_EMP].sug.map(s => `<button data-os="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+      <form class="of-in" id="ofIn"><textarea name="q" rows="2" maxlength="3000" placeholder="اكتب مهمة لـ${esc(E.name)}…" ${OF_BUSY[OF_EMP] ? 'disabled' : ''}></textarea><button class="btn pri" ${OF_BUSY[OF_EMP] ? 'disabled' : ''}>إرسال</button></form></div>
+    <div class="panel of-box"><div class="ph"><h3 style="margin:0">صندوق المسودات</h3><small>${OFC.drafts.length} إجمالاً</small></div>
+      <div class="tabs2" style="padding:10px 16px 0"><button data-of-f="new" class="${OF_F === 'new' ? 'on' : ''}">بانتظار الاعتماد (${allNew})</button>${Object.keys(OF_EMPS).map(k => `<button data-of-f="${k}" class="${OF_F === k ? 'on' : ''}">${esc(ofEmp(k).name)}</button>`).join('')}<button data-of-f="all" class="${OF_F === 'all' ? 'on' : ''}">الكل</button></div>
+      <div class="of-drafts">${list.length ? list.slice(0, 60).map(ofDraft).join('') : '<div class="empty">لا توجد مسودات هنا. اطلب من أي موظف «تقرير اليوم».</div>'}</div></div>
+  </div>
+  <p class="of-foot">${u.n ? `استهلاك اليوم: ${u.n} مهمة · ${Math.round((u.in || 0) / 1000)} ألف رمز قراءة · ${Math.round((u.out || 0) / 1000)} ألف رمز كتابة.` : ''} يعمل المكتب بمفتاح الذكاء الاصطناعي في إعدادات Netlify.</p>`;
+  const m = $('#ofMsgs'); if (m) m.scrollTop = m.scrollHeight; badge('ofBadge', allNew, true);
+}
+function ofDraft(d) {
+  const e = ofEmp(d.emp); const [kl, kc] = OF_KIND[d.kind] || [d.kind, 'p-off']; const c = COS.find(x => x.id === d.target); const tk = d.kind === 'ticket' && TKS.find(x => x.id === d.target);
+  const done = d.status !== 'new'; const p = (c && c.profile) || {}; const wa = c && waNum(p.contactMobile || c.phone || p.companyPhone); const mail = c && (p.officialEmail || c.ownerEmail);
+  let acts = '';
+  if (!done) {
+    if (d.kind === 'ticket') acts = tk ? `<button class="btn sm pri" data-od="send">إرسال الرد للعميل</button>` : '<small class="of-warn">التذكرة غير موجودة</small>';
+    else if (d.kind === 'message') acts = `${wa ? `<a class="btn sm pri" target="_blank" rel="noopener" href="https://wa.me/${wa}?text=${encodeURIComponent(d.body)}" data-od="wa">واتساب</a>` : ''}${mail ? `<a class="btn sm" href="mailto:${esc(mail)}?subject=${encodeURIComponent(d.title || '')}&body=${encodeURIComponent(d.body)}" data-od="mail">بريد</a>` : ''}<button class="btn sm" data-od="copy">نسخ</button><button class="btn sm" data-od="done">تم الإرسال</button>`;
+    else if (d.kind === 'note') acts = c ? `<button class="btn sm pri" data-od="note">حفظ في ملف الشركة</button>` : '<button class="btn sm" data-od="copy">نسخ</button>';
+    else acts = `<button class="btn sm pri" data-od="copy">نسخ</button><button class="btn sm" data-od="done">تم</button>`;
+    acts += `<button class="btn sm" data-od="skip">تجاهل</button>`;
+  }
+  return `<article class="of-d${done ? ' done' : ''}" data-did="${esc(d.id)}"><header>${ofAv(d.emp)}<div><span class="pill ${kc}">${kl}</span> <b>${esc(d.title || '')}</b><small>${esc(e.name)} · ${esc(d.targetName || (c && c.name) || (tk && tk.companyName) || '')} · ${esc(String(d.at || '').slice(0, 16).replace('T', ' '))}</small></div>
+    ${done ? `<span class="pill ${d.status === 'skip' ? 'p-off' : 'p-ok'}">${d.status === 'skip' ? 'تم تجاهلها' : 'معتمدة'}</span>` : ''}</header>
+    ${done ? `<div class="of-body">${esc(d.body)}</div>` : `<textarea class="of-ed" rows="${Math.min(9, Math.max(3, Math.ceil(String(d.body).length / 70)))}">${esc(d.body)}</textarea>`}
+    ${acts ? `<div class="of-acts">${acts}</div>` : ''}</article>`;
+}
+async function ofAct(d, a, body) {
+  const E = ofEmp(d.emp); d.body = body; const now = nowIso();
+  if (a === 'send') { const t = TKS.find(x => x.id === d.target); if (!t) return toast('التذكرة غير موجودة');
+    try { await F.addDoc(F.collection(fs, 'tickets', t.id, 'msgs'), { by: ME.email, byName: ME.name || 'فريق الدعم', text: body, at: now, side: 'plat' });
+      await F.updateDoc(F.doc(fs, 'tickets', t.id), { status: 'answered', unreadPlat: false, unreadCo: true, lastAt: now, lastBy: ME.email, assignee: ME.email });
+      notify({ action: 'ticket', ticketId: t.id, text: body }); plog('رد على تذكرة (مسودة ' + E.name + ')', `${t.companyName} · ${t.subject}`); toast('أُرسل الرد للعميل ✓'); loadTk(); }
+    catch (x) { return toast('تعذر الإرسال'); } }
+  if (a === 'note') { try { await F.addDoc(F.collection(fs, 'crm'), { cid: d.target, kind: 'ملاحظة', text: body, by: ME.email, byName: (ME.name || '') + ' · ' + E.name, at: now }); toast('حُفظت في ملف الشركة ✓'); } catch (x) { return toast('تعذر الحفظ'); } }
+  if (a === 'copy') { try { await navigator.clipboard.writeText(body); toast('نُسخ النص ✓'); } catch (x) { toast('تعذر النسخ'); } return saveOffice(); }
+  d.status = a === 'skip' ? 'skip' : 'done'; d.doneAt = now; await saveOffice(); renderOffice();
+}
+$('#t-office').addEventListener('click', e => {
+  const c = e.target.closest('[data-oe]'); if (c) { OF_EMP = c.dataset.oe; return renderOffice(); }
+  const f = e.target.closest('[data-of-f]'); if (f) { OF_F = f.dataset.ofF; return renderOffice(); }
+  const s = e.target.closest('[data-os]'); if (s) return ofAsk(OF_EMP, 'chat', s.dataset.os);
+  if (e.target.closest('#ofBrief')) return ofAsk(OF_EMP, 'brief');
+  if (e.target.closest('#ofAll')) { Object.keys(OF_EMPS).forEach(k => ofAsk(k, 'brief')); return toast('بدأ الجميع إعداد تقارير اليوم'); }
+  if (e.target.closest('#ofClr')) { OFC.chats[OF_EMP] = []; saveOffice(); return renderOffice(); }
+  if (e.target.closest('#ofSet')) { const k = OF_EMP; const x = ofEmp(k);
+    return dialog(`<h3>تخصيص ${esc(x.role)}</h3><label>اسم الموظف<input name="name" maxlength="30" value="${esc(x.name)}" required></label>
+      <label>تعليمات خاصة (اختياري)<textarea name="extra" rows="5" maxlength="2000" placeholder="مثال: خاطب العملاء بأسمائهم، واذكر رقم الواتساب 05xxxxxxxx في نهاية كل رسالة">${esc(x.extra || '')}</textarea></label>
+      <small style="color:var(--muted)">تُضاف هذه التعليمات لعمل الموظف في كل مهمة.</small>`, async fd => { OFC.persona[k] = { name: String(fd.get('name')).trim() || OF_EMPS[k].name, extra: String(fd.get('extra') || '').trim() }; await saveOffice(); toast('حُفظ ✓'); renderOffice(); }); }
+  const b = e.target.closest('[data-od]'); if (b) { const art = b.closest('[data-did]'); const d = OFC.drafts.find(x => x.id === art.dataset.did); if (!d) return; const ed = art.querySelector('.of-ed');
+    const a = b.dataset.od; if (a === 'wa' || a === 'mail') { d.body = ed ? ed.value : d.body; return; } ofAct(d, a, ed ? ed.value.trim() : d.body); }
+});
+$('#t-office').addEventListener('submit', e => { if (e.target.id !== 'ofIn') return; e.preventDefault(); const q = e.target.q.value.trim(); if (q) ofAsk(OF_EMP, 'chat', q); });
+$('#t-office').addEventListener('keydown', e => { if (e.target.name === 'q' && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); e.target.form.requestSubmit(); } });
+// تعديل نص المسودة قبل فتح واتساب أو البريد يُحدّث الرابط
+$('#t-office').addEventListener('input', e => { if (!e.target.classList.contains('of-ed')) return; const art = e.target.closest('[data-did]'); const v = e.target.value;
+  art.querySelectorAll('[data-od="wa"]').forEach(a => { a.href = a.href.replace(/text=.*$/, 'text=' + encodeURIComponent(v)); });
+  art.querySelectorAll('[data-od="mail"]').forEach(a => { a.href = a.href.replace(/body=.*$/, 'body=' + encodeURIComponent(v)); }); });
 
 /* ---------- 6) نظام المحاسبة الداخلي (platform/books) ---------- */
 // المستند الواحد يحمل: دليل الحسابات، الفروع، الموظفين، المسيّرات، المصروفات الثابتة، والقيود (expenses)
