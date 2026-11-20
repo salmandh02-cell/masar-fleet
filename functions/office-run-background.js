@@ -1,5 +1,6 @@
 // تشغيل موظفي المكتب تلقائياً على الخادم (دالة خلفية تعمل حتى 15 دقيقة)
 // - بلا تذكرة: تنفّذ المهام المجدولة المستحقة في هذه الساعة بتوقيت الرياض (تستدعيها office-cron كل ساعة)
+// - اجتماع الصباح يومياً (cfg.meet.hour، افتراضياً 10)، أو فوراً بطلب {meet:true} مرة واحدة في اليوم
 // - مع تذكرة: سارة تكتب الرد فور وصولها، وتُرسله تلقائياً فقط لأسئلة الشرح التي جوابها في المراجع المعتمدة
 // كل مهمة تُنفَّذ مرة واحدة (officerun)، والنتائج تُكتب في officeinbox وتدمجها لوحة المالك عند فتح المكتب
 // لا يُرسل شيء آخر لعميل ولا يُعدَّل أي نظام أو سياسة: كله مسودات بانتظار المالك
@@ -38,6 +39,35 @@ async function runScheduled(tok, cfg, n) {
   return out;
 }
 
+// اجتماع الصباح: كل موظف يعرض ما أنجزه وما سيعمل عليه وما يحتاجه، ثم يلخّص ماجد ويكلّف (التكليفات مسودات بانتظار المالك)
+const MEET_EMPS = ['coo', 'support', 'sales', 'accountant', 'ideas', 'legal'];
+const STANDUP = 'اجتماع الصباح مع ماجد وبقية الفريق. تكلّم بإيجاز في ثلاث نقاط فقط: ما أنجزته منذ أمس، وما ستعمل عليه اليوم، وما تحتاجه من زميل (سمّه) أو من المالك. لا تكتب مسودات.';
+async function runMeeting(tok, cfg, n, force) {
+  const m = cfg.meet || {};
+  if (!force && (m.on === false || +(m.hour ?? 10) !== n.h)) return null;
+  if (!(await P.claim(tok, `officerun/meet-${n.ymd}`, { task: 'meet', emp: 'ceo', at: new Date().toISOString() }))) return { skipped: 'done' };
+  const [office, kb] = await Promise.all([P.get(tok, 'platform/office').catch(() => null), P.get(tok, 'platform/officekb').catch(() => null)]);
+  const emps = (Array.isArray(m.emps) && m.emps.length ? m.emps : MEET_EMPS).filter(k => O.EMPS[k] && k !== 'ceo').slice(0, 8);
+  const usage = { in: 0, out: 0 }; const add = u => { usage.in += (u || {}).in || 0; usage.out += (u || {}).out || 0; };
+  const ctx = k => ({ sop: (cfg.sop || {})[k] || '', refs: D.refsFor(kb, cfg.rcat, k), persona: persona(cfg, k) });
+  const items = await Promise.all(emps.map(async k => {
+    try { const r = await O._work(O.EMPS[k], { task: 'chat', message: STANDUP, data: await D.build(tok, k, office || {}), ...ctx(k) }); add(r.usage); return { emp: k, text: String(r.reply || '').slice(0, 1500) }; }
+    catch (e) { console.error('meet', k, e.message); return { emp: k, text: 'تعذر حضوره: ' + String(e.message).slice(0, 160), err: true }; }
+  }));
+  const said = items.map(x => `### ${persona(cfg, x.emp).name}\n${x.text}`).join('\n\n');
+  const at = new Date().toISOString();
+  try {
+    const r = await O._work(O.EMPS.ceo, { task: 'chat', data: await D.build(tok, 'ceo', office || {}), ...ctx('ceo'),
+      message: `أدرت اجتماع الصباح، وهذا ما قاله الفريق:\n\n${said}\n\nاكتب للمالك خلاصة الاجتماع: أهم ما أُنجز، وأولويات اليوم، وما يحتاجه كل موظف من زميل أو من المالك. لكل متابعة بين الموظفين اكتب مسودة assign للموظف المعني، وما يحتاج قرار المالك نفسه مسودة task.` });
+    add(r.usage);
+    await P.create(tok, 'officeinbox', { type: 'meet', emp: 'ceo', title: 'اجتماع الصباح', items, reply: r.reply, drafts: r.drafts, usage, cut: !!r.cut, at });
+    return { meet: items.length, drafts: r.drafts.length };
+  } catch (e) {
+    await P.create(tok, 'officeinbox', { type: 'meet', emp: 'ceo', title: 'اجتماع الصباح', items, reply: 'تعذر على ماجد كتابة الخلاصة: ' + String(e.message).slice(0, 200), drafts: [], usage, at }).catch(() => {});
+    return { meet: items.length, error: e.message };
+  }
+}
+
 async function runTicket(tok, cfg, id, sysEmail) {
   if (!/^[A-Za-z0-9_-]{1,80}$/.test(id)) return { error: 'id' };
   if (cfg.support24 === false) return { skipped: 'off' };
@@ -72,8 +102,10 @@ exports.handler = async (event) => {
     const { token, email } = await P.sysLogin();
     const cfg = (await P.get(token, 'platform/officeauto').catch(() => null)) || {};
     if (cfg.on === false) return { statusCode: 200, body: 'off' };
-    const r = req.ticket ? await runTicket(token, cfg, String(req.ticket), email) : await runScheduled(token, cfg, ksaNow());
+    const n = ksaNow();
+    const r = req.ticket ? await runTicket(token, cfg, String(req.ticket), email) : req.meet ? await runMeeting(token, cfg, n, true)
+      : { tasks: await runScheduled(token, cfg, n), meet: await runMeeting(token, cfg, n, false) };
     console.log('office-run', JSON.stringify(r)); return { statusCode: 200, body: JSON.stringify(r) };
   } catch (e) { console.error('office-run failed', e.message); return { statusCode: 500, body: e.message }; }
 };
-Object.assign(exports, { _due: due, _runTicket: runTicket, _runScheduled: runScheduled });
+Object.assign(exports, { _due: due, _runTicket: runTicket, _runScheduled: runScheduled, _runMeeting: runMeeting });
