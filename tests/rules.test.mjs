@@ -273,6 +273,14 @@ console.log('لوحة المالك: التحكم والإحصاءات والأع
   await t('staff reads platform stats', acct.collection('platstats').get());
   await t('staff cannot write platform stats', mgr.doc('platstats/ca-111').set({ users: 99 }), false);
   await t('company cannot read platform stats', alice.doc('platstats/ca-111').get(), false);
+  await t('system account writes office inbox', sysA.doc('officeinbox/i1').set({ type: 'run', emp: 'sales', at: now }));
+  await t('system account claims a task run once', sysA.doc('officerun/sal-reg-2026-11-21').set({ task: 'sal-reg' }));
+  await t('system account cannot claim the same run twice', sysA.doc('officerun/sal-reg-2026-11-21').set({ task: 'sal-reg' }), false);
+  await t('system account cannot read the inbox', sysA.doc('officeinbox/i1').get(), false);
+  await t('system account cannot write the office itself', sysA.doc('platform/office').set({ drafts: [] }), false);
+  await t('manager cannot write office inbox', mgr.doc('officeinbox/i2').set({ type: 'run' }), false);
+  await t('owner reads and clears office inbox', sup.doc('officeinbox/i1').delete());
+  await t('company user cannot read office runs', alice.doc('officerun/sal-reg-2026-11-21').get(), false);
   await t('system writes job health', sysA.doc('platform/health').set({ remindAt: now, remindOk: true }, { merge: true }));
   await t('manager cannot write job health', mgr.doc('platform/health').set({ remindOk: true }, { merge: true }), false);
   await t('system cannot write platform settings', sysA.doc('platform/settings').set({ aiEnabled: 'on' }, { merge: true }), false);

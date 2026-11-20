@@ -403,6 +403,7 @@ body.va{overflow:hidden}
 .of-refs{display:grid;gap:10px;padding:12px 16px}.of-ref{grid-template-columns:minmax(0,1fr) auto;align-items:start}.of-ref small{display:block;color:var(--muted);font-size:12px;margin-top:3px}.of-ref p{margin:6px 0 0;color:var(--muted);font-size:13px}
 .of-chk{border:1px solid var(--line);border-radius:10px;display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 12px}.of-chk label{display:flex;align-items:center;gap:5px;font-size:13px}
 .of-tg{display:flex;gap:8px;align-items:center;margin:8px 0}
+.of-sch{display:grid;gap:10px;max-height:46vh;overflow:auto;margin:8px 0}.of-sr{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px;border:1px solid var(--line,#e5e7eb);border-radius:10px}.of-sr .of-tg{flex:1 1 100%;margin:0}.of-sr textarea{flex:1 1 100%;font:inherit;font-size:13px}
 @media (max-width:640px){.of-ref{grid-template-columns:1fr}.of-sops{padding:10px}}
 @media (max-width:1100px){.of-team{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:1000px){.of-main{grid-template-columns:1fr}}
@@ -1640,6 +1641,9 @@ async function loadOffice0() {
   let o = {}; try { const s = await F.getDoc(F.doc(fs, 'platform', 'office')); o = s.exists() ? s.data() : {}; } catch (e) { toast('تعذر تحميل المكتب'); }
   if (KB === null) await loadKb(); OFC = o;
   OFC.drafts = OFC.drafts || []; OFC.feed = OFC.feed || []; OFC.auto = OFC.auto || { review: true, assign: true, handoff: true }; OFC.queue = OFC.queue || []; OFC.reviews = OFC.reviews || {}; OFC.chats = OFC.chats || {}; OFC.persona = OFC.persona || {}; OFC.usage = OFC.usage || {};
+  try { const a = await F.getDoc(F.doc(fs, 'platform', 'officeauto')); OFA = a.exists() ? a.data() : ofaDef(); } catch (e) { OFA = ofaDef(); }
+  OFA.sched = Array.isArray(OFA.sched) ? OFA.sched : ofaDef().sched;
+  ofAutoSync(); await ofInbox(); clearInterval(OF_INBOX_T); OF_INBOX_T = setInterval(() => ofInbox(), 10 * 60e3);
 }
 // المستند الواحد محدود بحجم 1MB: نُبقي آخر 16 رسالة لكل موظف، وآخر 120 مسودة (المعلّقة أولاً)
 async function saveOffice() {
@@ -1795,6 +1799,55 @@ function ofRefs(k, max = 110000) { let out = '';
   return out.trim(); }
 const ofFeed = (emp, text, to) => { OFC.feed.unshift({ at: nowIso(), emp, to: to || '', text: cut(text, 240) }); };
 const OF_AUTO_L = { review: 'الخبير يراجع كل مسودة تلقائياً قبل أن تصلك', assign: 'تكليفات ماجد ولمى تُنفَّذ تلقائياً (الموظف يبدأ العمل فوراً)', handoff: 'الإحالة بين الموظفين تُنفَّذ تلقائياً' };
+// ---------- التشغيل التلقائي على الخادم (platform/officeauto + officeinbox) ----------
+// مهام كل موظف حددها المالك (سياسة داخلية). تعمل على الخادم في موعدها بتوقيت الرياض حتى لو كانت اللوحة مغلقة،
+// والنتائج مسودات بانتظار المالك. لا يعدّل أي موظف سياسة أو نظاماً أو مرجعاً معتمداً بنفسه
+const OF_FREQ = { daily: 'يومياً', weekly: 'أسبوعياً', monthly: 'شهرياً', monthEnd: 'آخر يوم في الشهر' };
+const OF_DOW = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+const OF_RULE = 'لا تعدّل أي سياسة أو نظام أو مرجع معتمد، واكتب أي تعديل مقترح مسودة بانتظار موافقة المالك.';
+const OF_SCHED_DEF = [
+  { id: 'sup-day', emp: 'support', title: 'مراجعة التذاكر', freq: 'daily', hour: 8, prompt: 'راجع كل التذاكر المفتوحة: رتّبها حسب الأولوية، وحدّد لكل تذكرة مدة الحل المتوقعة، واكتب الرد على كل تذكرة تحتاج رداً. ما لا يُحل عندك حوّله إلى القسم المختص، والأعطال البرمجية إلى ياسر بمسودة bug. الهدف: أول رد خلال 4 ساعات.' },
+  { id: 'sup-week', emp: 'support', title: 'الأسئلة المتكررة', freq: 'weekly', dow: 0, hour: 10, prompt: 'اكتب تقريراً أسبوعياً بأكثر الأسئلة والمشكلات تكراراً في التذاكر، واقترح نصاً لكل منها يضاف إلى صفحة الأسئلة الشائعة.' },
+  { id: 'sal-reg', emp: 'sales', title: 'طلبات التسجيل', freq: 'daily', hour: 8, prompt: 'تابع طلبات التسجيل الجديدة والمعلقة، وتحقق من اكتمال بيانات كل شركة ومطابقتها للمستندات، واذكر الناقص في كل طلب ورسالة تطلبه من الشركة.' },
+  { id: 'sal-renew', emp: 'sales', title: 'التجارب والتجديد', freq: 'daily', hour: 8, prompt: 'تابع الشركات التي تنتهي تجربتها قريباً، والاشتراكات التي تنتهي خلال أسبوع، واكتب رسالة متابعة أو تذكير بالتجديد لكل شركة. أي خصم تقترحه لا يتجاوز 20%.' },
+  { id: 'acc-day', emp: 'accountant', title: 'الفواتير والمدفوعات', freq: 'daily', hour: 8, prompt: 'طابق التحويلات البنكية والدفع الإلكتروني مع الفواتير الصادرة، وتأكد أن كل فاتورة مدفوعة مربوطة بسند قبض، ونبّه على الفواتير المتأخرة ومن يجب مطالبته.' },
+  { id: 'acc-exp', emp: 'accountant', title: 'تدقيق المصروفات', freq: 'daily', hour: 8, prompt: 'دقّق المصروفات المسجلة حديثاً: تأكد من عدم تكرارها، وصحة تصنيفها في الدليل المحاسبي، واكتب ما يحتاج تصحيحاً.' },
+  { id: 'acc-coa', emp: 'accountant', title: 'الدليل المحاسبي', freq: 'monthly', dom: 1, hour: 9, prompt: 'راجع الدليل المحاسبي: وضّح أبوابه وما يُسجَّل في كل باب، واقترح أي تعديل مسودةً بانتظار المالك.' },
+  { id: 'acc-close', emp: 'accountant', title: 'إقفال الشهر', freq: 'monthEnd', hour: 18, prompt: 'جهّز إقفال الشهر: الإيرادات والمصروفات والأرباح والخسائر، والفواتير غير المحصّلة، وقائمة بالاستردادات التي يجب إصدار إشعار دائن عنها خلال 15 يوماً من الشهر التالي.' },
+  { id: 'ide-day', emp: 'ideas', title: 'جديد الذكاء الاصطناعي', freq: 'daily', hour: 9, prompt: 'ابحث في الويب العام ومواقع التواصل المتاحة دون تسجيل دخول عن جديد الذكاء الاصطناعي وإدارة الأساطيل، واقترح أفكاراً تناسب نشاطنا، لكل فكرة مصدرها.' },
+  { id: 'ide-week', emp: 'ideas', title: 'تطوير المنصة', freq: 'weekly', dow: 1, hour: 10, prompt: 'اقترح تطويرات للمنصة في التصميم والإضافات وتسهيل الاستخدام، بناءً على التذاكر والأعطال وما وجدته من جديد. التنفيذ عند ياسر بعد موافقة المالك فقط.' },
+  { id: 'coo-day', emp: 'coo', title: 'الملخص الصباحي', freq: 'daily', hour: 9, prompt: 'اكتب للمالك ملخصاً صباحياً: سير مهام كل موظف، والمتأخر منها، والمشكلات والبلاغات غير المحلولة، والأفكار التي تحتاج عرضاً على الخبراء.' },
+  { id: 'leg-week', emp: 'legal', title: 'المراجعة النظامية', freq: 'weekly', dow: 0, hour: 9, prompt: 'راجع الأنظمة ذات الصلة من مصادرها الرسمية فقط، وتابع الأخبار في المنصات الرسمية، واكتب ما تغيّر وتوقعاتك للقادم موصوفة بأنها توقع. أي تحديث لسجل الأنظمة أو السياسات يكون مسودة بانتظار موافقة المالك.' }
+];
+let OFA = null;
+const ofaDef = () => ({ on: true, support24: true, supportAuto: 'howto', sched: OF_SCHED_DEF.map(x => ({ ...x, on: true })) });
+const ofSched = t => `${OF_FREQ[t.freq] || ''}${t.freq === 'weekly' ? ' ' + OF_DOW[+t.dow || 0] : t.freq === 'monthly' ? ' يوم ' + (t.dom || 1) : ''} الساعة ${t.hour}`;
+// نسخة يقرؤها الخادم: الجدول، ودليل العمل النهائي لكل موظف، والأسماء، وقرّاء كل تصنيف من المراجع
+async function ofAutoSync() {
+  const snap = { on: OFA.on !== false, support24: OFA.support24 !== false, supportAuto: OFA.supportAuto || 'off', sched: OFA.sched,
+    sop: Object.fromEntries(Object.keys(OF_EMPS).map(k => [k, `${ofSop(k)}\n${OF_RULE}`])), persona: Object.fromEntries(Object.keys(OF_EMPS).map(k => { const e = ofEmp(k); return [k, { name: `${e.name} (${e.role})`, extra: e.extra || '' }]; })),
+    rcat: Object.fromEntries(Object.entries(OF_RCAT).map(([c, v]) => [c, v[1]])), features: OF_FEATURES };
+  const sig = JSON.stringify(snap); if (sig === OFA._sig) return true; OFA._sig = sig;
+  try { await F.setDoc(F.doc(fs, 'platform', 'officeauto'), { ...snap, updatedAt: nowIso() }); return true; } catch (e) { OFA._sig = ''; toast('تعذر حفظ إعدادات التشغيل التلقائي: ' + (e.code || e.message)); return false; }
+}
+// دمج ما أنجزه الموظفون على الخادم في المكتب، ثم حذفه من الصندوق
+let OF_INBOX_T = 0;
+async function ofInbox() {
+  let L = []; try { const q = await F.getDocs(F.collection(fs, 'officeinbox')); L = q.docs.map(d => ({ _id: d.id, ...d.data() })).sort((a, b) => String(a.at).localeCompare(String(b.at))); } catch (e) { return; }
+  if (!L.length) return; const fresh = [];
+  for (const x of L) { const emp = OF_EMPS[x.emp] ? x.emp : 'support'; const chat = OFC.chats[emp] = OFC.chats[emp] || [];
+    const ids = (x.drafts || []).map(d => { const id = uid('d'); OFC.drafts.unshift({ id, emp, ...d, status: 'new', at: x.at || nowIso(), auto: true }); fresh.push(OFC.drafts[0]); return id; });
+    if (x.type === 'run') { chat.push({ role: 'user', content: `⏰ مهمة مجدولة: ${x.title}`, at: x.at }); chat.push({ role: 'assistant', content: (x.reply || '') + (x.cut ? '\n\n(انقطع الرد لطوله)' : ''), drafts: ids.length, at: x.at }); ofFeed(emp, `أنجز المهمة المجدولة «${x.title}»${ids.length ? ` وكتب ${ids.length} مسودة` : ''}`); }
+    else if (x.type === 'ticket') { chat.push({ role: 'assistant', content: x.sent ? `ردّيت تلقائياً على تذكرة «${x.title}» (${x.company}) لأنها سؤال شرح جوابه في المراجع:\n\n${x.reply}` : `وصلت تذكرة «${x.title}» (${x.company}). كتبت الرد مسودة بانتظارك. ${x.note || ''}${x.eta ? `\nمدة الحل المتوقعة: ${x.eta}` : ''}`, drafts: ids.length, at: x.at });
+      ofFeed(emp, x.sent ? `ردّت تلقائياً على تذكرة: ${x.title}` : `كتبت رداً على تذكرة جديدة: ${x.title}`); }
+    else if (x.type === 'error') ofFeed(emp, `تعذر تنفيذ المهمة المجدولة «${x.title}»: ${x.text || ''}`);
+    const day = String(x.at || nowIso()).slice(0, 10); const u = OFC.usage[day] = OFC.usage[day] || { n: 0, in: 0, out: 0 }; u.n++; u.in += (x.usage || {}).in || 0; u.out += (x.usage || {}).out || 0; }
+  if (!(await saveOffice())) return;
+  await Promise.all(L.map(x => F.deleteDoc(F.doc(fs, 'officeinbox', x._id)).catch(() => {})));
+  if (fresh.length) toast(`أنجز الموظفون ${L.length} مهمة تلقائياً و${fresh.length} مسودة بانتظارك`);
+  if (OF_VIEW === 'office' && ($('#t-office') || {}).offsetParent) renderOffice();
+  if (OFC.auto.review) ofAutoReview(fresh.filter(d => !['assign', 'handoff'].includes(d.kind)));
+}
 // تنفيذ تكليف أو إحالة: الموظف المستلم يبدأ العمل، ومسوداته تبقى بانتظار المالك
 async function ofDelegate(d, depth, auto) {
   const E = ofEmp(d.emp), t = d.target, T = ofEmp(t); d.status = d.kind === 'assign' ? 'assigned' : 'handed'; d.doneAt = nowIso(); if (auto) d.auto = 1;
@@ -2011,11 +2064,28 @@ $('#t-office').addEventListener('click', e => {
   const v = e.target.closest('[data-ov]'); if (v) { OF_VIEW = v.dataset.ov; return renderOffice(); }
   if (e.target.closest('#ofDay')) { OF_EMP = 'ceo'; toast('بدأ ماجد يوم العمل: يقرأ الوضع ويكلّف الفريق'); return ofAsk('ceo', 'chat', 'ابدأ يوم العمل: اقرأ وضع المنصة والفريق وسير العمل الأخير، وحدد أولويات اليوم، وكلّف كل موظف بما يخصه بمسودات assign.'); }
   if (e.target.closest('#ofFeedAll')) { OF_FEEDALL = !OF_FEEDALL; return renderOffice(); }
-  if (e.target.closest('#ofAuto')) return dialog(`<h3>التشغيل التلقائي</h3><p class="of-mut">كل ما يصل للعملاء يبقى مسودة بانتظار اعتمادك دائماً. هذه الإعدادات تخص العمل الداخلي بين الموظفين فقط.</p>${Object.entries(OF_AUTO_L).map(([k, l]) => `<label class="of-tg"><input type="checkbox" name="${k}"${OFC.auto[k] ? ' checked' : ''}> ${l}</label>`).join('')}`,
-    async fd => { Object.keys(OF_AUTO_L).forEach(k => { OFC.auto[k] = fd.get(k) === 'on'; }); await saveOffice(); toast('حُفظ ✓'); renderOffice(); });
+  if (e.target.closest('#ofAuto')) { const hrs = Array.from({ length: 24 }, (_, h) => h); const f = dialog(`<h3>التشغيل التلقائي</h3><p class="of-mut">كل ما يصل للعملاء يبقى مسودة بانتظار اعتمادك، عدا ما تسمح به أدناه لسارة. ولا يعدّل أي موظف سياسة أو نظاماً بنفسه.</p>${Object.entries(OF_AUTO_L).map(([k, l]) => `<label class="of-tg"><input type="checkbox" name="${k}"${OFC.auto[k] ? ' checked' : ''}> ${l}</label>`).join('')}
+    <h4>العمل على مدار الساعة</h4>
+    <label class="of-tg"><input type="checkbox" name="a_on"${OFA.on !== false ? ' checked' : ''}> تشغيل المهام المجدولة على الخادم حتى لو كانت اللوحة مغلقة</label>
+    <label class="of-tg"><input type="checkbox" name="a_s24"${OFA.support24 !== false ? ' checked' : ''}> سارة تكتب الرد فور وصول أي تذكرة (24 ساعة)</label>
+    <label class="of-tg"><input type="checkbox" name="a_how"${OFA.supportAuto === 'howto' ? ' checked' : ''}> سارة ترسل الرد مباشرة إذا كان سؤال شرح استخدام وجوابه في المراجع المعتمدة (المال والاسترداد والأعطال تنتظرك دائماً)</label>
+    <h4>جدول المهام <small class="of-mut">بتوقيت الرياض</small></h4>
+    <div class="of-sch">${OFA.sched.map((t, i) => `<div class="of-sr"><label class="of-tg"><input type="checkbox" name="on${i}"${t.on !== false ? ' checked' : ''}> <b>${esc(ofEmp(t.emp).name)}</b> · ${esc(t.title)}</label>
+      <select name="fq${i}">${Object.entries(OF_FREQ).map(([k, l]) => `<option value="${k}"${t.freq === k ? ' selected' : ''}>${l}</option>`).join('')}</select>
+      <select name="dw${i}" title="اليوم (للأسبوعي)">${OF_DOW.map((l, d) => `<option value="${d}"${+t.dow === d ? ' selected' : ''}>${l}</option>`).join('')}</select>
+      <input name="dm${i}" type="number" min="1" max="28" value="${+t.dom || 1}" title="يوم الشهر (للشهري)" style="width:64px">
+      <select name="hr${i}">${hrs.map(h => `<option value="${h}"${+t.hour === h ? ' selected' : ''}>${String(h).padStart(2, '0')}:00</option>`).join('')}</select>
+      <textarea name="pr${i}" rows="2" maxlength="1500">${esc(t.prompt)}</textarea></div>`).join('')}</div>
+    <button type="button" class="btn sm" data-ofa="reset">استعادة الجدول الافتراضي</button>`,
+    async fd => { Object.keys(OF_AUTO_L).forEach(k => { OFC.auto[k] = fd.get(k) === 'on'; }); await saveOffice();
+      OFA.on = fd.get('a_on') === 'on'; OFA.support24 = fd.get('a_s24') === 'on'; OFA.supportAuto = fd.get('a_how') === 'on' ? 'howto' : 'off';
+      OFA.sched = OFA.sched.map((t, i) => ({ ...t, on: fd.get('on' + i) === 'on', freq: fd.get('fq' + i) || t.freq, dow: +fd.get('dw' + i) || 0, dom: Math.min(28, Math.max(1, +fd.get('dm' + i) || 1)), hour: +fd.get('hr' + i) || 0, prompt: String(fd.get('pr' + i) || t.prompt).trim().slice(0, 1500) || t.prompt }));
+      if (await ofAutoSync()) { toast('حُفظ ✓'); plog('مكتب الموظفين: إعدادات التشغيل التلقائي', OFA.on ? 'مفعّل' : 'موقوف', `${OFA.sched.filter(t => t.on !== false).length} مهمة مجدولة`); } renderOffice(); });
+    f.querySelector('[data-ofa="reset"]').onclick = () => { if (!confirm('استعادة الجدول الافتراضي؟ ستُستبدل التعديلات على المهام.')) return; OFA.sched = ofaDef().sched; $('#dlg').close('cancel'); ofAutoSync().then(() => toast('استُعيد الجدول الافتراضي ✓')); };
+    return; }
   const sp = e.target.closest('[data-sop]'); if (sp) { const art = sp.closest('[data-sk]'); const k = art.dataset.sk; const v = art.querySelector('textarea').value.trim();
     if (sp.dataset.sop === 'reset' || v === OF_SOP[k] || !v) delete KB.sop[k]; else KB.sop[k] = v.slice(0, 8000);
-    saveKb('حُفظ دليل عمل ' + ofEmp(k).name + ' ✓').then(ok => { if (ok) plog('مكتب الموظفين: تعديل دليل العمل', ofEmp(k).name); renderOffice(); }); return; }
+    saveKb('حُفظ دليل عمل ' + ofEmp(k).name + ' ✓').then(ok => { if (ok) { plog('مكتب الموظفين: تعديل دليل العمل', ofEmp(k).name); ofAutoSync(); } renderOffice(); }); return; }
   if (e.target.closest('#kbAdd')) return kbDialog();
   if (e.target.closest('#kbImport')) return kbImport();
   const kb = e.target.closest('[data-kbe]'); if (kb) { const r = KB.docs.find(x => x.id === kb.closest('[data-kb]').dataset.kb); if (!r) return;
@@ -2027,13 +2097,13 @@ $('#t-office').addEventListener('click', e => {
   const s = e.target.closest('[data-os]'); if (s) return ofAsk(OF_EMP, 'chat', s.dataset.os);
   if (e.target.closest('#ofBrief')) return ofAsk(OF_EMP, 'brief');
   if (e.target.closest('#ofPerf')) return ofPerf(OF_EMP);
-  if (e.target.closest('#ofApplyRec')) { const k = OF_EMP, rv = OFC.reviews[k]; const cur = ofEmp(k); OFC.persona[k] = { name: cur.name, extra: [cur.extra || '', 'توصيات الخبير:', ...rv.recommendations.map(x => '- ' + x)].filter(Boolean).join('\n').slice(0, 2000) }; rv.applied = true; saveOffice(); toast('أُضيفت التوصيات لتعليمات ' + cur.name); return renderOffice(); }
+  if (e.target.closest('#ofApplyRec')) { const k = OF_EMP, rv = OFC.reviews[k]; const cur = ofEmp(k); OFC.persona[k] = { name: cur.name, extra: [cur.extra || '', 'توصيات الخبير:', ...rv.recommendations.map(x => '- ' + x)].filter(Boolean).join('\n').slice(0, 2000) }; rv.applied = true; saveOffice(); ofAutoSync(); toast('أُضيفت التوصيات لتعليمات ' + cur.name); return renderOffice(); }
   if (e.target.closest('#ofAll')) { Object.keys(OF_EMPS).forEach(k => ofAsk(k, 'brief')); return toast('بدأ الجميع إعداد تقارير اليوم'); }
   if (e.target.closest('#ofClr')) { OFC.chats[OF_EMP] = []; saveOffice(); return renderOffice(); }
   if (e.target.closest('#ofSet')) { const k = OF_EMP; const x = ofEmp(k);
     return dialog(`<h3>تخصيص ${esc(x.role)}</h3><label>اسم الموظف<input name="name" maxlength="30" value="${esc(x.name)}" required></label>
       <label>تعليمات خاصة (اختياري)<textarea name="extra" rows="5" maxlength="2000" placeholder="مثال: خاطب العملاء بأسمائهم، واذكر رقم الواتساب 05xxxxxxxx في نهاية كل رسالة">${esc(x.extra || '')}</textarea></label>
-      <small style="color:var(--muted)">تُضاف هذه التعليمات لعمل الموظف في كل مهمة.</small>`, async fd => { OFC.persona[k] = { name: String(fd.get('name')).trim() || OF_EMPS[k].name, extra: String(fd.get('extra') || '').trim() }; await saveOffice(); toast('حُفظ ✓'); renderOffice(); }); }
+      <small style="color:var(--muted)">تُضاف هذه التعليمات لعمل الموظف في كل مهمة.</small>`, async fd => { OFC.persona[k] = { name: String(fd.get('name')).trim() || OF_EMPS[k].name, extra: String(fd.get('extra') || '').trim() }; await saveOffice(); ofAutoSync(); toast('حُفظ ✓'); renderOffice(); }); }
   const b = e.target.closest('[data-od]'); if (b) { const art = b.closest('[data-did]'); const d = OFC.drafts.find(x => x.id === art.dataset.did); if (!d) return; const ed = art.querySelector('.of-ed');
     const a = b.dataset.od; if (a === 'wa' || a === 'mail') { d.body = ed ? ed.value : d.body; return; } ofAct(d, a, ed ? ed.value.trim() : d.body); }
 });
