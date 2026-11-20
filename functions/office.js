@@ -11,6 +11,8 @@ exports._setClient = c => { client = c; };
 
 // الموظفون: الدور وما يُنتجه وأنواع المسودات المسموحة
 const EMPS = {
+  ceo: { name: 'المدير التنفيذي', job: `تدير فريق المكتب (الدعم، المبيعات، المحاسبة، التسويق، تحليل العمليات، التطوير والأفكار، البرمجة) لصالح المالك. تقرأ وضع المنصة والفريق، وتحدد أهم 3 إلى 5 أولويات للأسبوع مرتبطة بالإيراد ورضا العملاء والنمو، وتقيّم هل يعمل الفريق على الأهم. لكل أولوية تحتاج عملاً اكتب مسودة من نوع assign تكلّف فيها الموظف المناسب بمهمة واضحة قابلة للقياس مع موعد. لا تكلّف موظفاً بما ليس من اختصاصه.`, kinds: ['assign', 'report', 'task'] },
+  coo: { name: 'مدير العمليات', job: `تتابع سير العمل اليومي في المكتب والمنصة: المسودات المعلّقة عند المالك، والتذاكر بلا رد، وطابور البرمجة، وطلبات التسجيل المعلقة، والفواتير المتأخرة، ونشاط كل موظف وتقييمات الخبراء له. ارفع للمالك ما تأخر وما يعطّل العمل بوضوح ومرتباً حسب الخطورة، واكتب مسودات assign لمتابعة كل متأخر مع الموظف المعني، ومسودات task لما يحتاج قراراً من المالك نفسه.`, kinds: ['assign', 'report', 'task'] },
   support: { name: 'موظف الدعم الفني', job: `تتولى تذاكر الدعم الواردة من الشركات المشتركة. لكل تذكرة مفتوحة تحتاج رداً اكتب مسودة رد مهذبة ودقيقة بالعربية الفصحى المبسطة تحل المشكلة أو تطلب المعلومة الناقصة، وابدأ بالتذاكر الأقدم والأكثر إلحاحاً. لا تَعِد بميزة غير موجودة ولا بموعد غير مؤكد. إذا كانت المشكلة خللاً في النظام نفسه (وليس خطأ استخدام) فاكتب أيضاً مسودة من نوع bug تصف الخلل للمبرمج: ما يحدث، وأين، وكيف يتكرر، والشركة المتأثرة.`, kinds: ['ticket', 'bug', 'note', 'task'] },
   sales: { name: 'موظف المبيعات', job: `تتابع طلبات التسجيل المعلقة، والشركات في الفترة التجريبية خاصة القريبة من الانتهاء، والشركات المنتهية غير المجددة. اقترح الأولوية واكتب رسائل متابعة قصيرة مقنعة غير مزعجة (واتساب أو بريد) لكل شركة تستحق المتابعة، تذكر قيمة النظام لها بأرقامها إن وُجدت، وتنتهي بخطوة واضحة.`, kinds: ['message', 'note', 'task'] },
   accountant: { name: 'المحاسب', job: `تراجع الفواتير غير المدفوعة والمتأخرة والتحصيل الشهري والمصروفات والرواتب. لخّص الوضع المالي بالأرقام، ونبّه إلى ما يحتاج إجراءً (فاتورة متأخرة، مصروف غير معتاد، تدفق نقدي ضعيف)، واكتب رسائل تذكير بالسداد للشركات المتأخرة بلغة لبقة. لا تخترع أرقاماً.
@@ -23,7 +25,7 @@ const EMPS = {
   coder: { name: 'المبرمج', job: `أنت مبرمج المنصة. تستلم البنود المعتمدة في «طابور البرمجة» (مقترحات تطوير اعتمدها المالك، وأعطال أحالها الدعم الفني) وأعطال المتصفح المسجلة. البنية: تطبيق ويب PWA بالعربية في ملف index.html كبير مع fb.js (الدخول وطبقة Firebase) وi18n.js، ولوحة المالك admin.html، وقاعدة بيانات Firebase Firestore بقواعد أمان في firestore.rules، ودوال Netlify بـNode.js في functions/. البيانات تحت companies/{cid}/... لكل شركة. لكل بند في الطابور اكتب مسودة من نوع dev هي «طلب تنفيذ» جاهز يُسلَّم لـClaude لينفذه في الكود: الهدف، الملفات المرجّح تعديلها، خطوات التنفيذ، تغيير قواعد الأمان إن لزم، الاختبار ومعيار القبول، والمخاطر. رتّب حسب الأولوية (الأعطال أولاً). أنت لا تملك صلاحية تعديل الكود أو النشر بنفسك، فلا تدّعِ ذلك.`, kinds: ['dev', 'report'] },
   ops: { name: 'محلل العمليات', job: `تراقب استخدام الشركات للنظام وصحة المنصة. حدّد الشركات الخاملة أو المعرضة لعدم التجديد وسبب ذلك، واقترح إجراءً محدداً لكل منها (اتصال، تدريب، تفعيل ميزة)، ونبّه إلى أعطال النظام إن ظهرت في البيانات.`, kinds: ['note', 'task', 'report', 'message'] }
 };
-const KIND_AR = { ticket: 'رد على تذكرة دعم (target = معرّف التذكرة)', message: 'رسالة لشركة (target = معرّف الشركة)', note: 'ملاحظة تُحفظ في ملف شركة (target = معرّف الشركة)', post: 'منشور أو نص تسويقي (target = اسم المنصة: linkedin أو x أو ads أو email)', task: 'مهمة مقترحة للمالك (target فارغ)', report: 'تقرير (target فارغ)', bug: 'خلل في النظام يُحال للمبرمج (target = معرّف التذكرة إن وجدت)', idea: 'مقترح تطوير يُعرض على المالك (target فارغ)', dev: 'طلب تنفيذ برمجي لبند من الطابور (target = معرّف البند في الطابور)',
+const KIND_AR = { assign: 'تكليف لموظف (target = مفتاح الموظف: support أو sales أو accountant أو marketing أو ops أو ideas أو coder، وbody نص المهمة كما سيستلمها الموظف)', ticket: 'رد على تذكرة دعم (target = معرّف التذكرة)', message: 'رسالة لشركة (target = معرّف الشركة)', note: 'ملاحظة تُحفظ في ملف شركة (target = معرّف الشركة)', post: 'منشور أو نص تسويقي (target = اسم المنصة: linkedin أو x أو ads أو email)', task: 'مهمة مقترحة للمالك (target فارغ)', report: 'تقرير (target فارغ)', bug: 'خلل في النظام يُحال للمبرمج (target = معرّف التذكرة إن وجدت)', idea: 'مقترح تطوير يُعرض على المالك (target فارغ)', dev: 'طلب تنفيذ برمجي لبند من الطابور (target = معرّف البند في الطابور)',
   coa: 'دليل حسابات أو تعديل عليه (target فارغ). body: سطر لكل حساب بالصيغة «الرمز | اسم الحساب | المجموعة» حيث الرمز 4 أرقام والمجموعة اسم إحدى مجموعات الحسابات المرفقة حرفياً (بدون الرقم). الحساب الموجود بنفس الرمز أو الاسم يُحدَّث، ولا يُحذف شيء',
   journal: 'قيد يومية مزدوج (target فارغ). body: السطر الأول «التاريخ: YYYY-MM-DD» والثاني «البيان: ...» ثم سطر لكل طرف «الرمز | اسم الحساب | مدين | دائن» بأرقام فقط وضع 0 في الطرف الفارغ. مجموع المدين يساوي مجموع الدائن' };
 
@@ -37,6 +39,7 @@ exports.handler = async (event) => {
     const me = await P.whoIs(auth.slice(7));
     if (!me || me.email !== P.SUPER() || !me.verified) return J(403, { error: 'owner only' });
     const E = EMPS[req.emp]; if (!E) return J(400, { error: 'emp' });
+    if (req.task === 'review') return J(200, await review(req));
     return J(200, await work(E, req));
   } catch (e) {
     if (e.refusal) return J(422, { error: 'refusal', message: 'اعتذر الموظف عن هذا الطلب، جرّب صياغة أخرى' });
@@ -107,4 +110,42 @@ ${kinds}
   const u = r.usage || {};
   return { reply: String(o.reply || '').slice(0, 8000), drafts, cut: r.stop_reason === 'max_tokens', model: r.model, searched,
     usage: { in: (u.input_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0), out: u.output_tokens || 0 } };
+}
+
+// ---------- الخبراء: تقييم عمل الموظفين ----------
+const EXPERTS = {
+  support: 'خبير خدمة عملاء ودعم فني لأنظمة SaaS بخبرة 15 سنة في السوق السعودي',
+  sales: 'خبير مبيعات B2B للبرمجيات في السعودية والخليج',
+  accountant: 'محاسب قانوني سعودي (SOCPA) خبير في المعايير المحاسبية المعتمدة في المملكة وأنظمة الزكاة وضريبة القيمة المضافة والفوترة الإلكترونية',
+  marketing: 'خبير تسويق رقمي ومحتوى للشركات في السوق السعودي',
+  ops: 'خبير عمليات ونجاح العملاء (Customer Success) في شركات SaaS',
+  ideas: 'مدير منتج أول (Senior Product Manager) لمنصات إدارة الأساطيل',
+  coder: 'مهندس برمجيات أول خبير في تطبيقات الويب وFirebase وأمن البيانات',
+  ceo: 'مستشار إداري واستراتيجي للشركات الناشئة',
+  coo: 'مستشار تشغيل وتحسين عمليات'
+};
+async function review(req) {
+  const who = EXPERTS[req.emp]; const empName = String(req.empName || EMPS[req.emp].name).slice(0, 60);
+  const perf = req.mode === 'perf';
+  const S2 = { type: 'array', items: S };
+  const schema = perf ? obj({ score: { type: 'integer' }, summary: S, strengths: S2, issues: S2, recommendations: S2 })
+    : obj({ score: { type: 'integer' }, verdict: S, strengths: S2, issues: S2, improved: S });
+  const item = String(req.item || '').slice(0, perf ? 40000 : 8000); if (!item.trim()) throw bad('لا يوجد ما يُقيَّم');
+  const r = await ai().messages.create({
+    model: MODEL(), max_tokens: 6000, output_config: { effort: 'medium', format: { type: 'json_schema', schema } },
+    system: `أنت ${who}. صاحب منصة «${P.APP()}» لإدارة أساطيل المركبات في السعودية ليس متخصصاً في مجالك، ويعتمد عليك لتقييم عمل «${empName}»، وهو موظف ذكاء اصطناعي في فريقه. كن صريحاً ودقيقاً ومهنياً، وقيّم وفق أفضل الممارسات في مجالك والأنظمة السعودية ذات الصلة، دون مجاملة ودون تشدد بلا سبب.
+${perf ? `قيّم أداء الموظف من مجموعة أعماله الأخيرة المرفقة: score من 1 إلى 10، summary خلاصة بالعربية في سطرين أو ثلاثة، strengths وissues نقاط قصيرة محددة، recommendations توصيات عملية لتحسين عمله (يمكن للمالك نسخها كتعليمات خاصة للموظف).`
+      : `قيّم العمل المرفق قبل أن يعتمده المالك: score من 1 إلى 10، verdict جملة واحدة (صالح للاعتماد، يحتاج تعديلاً بسيطاً، أو لا يُعتمد ولماذا)، strengths وissues نقاط قصيرة محددة (اذكر أي خطأ في الحقائق أو الأرقام أو الأنظمة أو النبرة)، improved النسخة المحسّنة كاملة جاهزة للاعتماد بنفس الغرض والصيغة (نص عادي بدون Markdown)، أو "" إذا لم تحتج تحسيناً.`}
+تاريخ اليوم ${new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 10)}.`,
+    messages: [{ role: 'user', content: (req.context ? `سياق من بيانات المنصة:\n${String(req.context).slice(0, 20000)}\n\n` : '') + (perf ? 'أعمال الموظف الأخيرة:\n' : 'العمل المطلوب تقييمه:\n') + item }]
+  });
+  if (r.stop_reason === 'refusal') { const e = new Error('refusal'); e.refusal = true; throw e; }
+  const txt = r.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
+  let o = {}; try { o = JSON.parse(txt); } catch (e) { throw bad('تعذر قراءة تقييم الخبير، أعد المحاولة'); }
+  const L = a => (Array.isArray(a) ? a : []).slice(0, 8).map(x => String(x).slice(0, 400));
+  const u = r.usage || {};
+  const out = { expert: who, score: Math.max(1, Math.min(10, parseInt(o.score, 10) || 0)), strengths: L(o.strengths), issues: L(o.issues), usage: { in: (u.input_tokens || 0) + (u.cache_read_input_tokens || 0), out: u.output_tokens || 0 } };
+  if (perf) Object.assign(out, { summary: String(o.summary || '').slice(0, 1200), recommendations: L(o.recommendations) });
+  else Object.assign(out, { verdict: String(o.verdict || '').slice(0, 400), improved: String(o.improved || '').slice(0, 3000) });
+  return out;
 }
