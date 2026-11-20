@@ -393,6 +393,17 @@ body.va{overflow:hidden}
 .of-sc{grid-column:1/-1;justify-self:start;font-size:11.5px;padding:1px 8px;border-radius:999px}.of-sc.ok{background:var(--ok-soft);color:var(--ok)}.of-sc.warn{background:var(--warn-soft);color:var(--warn)}.of-sc.crit{background:var(--crit-soft);color:var(--crit)}
 .of-m.xp{border-color:var(--brass,#A88653);background:color-mix(in srgb,var(--brass,#A88653) 8%,var(--surface))}
 .of-foot{color:var(--muted);font-size:12px;margin:0}
+.of-views{margin:0}.of-mut{color:var(--muted);font-size:12.5px}.of-xpl{display:block;margin-top:2px;color:var(--muted);font-size:12px}.of-lnk{all:unset;cursor:pointer;color:var(--accent);font-weight:500}
+.of-feed .ph{gap:10px}.of-fl{list-style:none;margin:0;padding:6px 16px 14px;display:grid;gap:8px;max-height:420px;overflow:auto}
+.of-fl li{display:flex;align-items:center;gap:8px;font-size:13.5px;line-height:1.6}.of-fl li>span:not(.of-av):not(.of-arr){flex:1;min-width:0}.of-fl time{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.of-fl .of-av{width:28px;height:28px;font-size:13px;border-radius:9px}.of-fl .of-av i{display:none}.of-arr{color:var(--muted)}
+.of-sops{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:12px;padding:12px 16px 16px}
+.of-sop,.of-ref{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:10px;background:var(--surface)}
+.of-sop header{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}.of-sop header small{display:block;color:var(--muted);font-size:12px}
+.of-refs{display:grid;gap:10px;padding:12px 16px}.of-ref{grid-template-columns:minmax(0,1fr) auto;align-items:start}.of-ref small{display:block;color:var(--muted);font-size:12px;margin-top:3px}.of-ref p{margin:6px 0 0;color:var(--muted);font-size:13px}
+.of-chk{border:1px solid var(--line);border-radius:10px;display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 12px}.of-chk label{display:flex;align-items:center;gap:5px;font-size:13px}
+.of-tg{display:flex;gap:8px;align-items:center;margin:8px 0}
+@media (max-width:640px){.of-ref{grid-template-columns:1fr}.of-sops{padding:10px}}
 @media (max-width:1100px){.of-team{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:1000px){.of-main{grid-template-columns:1fr}}
 @media (max-width:640px){.of-team{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;scroll-snap-type:x mandatory}.of-card{flex:0 0 152px;padding:10px;gap:6px 8px;scroll-snap-align:start}.of-job{display:none}.of-chat .ph{flex-wrap:wrap}.of-chat .ph>div{flex-basis:calc(100% - 60px)!important}.of-hero{padding:12px 14px}.of-msgs{max-height:60vh}.of-chat{min-height:0}.of-m{max-width:96%}}
@@ -1490,20 +1501,138 @@ const OF_EMPS = {
   ops: { name: 'ريم', role: 'تحليل العمليات', ic: 'pulse', tint: 'crit', job: 'ترصد الشركات الخاملة والمعرضة للإلغاء وتقترح الإجراء',
     sug: ['من الشركات المعرضة لعدم التجديد ولماذا؟', 'أي شركة تحتاج تدريباً؟', 'لخّص استخدام النظام هذا الأسبوع'] }
 };
-const OF_KIND = { assign: ['تكليف لموظف', 'p-pending'], coa: ['دليل حسابات', 'p-info'], journal: ['قيد يومية', 'p-pending'], idea: ['مقترح تطوير', 'p-info'], bug: ['خلل للمبرمج', 'p-crit'], dev: ['طلب تنفيذ', 'p-pending'], ticket: ['رد على تذكرة', 'p-info'], message: ['رسالة لعميل', 'p-ok'], note: ['ملاحظة في ملف الشركة', 'p-off'], post: ['محتوى تسويقي', 'p-pending'], task: ['مهمة مقترحة', 'p-warn'], report: ['تقرير', 'p-off'] };
+const OF_KIND = { assign: ['تكليف لموظف', 'p-pending'], coa: ['دليل حسابات', 'p-info'], journal: ['قيد يومية', 'p-pending'], idea: ['مقترح تطوير', 'p-info'], bug: ['خلل للمبرمج', 'p-crit'], dev: ['طلب تنفيذ', 'p-pending'], ticket: ['رد على تذكرة', 'p-info'], message: ['رسالة لعميل', 'p-ok'], note: ['ملاحظة في ملف الشركة', 'p-off'], post: ['محتوى تسويقي', 'p-pending'], task: ['مهمة مقترحة', 'p-warn'], report: ['تقرير', 'p-off'], handoff: ['إحالة لزميل', 'p-info'] };
+// دليل العمل الافتراضي لكل وظيفة. يقرؤه الموظف في كل مهمة، ويقيّم الخبير عمله على أساسه. المالك يعدّله من «دليل العمل»
+const OF_SOP = {
+  ceo: `الغرض: توجيه الفريق نحو أهداف المالك: الإيراد، ورضا العملاء، والنمو.
+المدخلات: مؤشرات المنصة، وحالة الفريق وتقييمات الخبراء، وطابور البرمجة، والتكليفات السابقة، والمراجع المعتمدة.
+خطوات العمل:
+1. اقرأ المؤشرات وحدّد ما تغيّر وما يقلق.
+2. حدّد من 3 إلى 5 أولويات فقط، لكل أولوية سبب من الأرقام.
+3. لكل أولوية كلّف موظفاً واحداً بمسودة assign فيها: المطلوب، والمخرج المتوقع، ومعيار النجاح، والموعد.
+4. لا تكلّف موظفاً لديه أكثر من 5 مسودات معلقة إلا بالأهم.
+5. ما يحتاج قرار المالك (سعر، خصم، توظيف، إنفاق) اكتبه مسودة task.
+معايير الجودة: أولويات مرتبطة بأرقام، وتكليف ضمن الاختصاص، ولا تكرار لتكليف قائم.
+لا تفعل: لا تعِد العملاء بشيء، ولا تتخذ قراراً مالياً نيابة عن المالك.
+المرجعية: جميع المراجع المعتمدة.`,
+  coo: `الغرض: ألا يتأخر شيء: لا تذكرة بلا رد، ولا مسودة منسية، ولا بند معطّل.
+المدخلات: المسودات المعلقة وأعمارها، والتذاكر، وطابور البرمجة، والفواتير المتأخرة، وسجل سير العمل.
+خطوات العمل:
+1. اعرض المتأخرات مرتبة، وما يمسّ العميل مباشرة أولاً.
+2. لكل متأخر: السبب، والمسؤول، والإجراء، والموعد الجديد.
+3. كلّف بالمتابعة بمسودة assign للموظف المعني.
+4. ما ينتظر المالك يومين فأكثر اجمعه في مسودة task واحدة.
+5. راقب الموظف الأقل تقييماً عند الخبراء، واقترح تحسين دليل عمله.
+معايير الجودة (مستوى الخدمة): الرد على التذكرة خلال 4 ساعات عمل، واعتماد طلب التسجيل خلال يوم عمل، وتذكير الفاتورة المتأخرة خلال يومين، وألا تبقى مسودة عند المالك أكثر من يومين.
+لا تفعل: لا تكرر تكليفاً قائماً، ولا تتجاوز أولويات المدير التنفيذي.
+المرجعية: جميع المراجع المعتمدة.`,
+  support: `الغرض: حل مشكلات الشركات المشتركة بسرعة ودقة، والحفاظ على رضاها.
+المدخلات: التذاكر المفتوحة ورسائلها، ودليل استخدام النظام، وسياسات الدعم والاسترجاع، والأسعار والباقات.
+خطوات العمل:
+1. رتّب التذاكر: ما توقف فيه عمل العميل أولاً، ثم الأقدم بلا رد، ثم البقية.
+2. صنّف كل تذكرة: خطأ استخدام، طلب معلومة، خلل في النظام، طلب ميزة، فوترة.
+3. اكتب الرد: تحية باسم العميل، ثم فهمك للمشكلة في جملة، ثم الحل بخطوات مرقمة، ثم سؤال تأكيد أو الخطوة التالية.
+4. إذا نقصت معلومة فاطلبها تحديداً (رقم اللوحة، صورة الشاشة، وقت حدوث المشكلة).
+5. الخلل في النظام: رد مطمئن بلا وعد بموعد، ومسودة bug للمبرمج.
+6. أسئلة الفوترة والدفع أحِلها لنورة، وطلبات المزايا أحِلها لعمر (handoff).
+معايير الجودة: أول رد خلال 4 ساعات عمل، والحل أو التصعيد خلال يوم عمل. عربية فصحى مبسطة بلا لوم للعميل ولا مصطلحات غير مشروحة. لا معلومة تخالف المراجع.
+لا تفعل: لا تطلب كلمة مرور، ولا تكشف بيانات شركة لأخرى، ولا تمنح خصماً أو تمديداً (قرار المالك: مسودة task).
+المرجعية: سياسات الدعم والاسترجاع، والشروط والأحكام، ودليل الاستخدام، ونظام حماية البيانات الشخصية.`,
+  sales: `الغرض: تحويل طلبات التسجيل والتجارب إلى اشتراكات مدفوعة، والمحافظة على التجديد.
+المدخلات: طلبات التسجيل، وشركات التجربة، والمنتهية غير المجددة، والقريبة من التجديد، والباقات والأسعار.
+خطوات العمل:
+1. صنّف الفرص: ساخنة (تجربة تنتهي خلال 7 أيام مع استخدام فعلي)، ودافئة، وباردة.
+2. لكل فرصة حدّد سبب التواصل من بياناتها (عدد السيارات، آخر نشاط، الأيام المتبقية).
+3. اكتب رسالة قصيرة (5 أسطر للواتساب كحد أقصى): اسم المسؤول، والقيمة بأرقام شركته، والباقة المناسبة وسعرها من قائمة الأسعار، ودعوة واحدة واضحة.
+4. لا تكرر التواصل مع شركة خلال 3 أيام إلا لسبب جديد.
+5. شركة التجربة الخاملة أحِلها لريم لخطة تفعيل (handoff) قبل البيع.
+6. أي خصم أو عرض خاص اكتبه مسودة task للمالك بالمبلغ والمبرر.
+معايير الجودة: أرقام صحيحة من البيانات، وسعر مطابق لقائمة الأسعار، ونبرة مهنية غير ملحّة، ورسالة واحدة لكل شركة.
+لا تفعل: لا تعِد بسعر أو ميزة غير موجودة، ولا تذكر عملاء آخرين بالاسم.
+المرجعية: قائمة الأسعار والباقات، وسياسة الخصومات، والشروط والأحكام، ودليل الأسلوب.`,
+  accountant: `الغرض: دفاتر صحيحة بالقيد المزدوج، وتحصيل منتظم، وصورة مالية واضحة للمالك.
+المدخلات: الفواتير، والتحصيل الشهري، والمصروفات، والمسيرات، ودليل الحسابات والقيود، ومراجع الزكاة والضريبة.
+خطوات العمل:
+1. يومياً: الفواتير المتأخرة حسب العمر (1 إلى 15، و16 إلى 30، وأكثر من 30 يوماً)، والإيصالات المرفوعة بانتظار المراجعة.
+2. تذكير السداد على ثلاث مراحل: لطيف عند الاستحقاق، ثم بعد 7 أيام، ثم بعد 15 يوماً مع الإشارة إلى إمكان إيقاف الخدمة بعد اعتماد المالك.
+3. العملية المالية: قيد متوازن من حسابات الدليل فقط، بتاريخ وبيان. لا قيد لما يُرحَّل تلقائياً.
+4. شهرياً: الإيراد والمصروف وصافي الربح والنقد، ومطابقة ضريبة المخرجات مع الفواتير المدفوعة.
+5. ربع سنوياً: أرقام إقرار ضريبة القيمة المضافة (15%) للمالك.
+6. استفسار العميل التقني أحِله لسارة (handoff).
+معايير الجودة: كل رقم من البيانات، ومجموع المدين يساوي الدائن، والحساب في مجموعته الصحيحة، والضريبة منفصلة عن الإيراد.
+لا تفعل: لا تخمّن مبلغاً أو تاريخاً، ولا تحذف حساباً عليه رصيد، ولا تعدّل قيداً مرحّلاً (يُعكس بقيد تسوية).
+المرجعية: المعايير المعتمدة من الهيئة السعودية للمراجعين والمحاسبين (IFRS للمنشآت الصغيرة والمتوسطة)، ونظام ضريبة القيمة المضافة ولائحته، ومتطلبات الفوترة الإلكترونية لهيئة الزكاة والضريبة والجمارك، ونظام الزكاة.`,
+  marketing: `الغرض: جذب شركات الأساطيل في السعودية وبناء الثقة بالمنصة.
+المدخلات: مزايا النظام، والأرقام العامة، والباقات، ودليل الأسلوب.
+خطوات العمل:
+1. حدّد جمهور كل منشور: شركات التأجير، أو النقل والتوزيع، أو المقاولات، أو الجهات الحكومية وشبه الحكومية.
+2. منشور واحد لفكرة واحدة: مشكلة يعرفها مدير الأسطول، ثم الميزة التي تحلها، ثم دعوة للتجربة المجانية.
+3. التزم بطول كل منصة: لينكدإن من 80 إلى 150 كلمة، وإكس أقل من 280 حرفاً، والإعلان عنوان وسطران.
+4. الخطة الأسبوعية 3 منشورات متنوعة: تعليمي، وميزة، ونتيجة أو رقم.
+5. الفكرة التي تحتاج ميزة جديدة أحِلها لعمر (handoff).
+معايير الجودة: صدق كل ادعاء، وعربية سليمة جذابة، واتساق مع هوية المنصة.
+لا تفعل: لا تذكر عميلاً بالاسم دون إذن مكتوب، ولا تسئ لمنافس باسمه، ولا تعِد بنتائج مضمونة.
+المرجعية: دليل الأسلوب والهوية، وقائمة الأسعار، ونظام التجارة الإلكترونية وضوابط الإعلان في المملكة.`,
+  ideas: `الغرض: تطوير المنصة بما يرفع قيمة العملاء والإيراد.
+المدخلات: أعطال المتصفح، والتذاكر التقنية وطلبات المزايا، ومؤشرات سير العمل، والمزايا الحالية، وبحث الويب.
+خطوات العمل:
+1. اجمع الإشارات: ما يتكرر في التذاكر والأعطال، وما يبطئ سير العمل.
+2. ابحث عند الحاجة عن ممارسات المنافسين والمتطلبات النظامية في السعودية، واذكر المصدر.
+3. لكل مقترح: المشكلة بدليلها، والفكرة، والمستفيد، والأثر المتوقع (برقم إن أمكن)، والجهد (صغير، متوسط، كبير)، والمخاطر.
+4. رتّب حسب الأثر مقابل الجهد، ولا تعرض أكثر من 5 مقترحات في المرة.
+5. تأكد أن الميزة غير موجودة ولم يرفضها المالك سابقاً.
+معايير الجودة: مقترح محدد قابل للتنفيذ، مستند إلى بيانات أو مصدر، بلا تكرار.
+لا تفعل: لا تُحِل للمبرمج مباشرة؛ المالك يعتمد أولاً.
+المرجعية: الشروط والأحكام، وسياسة الخصوصية، ونظام حماية البيانات الشخصية.`,
+  coder: `الغرض: تحويل البنود المعتمدة إلى طلبات تنفيذ دقيقة وآمنة.
+المدخلات: طابور البرمجة، وأعطال المتصفح، وصحة الخدمات.
+خطوات العمل:
+1. رتّب: الأعطال التي توقف العمل، ثم ما يمسّ الأمن أو البيانات، ثم المقترحات المعتمدة.
+2. لكل بند: الهدف، والسلوك الحالي والمطلوب، والملفات المرجّحة، والخطوات، وأثره على قواعد Firestore، والاختبار ومعيار القبول، والمخاطر وطريقة التراجع.
+3. حدّد موضع التغيير: تطبيق الشركات index.html، أو لوحة المالك admin.html، أو الدوال functions/.
+4. قسّم التغيير الكبير إلى طلبات صغيرة مستقلة.
+5. العطل الناتج عن خطأ استخدام لا عن الكود أعده لسارة (handoff) مع شرح للعميل.
+معايير الجودة: طلب يفهمه المطوّر دون أسئلة، ويبقي بيانات كل شركة معزولة، ولا يكسر ميزة قائمة.
+لا تفعل: لا تدّعِ أنك نفّذت أو نشرت، ولا تطلب تعطيل قواعد الأمان، ولا تضع مفاتيح في الكود.
+المرجعية: ملف CLAUDE.md في المستودع، وسياسة الخصوصية، ونظام حماية البيانات الشخصية.`,
+  ops: `الغرض: رفع استخدام الشركات للنظام ومنع الإلغاء.
+المدخلات: إحصاءات الشركات (السيارات، المستخدمون، آخر نشاط، المخاطر).
+خطوات العمل:
+1. صنّف الشركات: نشطة، وفاترة (لا نشاط منذ 7 أيام)، وخاملة (14 يوماً فأكثر أو بلا سيارات).
+2. لكل فاترة أو خاملة: السبب المرجّح من البيانات، والإجراء (اتصال، جلسة تدريب، تفعيل ميزة)، ومن ينفذه.
+3. اكتب ملاحظة في ملف الشركة بالتشخيص، ورسالة تفعيل عند الحاجة.
+4. فرصة ترقية الباقة أحِلها لخالد، والمشكلة التقنية المتكررة أحِلها لسارة (handoff).
+5. أسبوعياً: تقرير الاستخدام ونسبة الشركات النشطة واتجاهها.
+معايير الجودة: تشخيص مبني على أرقام، وإجراء واحد واضح لكل شركة، والأولوية للأكبر أسطولاً والأقرب للتجديد.
+لا تفعل: لا تستنتج بلا بيانات، ولا تراسل شركة راسلها خالد في اليوم نفسه.
+المرجعية: دليل استخدام النظام، وسياسة الدعم.`
+};
+// الخبراء: من يقيّم كل موظف (يطابق EXPERTS في functions/office.js)
+const OF_XP = { ceo: 'مستشار إداري واستراتيجي للشركات الناشئة', coo: 'مستشار تشغيل وتحسين عمليات', support: 'خبير خدمة عملاء ودعم فني لأنظمة SaaS في السوق السعودي', sales: 'خبير مبيعات B2B للبرمجيات في السعودية والخليج', accountant: 'محاسب قانوني سعودي (SOCPA) خبير في الزكاة والضريبة والفوترة الإلكترونية', marketing: 'خبير تسويق رقمي ومحتوى للشركات في السوق السعودي', ideas: 'مدير منتج أول لمنصات إدارة الأساطيل', coder: 'مهندس برمجيات أول خبير في الويب وFirebase وأمن البيانات', ops: 'خبير عمليات ونجاح العملاء في شركات SaaS' };
+// مكتبة المراجع: التصنيف ومن يقرؤه افتراضياً
+const OF_RCAT = {
+  pricing: ['الأسعار والباقات والخصومات', ['ceo', 'sales', 'accountant', 'marketing', 'support']],
+  policy: ['سياسات الدعم والاسترجاع والإلغاء', ['coo', 'support', 'sales', 'accountant']],
+  terms: ['الشروط والأحكام والخصوصية', ['ceo', 'support', 'sales', 'ideas', 'coder']],
+  tax: ['الزكاة والضريبة والفوترة الإلكترونية', ['accountant']],
+  tone: ['دليل الأسلوب والهوية', ['support', 'sales', 'marketing']],
+  product: ['دليل استخدام النظام', ['support', 'sales', 'marketing', 'ops', 'ideas', 'coder']],
+  other: ['مراجع أخرى', ['ceo', 'coo', 'support', 'sales', 'accountant', 'marketing', 'ideas', 'coder', 'ops']]
+};
 let OF_LOAD = null; let OFC = null, OF_EMP = 'support', OF_F = 'new', OF_BUSY = {};
 const ofEmp = k => ({ ...OF_EMPS[k], ...((OFC && OFC.persona && OFC.persona[k]) || {}) });
 async function loadOffice() { return OF_LOAD || (OF_LOAD = loadOffice0()); }
 async function loadOffice0() {
-  try { const s = await F.getDoc(F.doc(fs, 'platform', 'office')); OFC = s.exists() ? s.data() : {}; } catch (e) { OFC = {}; toast('تعذر تحميل المكتب'); }
-  OFC.drafts = OFC.drafts || []; OFC.queue = OFC.queue || []; OFC.reviews = OFC.reviews || {}; OFC.chats = OFC.chats || {}; OFC.persona = OFC.persona || {}; OFC.usage = OFC.usage || {};
+  let o = {}; try { const s = await F.getDoc(F.doc(fs, 'platform', 'office')); o = s.exists() ? s.data() : {}; } catch (e) { toast('تعذر تحميل المكتب'); }
+  if (KB === null) await loadKb(); OFC = o;
+  OFC.drafts = OFC.drafts || []; OFC.feed = OFC.feed || []; OFC.auto = OFC.auto || { review: true, assign: true, handoff: true }; OFC.queue = OFC.queue || []; OFC.reviews = OFC.reviews || {}; OFC.chats = OFC.chats || {}; OFC.persona = OFC.persona || {}; OFC.usage = OFC.usage || {};
 }
 // المستند الواحد محدود بحجم 1MB: نُبقي آخر 16 رسالة لكل موظف، وآخر 120 مسودة (المعلّقة أولاً)
 async function saveOffice() {
   const keep = [...OFC.drafts.filter(d => d.status === 'new'), ...OFC.drafts.filter(d => d.status !== 'new')].slice(0, 120); OFC.drafts = OFC.drafts.filter(d => keep.includes(d));
   Object.keys(OFC.chats).forEach(k => { OFC.chats[k] = OFC.chats[k].slice(-16); });
   const days = Object.keys(OFC.usage).sort().slice(-60); OFC.usage = Object.fromEntries(days.map(d => [d, OFC.usage[d]]));
-  try { await F.setDoc(F.doc(fs, 'platform', 'office'), { drafts: OFC.drafts, queue: OFC.queue.slice(-80), reviews: OFC.reviews, chats: OFC.chats, persona: OFC.persona, usage: OFC.usage, updatedAt: nowIso() }); return true; }
+  try { await F.setDoc(F.doc(fs, 'platform', 'office'), { drafts: OFC.drafts, feed: OFC.feed.slice(0, 150), auto: OFC.auto, queue: OFC.queue.slice(-80), reviews: OFC.reviews, chats: OFC.chats, persona: OFC.persona, usage: OFC.usage, updatedAt: nowIso() }); return true; }
   catch (e) { toast('تعذر حفظ المكتب: ' + (e.code || e.message)); return false; }
 }
 
@@ -1540,6 +1669,8 @@ async function ofData(emp) {
       تجارب_تنتهي_خلال_7_أيام: live.filter(c => stOf(c) === 'trial' && (daysLeft(c.trialEnds) ?? 99) <= 7).length, شركات_معرضة_للإلغاء: live.filter(c => riskOf(c).lvl > 1).length };
     if (emp === 'coo') d.مسودات_متأخرة_عند_المالك = OFC.drafts.filter(x => x.status === 'new' && age(x) >= 2).slice(0, 20).map(x => ({ الموظف: ofEmp(x.emp).name, العنوان: x.title, النوع: (OF_KIND[x.kind] || [x.kind])[0], منذ_أيام: age(x) }));
     if (emp === 'ceo') d.الباقات = plans;
+    d.سير_العمل_الأخير = OFC.feed.slice(0, 25).map(f => `${String(f.at).slice(0, 16).replace('T', ' ')} · ${f.emp === 'xp' ? 'الخبير' : ofEmp(f.emp).name}${f.to && OF_EMPS[f.to] ? ' ← ' + ofEmp(f.to).name : ''}: ${f.text}`);
+    d.المراجع_المتاحة = KB.docs.map(r => `${r.title} (${(OF_RCAT[r.cat] || OF_RCAT.other)[0]})`);
   }
   if (emp === 'sales') {
     d.الباقات = plans;
@@ -1600,23 +1731,117 @@ const OF_FEATURES = ['ملف كامل لكل سيارة وأرشيف وثائق�
 const r2of = n => Math.round((+n || 0) * 100) / 100;
 const APP_NAME_OF = () => APP_NAME || 'مسار';
 
-async function ofAsk(emp, task, message) {
-  if (OF_BUSY[emp]) return; OF_BUSY[emp] = true; const E = ofEmp(emp);
+async function ofAsk(emp, task, message, depth = 0, from = '') {
+  if (OF_BUSY[emp]) { if (from) { (OF_PEND[emp] = OF_PEND[emp] || []).push([task, message, depth, from]); renderOffice(); } return; }
+  OF_BUSY[emp] = true; const E = ofEmp(emp); let fresh = [];
+  ofFeed(emp, task === 'brief' ? 'بدأ إعداد تقرير اليوم' : from ? 'استلم المهمة وبدأ العمل' : 'بدأ العمل على طلبك: ' + cut(message, 100));
   const chat = OFC.chats[emp] = OFC.chats[emp] || [];
   chat.push({ role: 'user', content: task === 'brief' ? 'جهّز تقرير اليوم' : message, at: nowIso() }); renderOffice();
   try {
     const data = await ofData(emp); const tk = await auth.currentUser.getIdToken();
     const r = await fetch('/.netlify/functions/office', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tk },
-      body: JSON.stringify({ emp, task, message, data, history: chat.slice(0, -1).filter(m => !m.expert).slice(-10).map(m => ({ role: m.role, content: m.content })), persona: { name: E.name + ' (' + E.role + ')', extra: E.extra || '' } }) });
+      body: JSON.stringify({ emp, task, message, data, history: chat.slice(0, -1).filter(m => !m.expert).slice(-10).map(m => ({ role: m.role, content: m.content })), persona: { name: E.name + ' (' + E.role + ')', extra: E.extra || '' }, sop: ofSop(emp), refs: ofRefs(emp) }) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(j.message || (r.status === 404 ? 'دالة المكتب غير منشورة بعد' : j.error || ('خطأ ' + r.status)));
-    const ids = (j.drafts || []).map(x => { const id = uid('d'); OFC.drafts.unshift({ id, emp, ...x, status: 'new', at: nowIso() }); return id; });
+    const ids = (j.drafts || []).map(x => { const id = uid('d'); OFC.drafts.unshift({ id, emp, ...x, status: 'new', at: nowIso(), ...(from ? { from } : {}) }); return id; });
+    fresh = ids.map(id => OFC.drafts.find(x => x.id === id)); ofFeed(emp, ids.length ? `أنهى العمل وكتب ${ids.length} مسودة` : 'أنهى العمل ورفع رده');
     chat.push({ role: 'assistant', content: (j.reply || '') + (j.cut ? '\n\n(انقطع الرد لطوله، اطلب التكملة)' : ''), drafts: ids.length, at: nowIso() });
     const day = today(); const u = OFC.usage[day] = OFC.usage[day] || { n: 0, in: 0, out: 0 }; u.n++; u.in += (j.usage || {}).in || 0; u.out += (j.usage || {}).out || 0;
     await saveOffice(); plog('مكتب الموظفين: ' + (task === 'brief' ? 'تقرير اليوم' : 'طلب'), E.name + ' · ' + E.role, ids.length ? `${ids.length} مسودة` : '');
     if (ids.length) toast(`${E.name} كتب ${ids.length} مسودة بانتظار اعتمادك`);
-  } catch (e) { chat.push({ role: 'assistant', content: '⚠️ ' + e.message, err: true, at: nowIso() }); }
+  } catch (e) { chat.push({ role: 'assistant', content: '⚠️ ' + e.message, err: true, at: nowIso() }); ofFeed(emp, 'تعذر إكمال العمل: ' + e.message); }
   OF_BUSY[emp] = false; renderOffice();
+  // التشغيل التلقائي: التكليف والإحالة (بعمق مرحلتين على الأكثر حتى لا تدور الإحالات)، ثم مراجعة الخبير لبقية المسودات
+  const del = fresh.filter(d => ['assign', 'handoff'].includes(d.kind) && OF_EMPS[d.target] && d.target !== emp && OFC.auto[d.kind] && depth < 2).slice(0, 5);
+  const jobs = del.map(d => ofDelegate(d, depth + 1, true)); if (del.length) await saveOffice();
+  if (OFC.auto.review) jobs.push(ofAutoReview(fresh.filter(d => !['assign', 'handoff'].includes(d.kind))));
+  const nx = (OF_PEND[emp] || []).shift(); if (nx) jobs.push(ofAsk(emp, ...nx));
+  await Promise.all(jobs);
+}
+
+// ---------- دليل العمل والمراجع وسير العمل التلقائي (platform/officekb) ----------
+// المراجع ودليل العمل في مستند مستقل حتى لا يتجاوز مستند المكتب حد 1MB
+let KB = null, OF_VIEW = 'office', OF_FEEDALL = false; const OF_PEND = {}; const KB_MAX = 380000;
+async function loadKb() { try { const s = await F.getDoc(F.doc(fs, 'platform', 'officekb')); KB = s.exists() ? s.data() : {}; } catch (e) { KB = {}; } KB.docs = KB.docs || []; KB.sop = KB.sop || {}; }
+async function saveKb(msg) { try { await F.setDoc(F.doc(fs, 'platform', 'officekb'), { docs: KB.docs, sop: KB.sop, updatedAt: nowIso() }); if (msg) toast(msg); return true; } catch (e) { toast('تعذر الحفظ: ' + (e.code || e.message)); return false; } }
+const ofSop = k => (KB && KB.sop[k]) || OF_SOP[k] || '';
+const kbReaders = r => r.emps && r.emps.length ? r.emps : (OF_RCAT[r.cat] || OF_RCAT.other)[1];
+const kbUsed = () => KB.docs.reduce((t, r) => t + String(r.text || '').length, 0);
+// المراجع التي يقرؤها الموظف، بحد أقصى للطول (الأحدث أولاً)
+function ofRefs(k, max = 110000) { let out = '';
+  for (const r of (KB ? KB.docs : []).filter(r => kbReaders(r).includes(k))) { const t = `### «${r.title}» (${(OF_RCAT[r.cat] || OF_RCAT.other)[0]}، ${fmt(r.at)})\n${r.text}\n\n`; if (out.length + t.length > max) continue; out += t; }
+  return out.trim(); }
+const ofFeed = (emp, text, to) => { OFC.feed.unshift({ at: nowIso(), emp, to: to || '', text: cut(text, 240) }); };
+const OF_AUTO_L = { review: 'الخبير يراجع كل مسودة تلقائياً قبل أن تصلك', assign: 'تكليفات ماجد ولمى تُنفَّذ تلقائياً (الموظف يبدأ العمل فوراً)', handoff: 'الإحالة بين الموظفين تُنفَّذ تلقائياً' };
+// تنفيذ تكليف أو إحالة: الموظف المستلم يبدأ العمل، ومسوداته تبقى بانتظار المالك
+async function ofDelegate(d, depth, auto) {
+  const E = ofEmp(d.emp), t = d.target, T = ofEmp(t); d.status = d.kind === 'assign' ? 'assigned' : 'handed'; d.doneAt = nowIso(); if (auto) d.auto = 1;
+  ofFeed(d.emp, `${d.kind === 'assign' ? 'كلّف' : 'أحال إلى'} ${T.name}: ${d.title || cut(d.body, 120)}`, t);
+  plog((d.kind === 'assign' ? 'تكليف موظف من ' : 'إحالة بين الموظفين من ') + E.name + (auto ? ' (تلقائي)' : ''), T.name, cut(d.body, 120));
+  return ofAsk(t, 'chat', `${d.kind === 'assign' ? 'تكليف' : 'إحالة'} من ${E.name} (${E.role})${auto ? '' : '، معتمد من المالك'}:\n${d.title ? d.title + '\n' : ''}${d.body}`, depth, d.emp);
+}
+// مراجعة الخبراء التلقائية: اثنتان في وقت واحد
+async function ofAutoReview(list) { const q = [...list]; const run = async () => { while (q.length) { const d = q.shift(); if (d.status === 'new' && !d.review) await ofReview(d, d.body, true); } }; await Promise.all([run(), run()]); }
+
+function renderSopView() {
+  return `<div class="panel"><div class="ph"><div><h3 style="margin:0">دليل العمل</h3><small>لكل موظف دليل مكتوب: الغرض، والمدخلات، وخطوات العمل، ومعايير الجودة، وما لا يفعله، والمرجعية. الموظف يلتزم به في كل مهمة، والخبير يقيّم عمله على أساسه. عدّله بما يناسبك.</small></div></div>
+    <div class="of-sops">${Object.keys(OF_EMPS).map(k => { const e = ofEmp(k); const own = !!KB.sop[k]; const refs = KB.docs.filter(r => kbReaders(r).includes(k));
+      return `<article class="of-sop" data-sk="${k}"><header>${ofAv(k)}<div><b>${esc(e.name)} · ${esc(e.role)}</b><small>يقيّمه: ${esc(OF_XP[k])}</small></div>${own ? '<span class="pill p-info">معدّل</span>' : '<span class="pill p-off">افتراضي</span>'}</header>
+        <textarea class="of-ed" rows="14" maxlength="8000">${esc(ofSop(k))}</textarea>
+        <small class="of-mut">المراجع التي يقرؤها: ${refs.length ? refs.map(r => '«' + esc(r.title) + '»').join('، ') : 'لا شيء بعد. أضف مراجع من تبويب «المراجع».'}</small>
+        <div class="of-acts"><button class="btn sm pri" data-sop="save">حفظ</button>${own ? '<button class="btn sm" data-sop="reset">استعادة الافتراضي</button>' : ''}</div></article>`; }).join('')}</div></div>`;
+}
+function renderRefsView() {
+  const used = kbUsed(); const miss = Object.keys(OF_RCAT).filter(c => c !== 'other' && !KB.docs.some(r => r.cat === c));
+  return `<div class="panel"><div class="ph"><div><h3 style="margin:0">المراجع</h3><small>المستندات التي يستند إليها الموظفون والخبراء: الأسعار، والسياسات، والشروط، والضريبة، وأسلوب الكتابة. تُقدَّم على معلوماتهم العامة، ويذكرون اسم المرجع عند الاستناد إليه.</small></div>
+      <div class="of-acts"><button class="btn sm pri" id="kbAdd">إضافة نص</button><label class="btn sm" for="kbFile">رفع ملف</label><input type="file" id="kbFile" accept=".txt,.md,.csv,.pdf,image/png,image/jpeg,image/webp" hidden><button class="btn sm" id="kbImport">استيراد الشروط والخصوصية من صفحات المنصة</button></div></div>
+    ${miss.length ? `<div class="of-q" style="margin:12px 16px 0"><b>لم يُضف بعد</b><small>${miss.map(c => OF_RCAT[c][0]).join(' · ')}</small><small>الأسعار والباقات الحالية يقرؤها الموظفون من إعدادات المنصة تلقائياً؛ أضف هنا ما ليس في النظام (سياسة الخصومات، والاسترجاع، ودليل الأسلوب...).</small></div>` : ''}
+    ${OF_RV.kb ? '<div class="of-m ai typing" style="margin:12px 16px 0"><i></i><i></i><i></i> يقرأ المستند ويستخرج نصه…</div>' : ''}
+    <div class="of-refs">${KB.docs.length ? KB.docs.map(r => `<article class="of-ref" data-kb="${esc(r.id)}"><div><span class="pill p-info">${esc((OF_RCAT[r.cat] || OF_RCAT.other)[0])}</span> <b>${esc(r.title)}</b>
+        <small>${esc(fmt(r.at))} · ${Math.round(String(r.text).length / 100) / 10} ألف حرف · يقرؤه: ${kbReaders(r).map(k => esc(ofEmp(k).name)).join('، ')}</small><p>${esc(cut(r.text, 220))}</p></div>
+        <div class="of-acts"><button class="btn sm" data-kbe="edit">عرض وتعديل</button><button class="btn sm" data-kbe="del">حذف</button></div></article>`).join('') : '<div class="empty">لا توجد مراجع بعد.</div>'}</div>
+    <p class="of-foot" style="padding:0 16px 14px">المساحة المستخدمة: ${Math.round(used / 1000)} من ${KB_MAX / 1000} ألف حرف.</p></div>`;
+}
+function kbDialog(r) {
+  r = r || { cat: 'policy', title: '', text: '' }; const rd = kbReaders(r);
+  const f = dialog(`<h3>${r.id ? 'تعديل مرجع' : 'إضافة مرجع'}</h3><label>العنوان<input name="title" maxlength="120" required value="${esc(r.title)}" placeholder="مثال: سياسة الاسترجاع والإلغاء"></label>
+    <label>التصنيف<select name="cat">${Object.entries(OF_RCAT).map(([k, [l]]) => `<option value="${k}"${k === r.cat ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+    <label>النص<textarea name="text" rows="12" maxlength="60000" required placeholder="الصق نص المستند كما هو">${esc(r.text)}</textarea></label>
+    <fieldset class="of-chk"><legend>من يقرؤه</legend>${Object.keys(OF_EMPS).map(k => `<label><input type="checkbox" name="emps" value="${k}"${rd.includes(k) ? ' checked' : ''}> ${esc(ofEmp(k).name)}</label>`).join('')}</fieldset>`, async fd => {
+    const x = { id: r.id || uid('r'), title: String(fd.get('title')).trim(), cat: String(fd.get('cat')), text: String(fd.get('text')).trim().slice(0, 60000), emps: fd.getAll('emps').map(String), at: nowIso() };
+    if (!x.title || !x.text) return toast('العنوان والنص مطلوبان');
+    if (!x.emps.length) x.emps = OF_RCAT[x.cat][1];
+    const i = KB.docs.findIndex(y => y.id === x.id); const old = i >= 0 ? KB.docs[i] : null;
+    if (kbUsed() - (old ? old.text.length : 0) + x.text.length > KB_MAX) return toast('المساحة لا تكفي. احذف مرجعاً أو اختصر النص');
+    if (old) KB.docs[i] = x; else KB.docs.unshift(x);
+    if (await saveKb('حُفظ المرجع ✓')) { plog('مكتب الموظفين: ' + (old ? 'تعديل مرجع' : 'إضافة مرجع'), x.title); ofFeed('ceo', `أُضيف مرجع «${x.title}» للفريق`); saveOffice(); } renderOffice(); });
+  // تغيير التصنيف يختار القرّاء المناسبين له
+  f.onchange = e => { if (e.target.name !== 'cat') return; const rd2 = (OF_RCAT[e.target.value] || OF_RCAT.other)[1]; f.querySelectorAll('[name=emps]').forEach(c => { c.checked = rd2.includes(c.value); }); };
+}
+async function kbFile(f) {
+  if (!f) return; if (f.size > 3.2e6) return toast('الملف أكبر من 3 ميجابايت. قسّمه أو الصق النص');
+  const title = f.name.replace(/\.[^.]+$/, '');
+  if (/^text\/|\.(txt|md|csv)$/i.test(f.type + ' ' + f.name) && !/pdf|image/.test(f.type)) return kbDialog({ cat: 'other', title, text: (await f.text()).slice(0, 60000) });
+  const b64 = await new Promise((ok, no) => { const rd = new FileReader(); rd.onload = () => ok(String(rd.result).split(',')[1]); rd.onerror = no; rd.readAsDataURL(f); });
+  OF_RV.kb = 1; renderOffice();
+  try { const j = await ofCall({ task: 'extract', file: { name: f.name, type: f.type, b64 } }); ofUse(j); await saveOffice();
+    if (j.cut) toast('المستند طويل، فاستُخرج جزؤه الأول. راجع النص قبل الحفظ');
+    delete OF_RV.kb; renderOffice(); kbDialog({ cat: 'other', title: j.title || title, text: j.text }); }
+  catch (x) { delete OF_RV.kb; renderOffice(); toast('تعذر قراءة الملف: ' + x.message); }
+}
+async function kbImport() {
+  const pages = [['terms.html', 'الشروط والأحكام'], ['privacy.html', 'سياسة الخصوصية']]; let n = 0;
+  for (const [u, t] of pages) { try { const h = await (await fetch('/' + u, { cache: 'no-store' })).text(); const doc = new DOMParser().parseFromString(h, 'text/html'); doc.querySelectorAll('script,style,nav,header,footer').forEach(x => x.remove());
+    const text = (doc.querySelector('main') || doc.body).innerText || (doc.querySelector('main') || doc.body).textContent; const clean = String(text).replace(/\n\s*\n+/g, '\n').trim().slice(0, 60000); if (clean.length < 200) continue;
+    const old = KB.docs.find(r => r.title === t); if (old) Object.assign(old, { text: clean, at: nowIso() }); else KB.docs.unshift({ id: uid('r'), title: t, cat: 'terms', text: clean, emps: OF_RCAT.terms[1], at: nowIso() }); n++; } catch (e) {} }
+  if (!n) return toast('تعذر قراءة صفحات المنصة');
+  if (await saveKb(`استُورد ${n} مرجع من صفحات المنصة ✓`)) plog('مكتب الموظفين: استيراد المراجع', `${n} مرجع`); renderOffice();
+}
+function renderFeed() {
+  const L = OFC.feed.slice(0, OF_FEEDALL ? 60 : 6); const busy = Object.keys(OF_EMPS).filter(k => OF_BUSY[k]);
+  return `<div class="panel of-feed"><div class="ph"><div><h3 style="margin:0">سير العمل</h3><small>${busy.length ? `يعمل الآن: ${busy.map(k => esc(ofEmp(k).name)).join('، ')}` : 'لا أحد يعمل الآن'}${Object.values(OF_PEND).some(q => q.length) ? ` · بانتظار الدور: ${Object.keys(OF_PEND).filter(k => OF_PEND[k].length).map(k => esc(ofEmp(k).name)).join('، ')}` : ''}</small></div>
+    ${OFC.feed.length > 6 ? `<button class="btn sm" id="ofFeedAll">${OF_FEEDALL ? 'أقل' : 'عرض الكل'}</button>` : ''}</div>
+    <ol class="of-fl">${L.length ? L.map(f => `<li>${ofAv(f.emp)}${f.to && OF_EMPS[f.to] ? `<span class="of-arr">←</span>${ofAv(f.to)}` : ''}<span><b>${esc(f.emp === 'xp' ? 'الخبير' : ofEmp(f.emp).name)}</b> ${esc(f.text)}</span><time>${esc(String(f.at).slice(11, 16))}</time></li>`).join('') : '<li class="of-mut">لم يبدأ العمل بعد. اضغط «ابدأ يوم العمل» ليقرأ ماجد الوضع ويكلّف الفريق.</li>'}</ol></div>`;
 }
 
 function ofMd(md) { const lines = esc(md).split('\n'); let o = '', inL = false, inT = false; const inl = x => x.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
@@ -1629,7 +1854,7 @@ function ofMd(md) { const lines = esc(md).split('\n'); let o = '', inL = false, 
     if (l.trim()) o += `<p>${inl(l)}</p>`;
   }
   return o + (inT ? '</table>' : '') + (inL ? '</ul>' : ''); }
-const ofAv = (k, big) => { const E = ofEmp(k); return `<span class="of-av t-${OF_EMPS[k].tint}${big ? ' big' : ''}">${esc(String(E.name || '؟').trim().charAt(0))}<i></i></span>`; };
+const ofAv = (k, big) => { if (!OF_EMPS[k]) return `<span class="of-av t-warn${big ? ' big' : ''}">خ<i></i></span>`; const E = ofEmp(k); return `<span class="of-av t-${OF_EMPS[k].tint}${big ? ' big' : ''}">${esc(String(E.name || '؟').trim().charAt(0))}<i></i></span>`; };
 const waNum = s => { let d = String(s || '').replace(/\D/g, ''); if (d.startsWith('00')) d = d.slice(2); if (d.startsWith('05')) d = '966' + d.slice(1); else if (d.length === 9 && d.startsWith('5')) d = '966' + d; return d.length >= 11 ? d : ''; };
 
 async function renderOffice() {
@@ -1639,19 +1864,23 @@ async function renderOffice() {
   const u = OFC.usage[today()] || { n: 0 }; const allNew = OFC.drafts.filter(d => d.status === 'new').length;
   const E = ofEmp(OF_EMP); const chat = OFC.chats[OF_EMP] || [];
   const list = OFC.drafts.filter(d => (OF_F === 'all' || (OF_F === 'new' ? d.status === 'new' : d.emp === OF_F)));
-  box.innerHTML = `
+  const views = `<div class="tabs2 of-views">${[['office', 'المكتب'], ['sop', 'دليل العمل'], ['refs', `المراجع (${KB.docs.length})`]].map(([k, l]) => `<button data-ov="${k}" class="${OF_VIEW === k ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+  if (OF_VIEW !== 'office') { box.innerHTML = views + (OF_VIEW === 'sop' ? renderSopView() : renderRefsView()); badge('ofBadge', allNew, true); return; }
+  box.innerHTML = views + `
   <div class="of-hero"><div><b>${allNew ? `${allNew} مسودة بانتظار اعتمادك` : 'لا شيء بانتظارك الآن'}</b><small>الموظفون يقرؤون بيانات المنصة ويكتبون المسودات، ولا يُرسل شيء لأي عميل إلا بضغطة منك.</small></div>
-    <div class="of-hs"><span><b>${u.n}</b> مهمة اليوم</span><span><b>${OFC.queue.filter(x => x.status === 'queued').length}</b> في طابور البرمجة</span><button class="btn sm" id="ofAll">تقرير اليوم من الجميع</button></div></div>
+    <div class="of-hs"><span><b>${u.n}</b> مهمة اليوم</span><span><b>${OFC.queue.filter(x => x.status === 'queued').length}</b> في طابور البرمجة</span><button class="btn sm pri" id="ofDay" ${OF_BUSY.ceo ? 'disabled' : ''} title="ماجد يقرأ الوضع ويكلّف الفريق، والخبراء يراجعون كل مسودة">ابدأ يوم العمل</button><button class="btn sm" id="ofAll">تقرير من الجميع</button><button class="ib" id="ofAuto" title="إعدادات التشغيل التلقائي" aria-label="إعدادات التشغيل التلقائي">${svg('gear')}</button></div></div>
   ${[['الإدارة', k => OF_EMPS[k].mgmt], ['الفريق', k => !OF_EMPS[k].mgmt]].map(([g, f]) => `<div class="of-gl">${g}</div><div class="of-team${g === 'الإدارة' ? ' mg' : ''}">${Object.keys(OF_EMPS).filter(f).map(k => { const e = ofEmp(k); const n = pend(k); return `<button class="of-card${k === OF_EMP ? ' on' : ''}" data-oe="${k}">
     ${ofAv(k)}<span class="of-nm"><b>${esc(e.name)}</b><small>${esc(e.role)}</small></span>${OF_BUSY[k] ? '<span class="of-st busy">يعمل الآن</span>' : n ? `<span class="of-st">${n} مسودة</span>` : '<span class="of-st idle">متاح</span>'}
     <span class="of-job">${esc(e.job)}</span>${OFC.reviews[k] ? `<span class="of-sc ${OFC.reviews[k].score >= 8 ? 'ok' : OFC.reviews[k].score >= 5 ? 'warn' : 'crit'}" title="آخر تقييم خبير">تقييم الخبير ${OFC.reviews[k].score}/10</span>` : ''}</button>`; }).join('')}</div>`).join('')}
+  ${renderFeed()}
   <div class="of-main">
-    <div class="panel of-chat"><div class="ph">${ofAv(OF_EMP, 1)}<div style="flex:1;min-width:0"><h3 style="margin:0">${esc(E.name)} · ${esc(E.role)}</h3><small>${esc(E.job)}</small></div>
+    <div class="panel of-chat"><div class="ph">${ofAv(OF_EMP, 1)}<div style="flex:1;min-width:0"><h3 style="margin:0">${esc(E.name)} · ${esc(E.role)}</h3><small>${esc(E.job)}</small><small class="of-xpl">يعمل وفق <button class="of-lnk" data-ov="sop">دليل العمل</button> · ${KB.docs.some(r => kbReaders(r).includes(OF_EMP)) ? `يقرأ ${KB.docs.filter(r => kbReaders(r).includes(OF_EMP)).length} مرجع` : 'بلا مراجع بعد'} · يراجعه ${esc(OF_XP[OF_EMP])}</small></div>
       <button class="btn sm" id="ofBrief" ${OF_BUSY[OF_EMP] ? 'disabled' : ''}>تقرير اليوم</button><button class="btn sm" id="ofPerf" ${OF_RV['p-' + OF_EMP] ? 'disabled' : ''}>${OF_RV['p-' + OF_EMP] ? 'الخبير يقيّم…' : 'تقييم أداء'}</button><button class="ib" id="ofSet" title="تخصيص الموظف" aria-label="تخصيص الموظف">${svg('gear')}</button>${chat.length ? `<button class="ib" id="ofClr" title="محادثة جديدة" aria-label="محادثة جديدة">${svg('log')}</button>` : ''}</div>
       ${OF_EMP === 'coder' ? ofQueue() : ''}
       ${OFC.reviews[OF_EMP] && OFC.reviews[OF_EMP].recommendations && OFC.reviews[OF_EMP].recommendations.length && !OFC.reviews[OF_EMP].applied ? `<div class="of-q"><b>توصيات الخبير لـ${esc(E.name)}</b><small>${esc(OFC.reviews[OF_EMP].recommendations.slice(0, 3).join(' · '))}</small><button class="btn sm" id="ofApplyRec" style="justify-self:start">أضفها لتعليمات الموظف</button></div>` : ''}
       <div class="of-msgs" id="ofMsgs">${chat.length ? chat.map(m => `<div class="of-m ${m.role === 'user' ? 'me' : 'ai'}${m.err ? ' err' : ''}${m.expert ? ' xp' : ''}">${m.role === 'user' ? esc(m.content) : ofMd(m.content)}${m.drafts ? `<button class="of-dl" data-of-f="${OF_EMP}">${m.drafts} مسودة ← صندوق المسودات</button>` : ''}</div>`).join('')
         : `<div class="of-hello">${ofAv(OF_EMP, 1)}<p>أهلاً، أنا ${esc(E.name)} من ${esc(E.role)}. اطلب مني أي مهمة، أو اضغط «تقرير اليوم».</p></div>`}
+        ${(OF_PEND[OF_EMP] || []).length ? `<div class="of-m ai typing">${(OF_PEND[OF_EMP] || []).length} مهمة بانتظار الدور</div>` : ''}
         ${OF_BUSY[OF_EMP] ? `<div class="of-m ai typing"><i></i><i></i><i></i> ${esc(E.name)} يقرأ البيانات ويكتب…</div>` : ''}</div>
       <div class="of-sug">${OF_EMPS[OF_EMP].sug.map(s => `<button data-os="${esc(s)}">${esc(s)}</button>`).join('')}</div>
       <form class="of-in" id="ofIn"><textarea name="q" rows="2" maxlength="3000" placeholder="اكتب مهمة لـ${esc(E.name)}…" ${OF_BUSY[OF_EMP] ? 'disabled' : ''}></textarea><button class="btn pri" ${OF_BUSY[OF_EMP] ? 'disabled' : ''}>إرسال</button></form></div>
@@ -1666,12 +1895,12 @@ let OF_RV = {};
 const ofCall = async body => { const tk = await auth.currentUser.getIdToken(); const r = await fetch('/.netlify/functions/office', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tk }, body: JSON.stringify(body) });
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.message || (r.status === 404 ? 'دالة المكتب غير منشورة بعد' : j.error || ('خطأ ' + r.status))); return j; };
 const ofUse = j => { const day = today(); const u = OFC.usage[day] = OFC.usage[day] || { n: 0, in: 0, out: 0 }; u.n++; u.in += (j.usage || {}).in || 0; u.out += (j.usage || {}).out || 0; };
-async function ofReview(d, body) {
+async function ofReview(d, body, auto) {
   if (OF_RV[d.id]) return; OF_RV[d.id] = 1; d.body = body; renderOffice();
   const e = ofEmp(d.emp); const c = COS.find(x => x.id === d.target); const tk = TKS.find(x => x.id === d.target);
   const ctx = tk ? `التذكرة: ${tk.subject}\n${cut(tk.body, 1500)}` : c ? `الشركة: ${c.name} · ${ST[stOf(c)] ? ST[stOf(c)][0] : ''} · ${planName(c)}` : '';
-  try { const j = await ofCall({ emp: d.emp, task: 'review', empName: `${e.name} (${e.role})`, item: `النوع: ${(OF_KIND[d.kind] || [d.kind])[0]}\nالعنوان: ${d.title || ''}\nالجهة: ${d.targetName || ''}\n\n${body}`, context: ctx });
-    d.review = { ...j, at: nowIso() }; delete d.review.usage; ofUse(j); await saveOffice(); plog('تقييم خبير لمسودة', `${e.name} · ${d.title || ''}`, `${j.score}/10`); }
+  try { const j = await ofCall({ emp: d.emp, task: 'review', empName: `${e.name} (${e.role})`, item: `النوع: ${(OF_KIND[d.kind] || [d.kind])[0]}\nالعنوان: ${d.title || ''}\nالجهة: ${d.targetName || ''}\n\n${body}`, context: ctx, sop: ofSop(d.emp), refs: ofRefs(d.emp, 50000) });
+    d.review = { ...j, at: nowIso(), ...(auto ? { auto: 1 } : {}) }; delete d.review.usage; ofUse(j); ofFeed('xp', `(${OF_XP[d.emp]}) قيّم «${d.title || (OF_KIND[d.kind] || [''])[0]}» من ${e.name}: ${j.score}/10${j.improved ? '، واقترح نسخة محسّنة' : ''}`, d.emp); await saveOffice(); if (!auto) plog('تقييم خبير لمسودة', `${e.name} · ${d.title || ''}`, `${j.score}/10`); }
   catch (x) { toast('تعذر التقييم: ' + x.message); }
   delete OF_RV[d.id]; renderOffice();
 }
@@ -1686,10 +1915,10 @@ async function ofPerf(k) {
   OF_RV['p-' + k] = 1; renderOffice();
   const txt = items.map((x, i) => `#${i + 1} ${(OF_KIND[x.kind] || [x.kind])[0]} · ${x.title || ''} · الحالة: ${x.status === 'new' ? 'لم يُراجع' : x.status === 'skip' ? 'رفضه المالك' : 'اعتمده المالك'}${x.review ? ` · تقييم سابق ${x.review.score}/10` : ''}\n${cut(x.body, 1500)}`).join('\n\n')
     + (replies.length ? '\n\nردوده الأخيرة على المالك:\n' + replies.map(m => cut(m.content, 1500)).join('\n---\n') : '');
-  try { const j = await ofCall({ emp: k, task: 'review', mode: 'perf', empName: `${e.name} (${e.role})`, item: `المهمة الموكلة للموظف: ${e.job}\n\n${txt}` });
+  try { const j = await ofCall({ emp: k, task: 'review', mode: 'perf', empName: `${e.name} (${e.role})`, item: `المهمة الموكلة للموظف: ${e.job}\n\n${txt}`, sop: ofSop(k), refs: ofRefs(k, 50000) });
     OFC.reviews[k] = { score: j.score, summary: j.summary, strengths: j.strengths, issues: j.issues, recommendations: j.recommendations, expert: j.expert, at: nowIso() }; ofUse(j);
     (OFC.chats[k] = OFC.chats[k] || []).push({ role: 'assistant', expert: 1, at: nowIso(), content: `### تقييم الأداء من ${j.expert}: ${j.score}/10\n${j.summary}\n\n**نقاط القوة**\n${j.strengths.map(x => '- ' + x).join('\n')}\n\n**الملاحظات**\n${j.issues.map(x => '- ' + x).join('\n')}\n\n**التوصيات**\n${j.recommendations.map(x => '- ' + x).join('\n')}` });
-    await saveOffice(); plog('تقييم أداء موظف', e.name, `${j.score}/10`); }
+    ofFeed('xp', `قيّم أداء ${e.name}: ${j.score}/10`, k); await saveOffice(); plog('تقييم أداء موظف', e.name, `${j.score}/10`); }
   catch (x) { toast('تعذر التقييم: ' + x.message); }
   delete OF_RV['p-' + k]; renderOffice();
 }
@@ -1704,7 +1933,7 @@ function ofDraft(d) {
   const done = d.status !== 'new'; const p = (c && c.profile) || {}; const wa = c && waNum(p.contactMobile || c.phone || p.companyPhone); const mail = c && (p.officialEmail || c.ownerEmail);
   let acts = '';
   if (!done) {
-    if (d.kind === 'assign') acts = OF_EMPS[d.target] ? `<button class="btn sm pri" data-od="assign">اعتماد وتكليف ${esc(ofEmp(d.target).name)}</button>` : '<small class="of-warn">موظف غير معروف</small>';
+    if (d.kind === 'assign' || d.kind === 'handoff') acts = OF_EMPS[d.target] ? `<button class="btn sm pri" data-od="assign">${d.kind === 'assign' ? 'اعتماد وتكليف ' : 'اعتماد وإحالة إلى '}${esc(ofEmp(d.target).name)}</button>` : '<small class="of-warn">موظف غير معروف</small>';
     else if (d.kind === 'coa') acts = `<button class="btn sm pri" data-od="coa">اعتماد وتطبيق على الدليل</button>`;
     else if (d.kind === 'journal') acts = `<button class="btn sm pri" data-od="jpost">اعتماد وترحيل القيد</button>`;
     else if (d.kind === 'idea') acts = `<button class="btn sm pri" data-od="queue">اعتماد وإحالة للمبرمج</button>`;
@@ -1716,8 +1945,8 @@ function ofDraft(d) {
     else acts = `<button class="btn sm pri" data-od="copy">نسخ</button><button class="btn sm" data-od="done">تم</button>`;
     acts += `<button class="btn sm" data-od="skip">تجاهل</button><button class="btn sm of-xb" data-od="review" ${OF_RV[d.id] ? 'disabled' : ''}>${OF_RV[d.id] ? 'الخبير يراجع…' : d.review ? 'إعادة التقييم' : 'قيّمها بخبير'}</button>`;
   }
-  return `<article class="of-d${done ? ' done' : ''}" data-did="${esc(d.id)}"><header>${ofAv(d.emp)}<div><span class="pill ${kc}">${kl}</span> <b>${esc(d.title || '')}</b><small>${esc(e.name)} · ${esc(d.targetName || (c && c.name) || (tk && tk.companyName) || '')} · ${esc(String(d.at || '').slice(0, 16).replace('T', ' '))}</small></div>
-    ${done ? `<span class="pill ${d.status === 'skip' ? 'p-off' : 'p-ok'}">${d.status === 'skip' ? 'تم تجاهلها' : d.status === 'queued' ? 'أُحيلت للمبرمج' : d.status === 'built' ? 'نُفّذت' : d.status === 'posted' ? 'رُحّلت للدفاتر' : d.status === 'assigned' ? 'كُلّف الموظف' : 'معتمدة'}</span>` : ''}</header>
+  return `<article class="of-d${done ? ' done' : ''}" data-did="${esc(d.id)}"><header>${ofAv(d.emp)}<div><span class="pill ${kc}">${kl}</span> <b>${esc(d.title || '')}</b><small>${esc(e.name)}${d.from && OF_EMPS[d.from] ? ` (بتكليف من ${esc(ofEmp(d.from).name)})` : ''}${(d.kind === 'assign' || d.kind === 'handoff') && OF_EMPS[d.target] ? ` ← ${esc(ofEmp(d.target).name)}` : ''} · ${esc(d.targetName || (c && c.name) || (tk && tk.companyName) || '')} · ${esc(String(d.at || '').slice(0, 16).replace('T', ' '))}</small></div>
+    ${done ? `<span class="pill ${d.status === 'skip' ? 'p-off' : 'p-ok'}">${d.status === 'skip' ? 'تم تجاهلها' : d.status === 'queued' ? 'أُحيلت للمبرمج' : d.status === 'built' ? 'نُفّذت' : d.status === 'posted' ? 'رُحّلت للدفاتر' : d.status === 'assigned' ? (d.auto ? 'كُلّف تلقائياً' : 'كُلّف الموظف') : d.status === 'handed' ? (d.auto ? 'أُحيلت تلقائياً' : 'أُحيلت للزميل') : 'معتمدة'}</span>` : OF_RV[d.id] ? '<span class="pill p-pending">الخبير يراجع…</span>' : d.review ? `<span class="pill ${d.review.score >= 8 ? 'p-ok' : d.review.score >= 5 ? 'p-warn' : 'p-crit'}" title="تقييم الخبير">${d.review.score}/10</span>` : ''}</header>
     ${done ? `<div class="of-body">${esc(d.body)}</div>` : `<textarea class="of-ed" rows="${Math.min(10, Math.max(3, String(d.body).split("\n").length + Math.ceil(String(d.body).length / 80)))}">${esc(d.body)}</textarea>`}
     ${d.review ? ofRevBox(d) : ''}${acts ? `<div class="of-acts">${acts}</div>` : ''}</article>`;
 }
@@ -1731,7 +1960,7 @@ async function ofAct(d, a, body) {
   if (a === 'note') { try { await F.addDoc(F.collection(fs, 'crm'), { cid: d.target, kind: 'ملاحظة', text: body, by: ME.email, byName: (ME.name || '') + ' · ' + E.name, at: now }); toast('حُفظت في ملف الشركة ✓'); } catch (x) { return toast('تعذر الحفظ'); } }
   if (a === 'review') return ofReview(d, body);
   if (a === 'useimp') { if (d.review && d.review.improved) { d.body = d.review.improved; d.review.used = true; await saveOffice(); toast('اعتُمدت نسخة الخبير في المسودة'); } return renderOffice(); }
-  if (a === 'assign') { const t = d.target; d.status = 'assigned'; d.doneAt = now; await saveOffice(); plog('تكليف موظف من ' + E.name, ofEmp(t).name, cut(body, 120)); OF_EMP = t; toast(`كُلّف ${ofEmp(t).name} وبدأ العمل`); renderOffice(); return ofAsk(t, 'chat', `تكليف من ${E.name} (${E.role}) معتمد من المالك:\n${body}`); }
+  if (a === 'assign') { const t = d.target; OF_EMP = t; toast(`${d.kind === 'assign' ? 'كُلّف' : 'أُحيل إلى'} ${ofEmp(t).name} وبدأ العمل`); const p = ofDelegate(d, 1, false); await saveOffice(); renderOffice(); return p; }
   if (a === 'coa' || a === 'jpost') { if (BOOKS === null) await loadBooks();
     if (a === 'coa') { const { out } = parseCoa(body); if (!out.length) return toast('لم أجد حسابات بالصيغة: الرمز | الاسم | المجموعة'); let add = 0, upd = 0;
       out.forEach(x => { const e = BOOKS.accounts.find(y => String(y.code) === x.code) || BOOKS.accounts.find(y => y.name === x.name);
@@ -1748,9 +1977,22 @@ async function ofAct(d, a, body) {
   if (a === 'copydev') { try { await navigator.clipboard.writeText(`نفّذ في منصة ${APP_NAME_OF()} (لوحة المالك admin.html وتطبيق الشركات index.html):\n\n${d.title ? d.title + '\n' : ''}${body}`); toast('نُسخ طلب التنفيذ. الصقه لـClaude في محادثة المشروع'); } catch (x) { toast('تعذر النسخ'); } return saveOffice(); }
   if (a === 'built') { const q = OFC.queue.find(x => x.id === d.target); if (q) { q.status = 'done'; q.doneAt = now; } d.status = 'built'; d.doneAt = now; await saveOffice(); plog('تنفيذ بند برمجي', d.title || ''); return renderOffice(); }
   if (a === 'copy') { try { await navigator.clipboard.writeText(body); toast('نُسخ النص ✓'); } catch (x) { toast('تعذر النسخ'); } return saveOffice(); }
-  d.status = a === 'skip' ? 'skip' : 'done'; d.doneAt = now; await saveOffice(); renderOffice();
+  d.status = a === 'skip' ? 'skip' : 'done'; d.doneAt = now; ofFeed(d.emp, `${a === 'skip' ? 'تجاهل المالك' : 'اعتمد المالك'} «${d.title || (OF_KIND[d.kind] || [''])[0]}»`); await saveOffice(); renderOffice();
 }
 $('#t-office').addEventListener('click', e => {
+  const v = e.target.closest('[data-ov]'); if (v) { OF_VIEW = v.dataset.ov; return renderOffice(); }
+  if (e.target.closest('#ofDay')) { OF_EMP = 'ceo'; toast('بدأ ماجد يوم العمل: يقرأ الوضع ويكلّف الفريق'); return ofAsk('ceo', 'chat', 'ابدأ يوم العمل: اقرأ وضع المنصة والفريق وسير العمل الأخير، وحدد أولويات اليوم، وكلّف كل موظف بما يخصه بمسودات assign.'); }
+  if (e.target.closest('#ofFeedAll')) { OF_FEEDALL = !OF_FEEDALL; return renderOffice(); }
+  if (e.target.closest('#ofAuto')) return dialog(`<h3>التشغيل التلقائي</h3><p class="of-mut">كل ما يصل للعملاء يبقى مسودة بانتظار اعتمادك دائماً. هذه الإعدادات تخص العمل الداخلي بين الموظفين فقط.</p>${Object.entries(OF_AUTO_L).map(([k, l]) => `<label class="of-tg"><input type="checkbox" name="${k}"${OFC.auto[k] ? ' checked' : ''}> ${l}</label>`).join('')}`,
+    async fd => { Object.keys(OF_AUTO_L).forEach(k => { OFC.auto[k] = fd.get(k) === 'on'; }); await saveOffice(); toast('حُفظ ✓'); renderOffice(); });
+  const sp = e.target.closest('[data-sop]'); if (sp) { const art = sp.closest('[data-sk]'); const k = art.dataset.sk; const v = art.querySelector('textarea').value.trim();
+    if (sp.dataset.sop === 'reset' || v === OF_SOP[k] || !v) delete KB.sop[k]; else KB.sop[k] = v.slice(0, 8000);
+    saveKb('حُفظ دليل عمل ' + ofEmp(k).name + ' ✓').then(ok => { if (ok) plog('مكتب الموظفين: تعديل دليل العمل', ofEmp(k).name); renderOffice(); }); return; }
+  if (e.target.closest('#kbAdd')) return kbDialog();
+  if (e.target.closest('#kbImport')) return kbImport();
+  const kb = e.target.closest('[data-kbe]'); if (kb) { const r = KB.docs.find(x => x.id === kb.closest('[data-kb]').dataset.kb); if (!r) return;
+    if (kb.dataset.kbe === 'edit') return kbDialog(r);
+    return dialog(`<h3>حذف المرجع</h3><p>سيُحذف «${esc(r.title)}» ولن يقرأه الموظفون بعد الآن.</p>`, async () => { KB.docs = KB.docs.filter(x => x !== r); if (await saveKb('حُذف ✓')) plog('مكتب الموظفين: حذف مرجع', r.title); renderOffice(); }, 'حذف'); }
   const c = e.target.closest('[data-oe]'); if (c) { OF_EMP = c.dataset.oe; return renderOffice(); }
   const f = e.target.closest('[data-of-f]'); if (f) { OF_F = f.dataset.ofF; return renderOffice(); }
   const q = e.target.closest('[data-oq]'); if (q) { const x = OFC.queue.find(y => y.id === q.dataset.oq); if (x) { x.status = 'removed'; saveOffice(); renderOffice(); } return; }
@@ -1767,10 +2009,11 @@ $('#t-office').addEventListener('click', e => {
   const b = e.target.closest('[data-od]'); if (b) { const art = b.closest('[data-did]'); const d = OFC.drafts.find(x => x.id === art.dataset.did); if (!d) return; const ed = art.querySelector('.of-ed');
     const a = b.dataset.od; if (a === 'wa' || a === 'mail') { d.body = ed ? ed.value : d.body; return; } ofAct(d, a, ed ? ed.value.trim() : d.body); }
 });
+$('#t-office').addEventListener('change', e => { if (e.target.id === 'kbFile') { kbFile(e.target.files[0]); e.target.value = ''; } });
 $('#t-office').addEventListener('submit', e => { if (e.target.id !== 'ofIn') return; e.preventDefault(); const q = e.target.q.value.trim(); if (q) ofAsk(OF_EMP, 'chat', q); });
 $('#t-office').addEventListener('keydown', e => { if (e.target.name === 'q' && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); e.target.form.requestSubmit(); } });
 // تعديل نص المسودة قبل فتح واتساب أو البريد يُحدّث الرابط
-$('#t-office').addEventListener('input', e => { if (!e.target.classList.contains('of-ed')) return; const art = e.target.closest('[data-did]'); const v = e.target.value;
+$('#t-office').addEventListener('input', e => { if (!e.target.classList.contains('of-ed')) return; const art = e.target.closest('[data-did]'); if (!art) return; const v = e.target.value;
   art.querySelectorAll('[data-od="wa"]').forEach(a => { a.href = a.href.replace(/text=.*$/, 'text=' + encodeURIComponent(v)); });
   art.querySelectorAll('[data-od="mail"]').forEach(a => { a.href = a.href.replace(/body=.*$/, 'body=' + encodeURIComponent(v)); });
   const dd = OFC.drafts.find(x => x.id === art.dataset.did); art.querySelectorAll('[data-od="gh"]').forEach(a => { if (dd) a.href = ghIssueUrl({ ...dd, body: v }); }); });

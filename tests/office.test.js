@@ -10,7 +10,7 @@ const call = (body, tok = 'Bearer t') => O.handler({ httpMethod: 'POST', headers
   let r = await call({ emp: 'support', task: 'brief', data: '{"x":1}' });
   assert.equal(r.s, 200); assert.equal(r.j.drafts.length, 1, 'kind not allowed for this employee is dropped'); assert.equal(r.j.drafts[0].kind, 'ticket');
   assert.ok(last.system[0].text.includes('الدعم')); assert.ok(last.system[1].text.includes('{"x":1}')); assert.equal(last.output_config.format.type, 'json_schema');
-  assert.deepEqual(last.output_config.format.schema.properties.drafts.items.properties.kind.enum, ['ticket', 'bug', 'note', 'task']);
+  assert.deepEqual(last.output_config.format.schema.properties.drafts.items.properties.kind.enum, ['ticket', 'bug', 'note', 'task', 'handoff']);
   r = await call({ emp: 'coder', task: 'brief', data: '{}' }); assert.equal(r.s, 200); assert.ok(last.system[0].text.includes('طابور البرمجة')); assert.ok(!last.tools, 'coder has no web search');
   r = await call({ emp: 'ideas', message: 'ابحث' }); assert.equal(r.s, 200); assert.equal(last.tools[0].type, 'web_search_20260209', 'ideas researches');
   // إذا رُفضت أداة البحث يعيد الطلب بدونها
@@ -38,10 +38,27 @@ const call = (body, tok = 'Bearer t') => O.handler({ httpMethod: 'POST', headers
   r = await call({ emp: 'sales', message: '' }); assert.equal(r.s, 400);
   r = await call({ emp: 'nobody', message: 'x' }); assert.equal(r.s, 400);
   r = await call({ emp: 'sales', message: 'x', persona: { name: 'أبو فهد', extra: 'اذكر الواتساب' } }); assert.ok(last.system[0].text.includes('أبو فهد') && last.system[0].text.includes('اذكر الواتساب'));
+  // دليل العمل والمراجع يصلان للموظف وللخبير
+  O._setClient({ messages: { create: async p => { last = p; return { model: 'm', stop_reason: 'end_turn', content: [{ type: 'text', text: JSON.stringify(reply) }], usage: { input_tokens: 10, output_tokens: 5 } }; } } });
+  reply = { reply: 'ok', drafts: [{ kind: 'handoff', target: 'accountant', targetName: 'نورة', title: 'فوترة', body: 'سؤال عن فاتورة' }] };
+  r = await call({ emp: 'support', message: 'x', sop: 'الخطوة الأولى: رتّب التذاكر', refs: '### «سياسة الاسترجاع»\nلا استرجاع بعد 14 يوماً' });
+  assert.equal(r.j.drafts[0].kind, 'handoff', 'support hands off to a colleague');
+  assert.ok(last.system[0].text.includes('دليل العمل المعتمد') && last.system[0].text.includes('رتّب التذاكر'), 'sop in prompt');
+  assert.ok(last.system[1].text.includes('سياسة الاسترجاع') && last.system[0].text.includes('المراجع المعتمدة'), 'refs in cached data block');
+  r = await call({ emp: 'sales', message: 'x' }); assert.ok(!last.system[0].text.includes('دليل العمل المعتمد') && !last.system[1].text.includes('المراجع المعتمدة'), 'no sop/refs text when absent');
+  reply = { score: 6, verdict: 'v', strengths: [], issues: ['يخالف السياسة'], improved: '' };
+  r = await call({ emp: 'support', task: 'review', item: 'رد', sop: 'معيار: الرد خلال 4 ساعات', refs: '«سياسة الاسترجاع»' });
+  assert.equal(r.s, 200); assert.ok(last.system.includes('معيار: الرد خلال 4 ساعات') && last.messages[0].content.includes('سياسة الاسترجاع'), 'expert judges against sop and refs');
+  // استخراج نص مرجع مرفوع
+  reply = { title: 'سياسة الإلغاء', text: 'البند 1' };
+  r = await call({ task: 'extract', file: { name: 'p.pdf', type: 'application/pdf', b64: 'JVBERi0=' } }); assert.equal(r.s, 200); assert.equal(r.j.title, 'سياسة الإلغاء');
+  assert.equal(last.messages[0].content[0].type, 'document', 'pdf sent as document block');
+  r = await call({ task: 'extract', file: { name: 'x.exe', type: 'application/x-msdownload', b64: 'AA' } }); assert.equal(r.s, 400, 'unsupported type');
+  who = { email: 'staff@x.sa', verified: true }; r = await call({ task: 'extract', file: { name: 'p.pdf', type: 'application/pdf', b64: 'AA' } }); assert.equal(r.s, 403, 'extract owner only'); who = { email: 'salmandh02@gmail.com', verified: true };
   who = { email: 'staff@x.sa', verified: true }; r = await call({ emp: 'sales', message: 'x' }); assert.equal(r.s, 403, 'staff blocked');
   who = { email: 'salmandh02@gmail.com', verified: false }; r = await call({ emp: 'sales', message: 'x' }); assert.equal(r.s, 403, 'unverified blocked');
   r = await call({ emp: 'sales', message: 'x' }, ''); assert.equal(r.s, 401);
   who = { email: 'salmandh02@gmail.com', verified: true }; reply = 'not json'; O._setClient({ messages: { create: async () => ({ stop_reason: 'refusal', content: [], usage: {} }) } });
   r = await call({ emp: 'ops', message: 'x' }); assert.equal(r.s, 422);
-  console.log('office tests: 28 checks passed');
+  console.log('office tests: 40 checks passed');
 })().catch(e => { console.error(e); process.exit(1); });
