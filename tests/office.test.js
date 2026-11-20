@@ -10,8 +10,14 @@ const call = (body, tok = 'Bearer t') => O.handler({ httpMethod: 'POST', headers
   let r = await call({ emp: 'support', task: 'brief', data: '{"x":1}' });
   assert.equal(r.s, 200); assert.equal(r.j.drafts.length, 1, 'kind not allowed for this employee is dropped'); assert.equal(r.j.drafts[0].kind, 'ticket');
   assert.ok(last.system[0].text.includes('الدعم')); assert.ok(last.system[1].text.includes('{"x":1}')); assert.equal(last.output_config.format.type, 'json_schema');
-  assert.deepEqual(last.output_config.format.schema.properties.drafts.items.properties.kind.enum, ['ticket', 'note', 'task']);
-  r = await call({ emp: 'dev', task: 'brief', data: '{}' }); assert.equal(r.s, 200); assert.ok(last.system[0].text.includes('مهندس'));
+  assert.deepEqual(last.output_config.format.schema.properties.drafts.items.properties.kind.enum, ['ticket', 'bug', 'note', 'task']);
+  r = await call({ emp: 'coder', task: 'brief', data: '{}' }); assert.equal(r.s, 200); assert.ok(last.system[0].text.includes('طابور البرمجة')); assert.ok(!last.tools, 'coder has no web search');
+  r = await call({ emp: 'ideas', message: 'ابحث' }); assert.equal(r.s, 200); assert.equal(last.tools[0].type, 'web_search_20260209', 'ideas researches');
+  // إذا رُفضت أداة البحث يعيد الطلب بدونها
+  const A = require('@anthropic-ai/sdk'); let calls = 0;
+  O._setClient({ messages: { create: async p => { calls++; if (p.tools) throw new A.BadRequestError(400, {}, 'tools not allowed', new Headers()); last = p; return { model: 'm', stop_reason: 'end_turn', content: [{ type: 'text', text: 'تمهيد ' }, { type: 'text', text: JSON.stringify({ reply: 'ok', drafts: [{ kind: 'idea', target: '', targetName: '', title: 'فكرة', body: 'نص' }] }) }], usage: {} }; } } });
+  r = await call({ emp: 'ideas', message: 'ابحث' }); assert.equal(r.s, 200); assert.equal(calls, 2); assert.equal(r.j.drafts[0].kind, 'idea', 'last text block parsed');
+  O._setClient({ messages: { create: async p => { last = p; return { model: 'm', stop_reason: 'end_turn', content: [{ type: 'text', text: JSON.stringify(reply) }], usage: { input_tokens: 10, output_tokens: 5 } }; } } });
   r = await call({ emp: 'sales', message: 'مرحبا', history: [{ role: 'assistant', content: 'a' }, { role: 'user', content: 'b' }, { role: 'assistant', content: 'c' }] });
   assert.equal(r.s, 200); assert.equal(last.messages[0].role, 'user'); assert.equal(last.messages[last.messages.length - 1].content, 'مرحبا');
   r = await call({ emp: 'sales', message: '' }); assert.equal(r.s, 400);
@@ -22,5 +28,5 @@ const call = (body, tok = 'Bearer t') => O.handler({ httpMethod: 'POST', headers
   r = await call({ emp: 'sales', message: 'x' }, ''); assert.equal(r.s, 401);
   who = { email: 'salmandh02@gmail.com', verified: true }; reply = 'not json'; O._setClient({ messages: { create: async () => ({ stop_reason: 'refusal', content: [], usage: {} }) } });
   r = await call({ emp: 'ops', message: 'x' }); assert.equal(r.s, 422);
-  console.log('office tests: 12 checks passed');
+  console.log('office tests: 17 checks passed');
 })().catch(e => { console.error(e); process.exit(1); });

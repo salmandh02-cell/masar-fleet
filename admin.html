@@ -338,7 +338,7 @@ body.va{overflow:hidden}
 .of-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .of-hero b{display:block;font:600 16px var(--f-display)}.of-hero small{color:var(--muted);font-size:13px}
 .of-hs{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)}.of-hs b{color:var(--ink);font:600 18px var(--f-display);margin-inline-end:4px}
-.of-team{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.of-team{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .of-card{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"av nm" "st st" "job job";gap:8px 10px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);transition:border-color .15s,box-shadow .15s}
 .of-card:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
 .of-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -382,8 +382,9 @@ body.va{overflow:hidden}
 .of-ed{width:100%;font:inherit;font-size:13.5px;line-height:1.7;resize:vertical;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink)}
 .of-body{white-space:pre-wrap;font-size:13.5px;color:var(--muted);max-height:120px;overflow:auto}
 .of-acts{display:flex;gap:6px;flex-wrap:wrap}.of-warn{color:var(--crit)}
+.of-q{display:grid;gap:6px;margin:0 16px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px;background:var(--surface-2);font-size:13px}.of-q small{color:var(--muted)}.of-qi{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center}
 .of-foot{color:var(--muted);font-size:12px;margin:0}
-@media (max-width:1400px){.of-team{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:1100px){.of-team{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:1000px){.of-main{grid-template-columns:1fr}}
 @media (max-width:640px){.of-team{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;scroll-snap-type:x mandatory}.of-card{flex:0 0 152px;padding:10px;gap:6px 8px;scroll-snap-align:start}.of-job{display:none}.of-chat .ph{flex-wrap:wrap}.of-chat .ph>div{flex-basis:calc(100% - 60px)!important}.of-hero{padding:12px 14px}.of-msgs{max-height:60vh}.of-chat{min-height:0}.of-m{max-width:96%}}
 </style>
@@ -1469,25 +1470,27 @@ const OF_EMPS = {
     sug: ['لخّص الوضع المالي هذا الشهر', 'اكتب تذكيرات للفواتير المتأخرة', 'هل في المصروفات شيء غير معتاد؟'] },
   marketing: { name: 'فهد', role: 'التسويق', ic: 'mega', tint: 'violet', job: 'يكتب منشورات وإعلانات ورسائل حملات للمنصة',
     sug: ['اكتب 3 منشورات لينكدإن لهذا الأسبوع', 'اكتب نص إعلان قصير لشركات التأجير', 'اقترح خطة محتوى لشهر كامل'] },
-  dev: { name: 'عمر', role: 'التطوير والبرمجة', ic: 'gear', tint: 'info', job: 'يحلل الأعطال وطلبات المزايا وسير العمل ويكتب مهام التطوير',
-    sug: ['ما أهم 5 تحسينات للمنصة الآن؟', 'حلّل أعطال المتصفح واكتب مهام إصلاحها', 'أين يتعطل سير العمل عندنا وكيف نسرّعه؟'] },
+  ideas: { name: 'عمر', role: 'التطوير والأفكار', ic: 'chart', tint: 'info', job: 'يبحث ويحلل ويعرض عليك مقترحات تطوير المنصة وسير العمل',
+    sug: ['ابحث عن أهم 5 مزايا عند منافسينا وليست عندنا', 'ما أهم 5 تحسينات للمنصة الآن؟', 'أين يتعطل سير العمل عندنا وكيف نسرّعه؟'] },
+  coder: { name: 'ياسر', role: 'البرمجة', ic: 'gear', tint: 'ok', job: 'يستلم المقترحات المعتمدة وأعطال الدعم ويجهز طلبات التنفيذ',
+    sug: ['جهّز طلبات تنفيذ لكل بنود الطابور', 'ابدأ بأخطر عطل مسجل', 'ما الذي يمكن إنجازه هذا الأسبوع؟'] },
   ops: { name: 'ريم', role: 'تحليل العمليات', ic: 'pulse', tint: 'crit', job: 'ترصد الشركات الخاملة والمعرضة للإلغاء وتقترح الإجراء',
     sug: ['من الشركات المعرضة لعدم التجديد ولماذا؟', 'أي شركة تحتاج تدريباً؟', 'لخّص استخدام النظام هذا الأسبوع'] }
 };
-const OF_KIND = { ticket: ['رد على تذكرة', 'p-info'], message: ['رسالة لعميل', 'p-ok'], note: ['ملاحظة في ملف الشركة', 'p-off'], post: ['محتوى تسويقي', 'p-pending'], task: ['مهمة مقترحة', 'p-warn'], report: ['تقرير', 'p-off'] };
+const OF_KIND = { idea: ['مقترح تطوير', 'p-info'], bug: ['خلل للمبرمج', 'p-crit'], dev: ['طلب تنفيذ', 'p-pending'], ticket: ['رد على تذكرة', 'p-info'], message: ['رسالة لعميل', 'p-ok'], note: ['ملاحظة في ملف الشركة', 'p-off'], post: ['محتوى تسويقي', 'p-pending'], task: ['مهمة مقترحة', 'p-warn'], report: ['تقرير', 'p-off'] };
 let OF_LOAD = null; let OFC = null, OF_EMP = 'support', OF_F = 'new', OF_BUSY = {};
 const ofEmp = k => ({ ...OF_EMPS[k], ...((OFC && OFC.persona && OFC.persona[k]) || {}) });
 async function loadOffice() { return OF_LOAD || (OF_LOAD = loadOffice0()); }
 async function loadOffice0() {
   try { const s = await F.getDoc(F.doc(fs, 'platform', 'office')); OFC = s.exists() ? s.data() : {}; } catch (e) { OFC = {}; toast('تعذر تحميل المكتب'); }
-  OFC.drafts = OFC.drafts || []; OFC.chats = OFC.chats || {}; OFC.persona = OFC.persona || {}; OFC.usage = OFC.usage || {};
+  OFC.drafts = OFC.drafts || []; OFC.queue = OFC.queue || []; OFC.chats = OFC.chats || {}; OFC.persona = OFC.persona || {}; OFC.usage = OFC.usage || {};
 }
 // المستند الواحد محدود بحجم 1MB: نُبقي آخر 16 رسالة لكل موظف، وآخر 120 مسودة (المعلّقة أولاً)
 async function saveOffice() {
   const keep = [...OFC.drafts.filter(d => d.status === 'new'), ...OFC.drafts.filter(d => d.status !== 'new')].slice(0, 120); OFC.drafts = OFC.drafts.filter(d => keep.includes(d));
   Object.keys(OFC.chats).forEach(k => { OFC.chats[k] = OFC.chats[k].slice(-16); });
   const days = Object.keys(OFC.usage).sort().slice(-60); OFC.usage = Object.fromEntries(days.map(d => [d, OFC.usage[d]]));
-  try { await F.setDoc(F.doc(fs, 'platform', 'office'), { drafts: OFC.drafts, chats: OFC.chats, persona: OFC.persona, usage: OFC.usage, updatedAt: nowIso() }); return true; }
+  try { await F.setDoc(F.doc(fs, 'platform', 'office'), { drafts: OFC.drafts, queue: OFC.queue.slice(-80), chats: OFC.chats, persona: OFC.persona, usage: OFC.usage, updatedAt: nowIso() }); return true; }
   catch (e) { toast('تعذر حفظ المكتب: ' + (e.code || e.message)); return false; }
 }
 
@@ -1533,9 +1536,9 @@ async function ofData(emp) {
   if (emp === 'marketing') {
     const vs = live.reduce((t, c) => t + (+(STATS[c.id] || {}).vehicles || 0), 0); const cities = {}; live.forEach(c => { const x = (c.profile || {}).city; if (x) cities[x] = (cities[x] || 0) + 1; });
     d.الباقات = plans; d.أرقام_عامة = { سيارات_تُدار_على_المنصة: vs, مدن_العملاء: cities };
-    d.مزايا_النظام = ['ملف كامل لكل سيارة وأرشيف وثائقها وتنبيه قبل انتهائها', 'محاضر تسليم واستلام بتوقيع إلكتروني وصور', 'فحص دوري بالصور وجدول فحص لكل شركة', 'الصيانة والوقود مع كشف التلاعب والهدر', 'المخالفات والحوادث والمطالبات', 'الفروع ومشرفو الفروع', 'كشف خصومات الموارد البشرية بالبريد', 'تطبيق للسائق بالعربية والإنجليزية والأردية', 'قراءة المستندات بالتصوير ومساعد ذكي', 'تقارير PDF وتنبيهات وإشعارات فورية'];
+    d.مزايا_النظام = OF_FEATURES;
   }
-  if (emp === 'dev') {
+  if (emp === 'ideas' || emp === 'coder') {
     if (!TKS.length) await loadTk();
     let errs = [], hdoc = {}; try { const q = await F.getDocs(F.query(F.collection(fs, 'clienterr'), F.orderBy('at', 'desc'), F.limit(200))); errs = q.docs.map(x => x.data()); } catch (e) {}
     try { const h = await F.getDoc(F.doc(fs, 'platform', 'health')); hdoc = h.exists() ? h.data() : {}; } catch (e) {}
@@ -1549,6 +1552,10 @@ async function ofData(emp) {
       تذاكر_بلا_رد_أكثر_من_يوم: TKS.filter(x => x.status === 'open' && daysAgo(x.lastAt) >= 1).length, فواتير_متأخرة: INVS.filter(i => istOf(i) === 'overdue').length, إيصالات_تنتظر_المراجعة: INVS.filter(i => i.status === 'unpaid' && i.receiptId).length,
       شركات_بلا_سيارات: COS.filter(c => !isOpen(c) && (STATS[c.id] || {}).vehicles === 0).length };
     d.استخدام_المزايا = Object.fromEntries(FEATS.map(([k, l]) => [l, COS.filter(c => !isOpen(c) && (c.features || {})[k] === false).length + ' شركة أوقفتها']));
+    if (emp === 'ideas') { d.مزايا_النظام_الحالية = OF_FEATURES; d.مقترحات_سابقة = OFC.drafts.filter(x => x.kind === 'idea').slice(0, 30).map(x => ({ العنوان: x.title, الحالة: x.status === 'new' ? 'بانتظار المالك' : x.status === 'skip' ? 'رفضها المالك' : 'اعتُمدت' })); }
+    if (emp === 'coder') { delete d.استخدام_المزايا; delete d.مؤشرات_سير_العمل;
+      d.طابور_البرمجة = OFC.queue.filter(x => x.status === 'queued').map(x => ({ id: x.id, النوع: x.from === 'bug' ? 'عطل من الدعم' : 'مقترح معتمد', العنوان: x.title, التفاصيل: cut(x.body, 2500), أحيل_في: fmt(x.at) }));
+      d.منفذ_سابقاً = OFC.queue.filter(x => x.status === 'done').slice(-15).map(x => x.title); }
   }
   if (emp === 'ops') {
     d.الشركات = live.map(coRow);
@@ -1556,6 +1563,7 @@ async function ofData(emp) {
   }
   return JSON.stringify(d, null, 1);
 }
+const OF_FEATURES = ['ملف كامل لكل سيارة وأرشيف وثائقها وتنبيه قبل انتهائها', 'محاضر تسليم واستلام بتوقيع إلكتروني وصور', 'فحص دوري بالصور وجدول فحص لكل شركة', 'الصيانة والوقود مع كشف التلاعب والهدر', 'المخالفات والحوادث والمطالبات', 'الفروع ومشرفو الفروع', 'كشف خصومات الموارد البشرية بالبريد', 'تطبيق للسائق بالعربية والإنجليزية والأردية', 'قراءة المستندات بالتصوير ومساعد ذكي', 'تقارير PDF وتنبيهات وإشعارات فورية', 'لوحة المالك: الاعتماد والفواتير والكوبونات والإعلانات والمحاسبة والتذاكر'];
 const r2of = n => Math.round((+n || 0) * 100) / 100;
 const APP_NAME_OF = () => APP_NAME || 'مسار';
 
@@ -1600,13 +1608,14 @@ async function renderOffice() {
   const list = OFC.drafts.filter(d => (OF_F === 'all' || (OF_F === 'new' ? d.status === 'new' : d.emp === OF_F)));
   box.innerHTML = `
   <div class="of-hero"><div><b>${allNew ? `${allNew} مسودة بانتظار اعتمادك` : 'لا شيء بانتظارك الآن'}</b><small>الموظفون يقرؤون بيانات المنصة ويكتبون المسودات، ولا يُرسل شيء لأي عميل إلا بضغطة منك.</small></div>
-    <div class="of-hs"><span><b>${u.n}</b> مهمة اليوم</span><button class="btn sm" id="ofAll">تقرير اليوم من الجميع</button></div></div>
+    <div class="of-hs"><span><b>${u.n}</b> مهمة اليوم</span><span><b>${OFC.queue.filter(x => x.status === 'queued').length}</b> في طابور البرمجة</span><button class="btn sm" id="ofAll">تقرير اليوم من الجميع</button></div></div>
   <div class="of-team">${Object.keys(OF_EMPS).map(k => { const e = ofEmp(k); const n = pend(k); return `<button class="of-card${k === OF_EMP ? ' on' : ''}" data-oe="${k}">
     ${ofAv(k)}<span class="of-nm"><b>${esc(e.name)}</b><small>${esc(e.role)}</small></span>${OF_BUSY[k] ? '<span class="of-st busy">يعمل الآن</span>' : n ? `<span class="of-st">${n} مسودة</span>` : '<span class="of-st idle">متاح</span>'}
     <span class="of-job">${esc(e.job)}</span></button>`; }).join('')}</div>
   <div class="of-main">
     <div class="panel of-chat"><div class="ph">${ofAv(OF_EMP, 1)}<div style="flex:1;min-width:0"><h3 style="margin:0">${esc(E.name)} · ${esc(E.role)}</h3><small>${esc(E.job)}</small></div>
       <button class="btn sm" id="ofBrief" ${OF_BUSY[OF_EMP] ? 'disabled' : ''}>تقرير اليوم</button><button class="ib" id="ofSet" title="تخصيص الموظف" aria-label="تخصيص الموظف">${svg('gear')}</button>${chat.length ? `<button class="ib" id="ofClr" title="محادثة جديدة" aria-label="محادثة جديدة">${svg('log')}</button>` : ''}</div>
+      ${OF_EMP === 'coder' ? ofQueue() : ''}
       <div class="of-msgs" id="ofMsgs">${chat.length ? chat.map(m => `<div class="of-m ${m.role === 'user' ? 'me' : 'ai'}${m.err ? ' err' : ''}">${m.role === 'user' ? esc(m.content) : ofMd(m.content)}${m.drafts ? `<button class="of-dl" data-of-f="${OF_EMP}">${m.drafts} مسودة ← صندوق المسودات</button>` : ''}</div>`).join('')
         : `<div class="of-hello">${ofAv(OF_EMP, 1)}<p>أهلاً، أنا ${esc(E.name)} من ${esc(E.role)}. اطلب مني أي مهمة، أو اضغط «تقرير اليوم».</p></div>`}
         ${OF_BUSY[OF_EMP] ? `<div class="of-m ai typing"><i></i><i></i><i></i> ${esc(E.name)} يقرأ البيانات ويكتب…</div>` : ''}</div>
@@ -1619,19 +1628,24 @@ async function renderOffice() {
   <p class="of-foot">${u.n ? `استهلاك اليوم: ${u.n} مهمة · ${Math.round((u.in || 0) / 1000)} ألف رمز قراءة · ${Math.round((u.out || 0) / 1000)} ألف رمز كتابة.` : ''} يعمل المكتب بمفتاح الذكاء الاصطناعي في إعدادات Netlify.</p>`;
   const m = $('#ofMsgs'); if (m) m.scrollTop = m.scrollHeight; badge('ofBadge', allNew, true);
 }
+function ofQueue() { const L = OFC.queue.filter(x => x.status === 'queued');
+  return `<div class="of-q"><b>طابور البرمجة (${L.length})</b>${L.length ? L.map(x => `<div class="of-qi"><span class="pill ${x.from === 'bug' ? 'p-crit' : 'p-info'}">${x.from === 'bug' ? 'عطل' : 'مقترح'}</span><span>${esc(x.title)}</span><button class="btn sm" data-oq="${esc(x.id)}" title="إزالة من الطابور">إزالة</button></div>`).join('') : '<small>فارغ. اعتمد مقترحات عمر أو أحل أعطال سارة لتظهر هنا.</small>'}</div>`; }
 function ofDraft(d) {
   const e = ofEmp(d.emp); const [kl, kc] = OF_KIND[d.kind] || [d.kind, 'p-off']; const c = COS.find(x => x.id === d.target); const tk = d.kind === 'ticket' && TKS.find(x => x.id === d.target);
   const done = d.status !== 'new'; const p = (c && c.profile) || {}; const wa = c && waNum(p.contactMobile || c.phone || p.companyPhone); const mail = c && (p.officialEmail || c.ownerEmail);
   let acts = '';
   if (!done) {
-    if (d.kind === 'ticket') acts = tk ? `<button class="btn sm pri" data-od="send">إرسال الرد للعميل</button>` : '<small class="of-warn">التذكرة غير موجودة</small>';
+    if (d.kind === 'idea') acts = `<button class="btn sm pri" data-od="queue">اعتماد وإحالة للمبرمج</button>`;
+    else if (d.kind === 'bug') acts = `<button class="btn sm pri" data-od="queue">إحالة للمبرمج</button>`;
+    else if (d.kind === 'dev') acts = `<button class="btn sm pri" data-od="copydev">نسخ طلب التنفيذ</button><button class="btn sm" data-od="built">تم التنفيذ</button>`;
+    else if (d.kind === 'ticket') acts = tk ? `<button class="btn sm pri" data-od="send">إرسال الرد للعميل</button>` : '<small class="of-warn">التذكرة غير موجودة</small>';
     else if (d.kind === 'message') acts = `${wa ? `<a class="btn sm pri" target="_blank" rel="noopener" href="https://wa.me/${wa}?text=${encodeURIComponent(d.body)}" data-od="wa">واتساب</a>` : ''}${mail ? `<a class="btn sm" href="mailto:${esc(mail)}?subject=${encodeURIComponent(d.title || '')}&body=${encodeURIComponent(d.body)}" data-od="mail">بريد</a>` : ''}<button class="btn sm" data-od="copy">نسخ</button><button class="btn sm" data-od="done">تم الإرسال</button>`;
     else if (d.kind === 'note') acts = c ? `<button class="btn sm pri" data-od="note">حفظ في ملف الشركة</button>` : '<button class="btn sm" data-od="copy">نسخ</button>';
     else acts = `<button class="btn sm pri" data-od="copy">نسخ</button><button class="btn sm" data-od="done">تم</button>`;
     acts += `<button class="btn sm" data-od="skip">تجاهل</button>`;
   }
   return `<article class="of-d${done ? ' done' : ''}" data-did="${esc(d.id)}"><header>${ofAv(d.emp)}<div><span class="pill ${kc}">${kl}</span> <b>${esc(d.title || '')}</b><small>${esc(e.name)} · ${esc(d.targetName || (c && c.name) || (tk && tk.companyName) || '')} · ${esc(String(d.at || '').slice(0, 16).replace('T', ' '))}</small></div>
-    ${done ? `<span class="pill ${d.status === 'skip' ? 'p-off' : 'p-ok'}">${d.status === 'skip' ? 'تم تجاهلها' : 'معتمدة'}</span>` : ''}</header>
+    ${done ? `<span class="pill ${d.status === 'skip' ? 'p-off' : 'p-ok'}">${d.status === 'skip' ? 'تم تجاهلها' : d.status === 'queued' ? 'أُحيلت للمبرمج' : d.status === 'built' ? 'نُفّذت' : 'معتمدة'}</span>` : ''}</header>
     ${done ? `<div class="of-body">${esc(d.body)}</div>` : `<textarea class="of-ed" rows="${Math.min(10, Math.max(3, String(d.body).split("\n").length + Math.ceil(String(d.body).length / 80)))}">${esc(d.body)}</textarea>`}
     ${acts ? `<div class="of-acts">${acts}</div>` : ''}</article>`;
 }
@@ -1643,12 +1657,17 @@ async function ofAct(d, a, body) {
       notify({ action: 'ticket', ticketId: t.id, text: body }); plog('رد على تذكرة (مسودة ' + E.name + ')', `${t.companyName} · ${t.subject}`); toast('أُرسل الرد للعميل ✓'); loadTk(); }
     catch (x) { return toast('تعذر الإرسال'); } }
   if (a === 'note') { try { await F.addDoc(F.collection(fs, 'crm'), { cid: d.target, kind: 'ملاحظة', text: body, by: ME.email, byName: (ME.name || '') + ' · ' + E.name, at: now }); toast('حُفظت في ملف الشركة ✓'); } catch (x) { return toast('تعذر الحفظ'); } }
+  if (a === 'queue') { OFC.queue.push({ id: uid('q'), from: d.kind, src: d.id, title: d.title || cut(body, 80), body, status: 'queued', at: now }); d.status = 'queued'; d.doneAt = now;
+    await saveOffice(); plog(d.kind === 'idea' ? 'اعتماد مقترح تطوير' : 'إحالة عطل للمبرمج', d.title || ''); toast('أُحيل إلى ياسر في طابور البرمجة ✓'); return renderOffice(); }
+  if (a === 'copydev') { try { await navigator.clipboard.writeText(`نفّذ في منصة ${APP_NAME_OF()} (لوحة المالك admin.html وتطبيق الشركات index.html):\n\n${d.title ? d.title + '\n' : ''}${body}`); toast('نُسخ طلب التنفيذ. الصقه لـClaude في محادثة المشروع'); } catch (x) { toast('تعذر النسخ'); } return saveOffice(); }
+  if (a === 'built') { const q = OFC.queue.find(x => x.id === d.target); if (q) { q.status = 'done'; q.doneAt = now; } d.status = 'built'; d.doneAt = now; await saveOffice(); plog('تنفيذ بند برمجي', d.title || ''); return renderOffice(); }
   if (a === 'copy') { try { await navigator.clipboard.writeText(body); toast('نُسخ النص ✓'); } catch (x) { toast('تعذر النسخ'); } return saveOffice(); }
   d.status = a === 'skip' ? 'skip' : 'done'; d.doneAt = now; await saveOffice(); renderOffice();
 }
 $('#t-office').addEventListener('click', e => {
   const c = e.target.closest('[data-oe]'); if (c) { OF_EMP = c.dataset.oe; return renderOffice(); }
   const f = e.target.closest('[data-of-f]'); if (f) { OF_F = f.dataset.ofF; return renderOffice(); }
+  const q = e.target.closest('[data-oq]'); if (q) { const x = OFC.queue.find(y => y.id === q.dataset.oq); if (x) { x.status = 'removed'; saveOffice(); renderOffice(); } return; }
   const s = e.target.closest('[data-os]'); if (s) return ofAsk(OF_EMP, 'chat', s.dataset.os);
   if (e.target.closest('#ofBrief')) return ofAsk(OF_EMP, 'brief');
   if (e.target.closest('#ofAll')) { Object.keys(OF_EMPS).forEach(k => ofAsk(k, 'brief')); return toast('بدأ الجميع إعداد تقارير اليوم'); }
