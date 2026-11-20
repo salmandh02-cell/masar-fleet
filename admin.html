@@ -365,6 +365,15 @@ body.va{overflow:hidden}
 .of-md{padding:0 16px 14px}.of-md summary{cursor:pointer;font-size:13.5px;color:var(--accent);padding:4px 0 10px}.of-mt{display:grid;gap:10px;margin-bottom:12px}.of-mt-i{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px;border:1px solid var(--line);border-radius:12px;font-size:13.5px;line-height:1.7}.of-mt-i.sum{background:var(--gold-soft);border-color:color-mix(in srgb,var(--gold) 40%,var(--line))}.of-mt-i.err{opacity:.7}.of-mt-i b{display:block;margin-bottom:2px}
 .of-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}.of-tm{list-style:none;margin:0;padding:6px 16px 14px;display:grid;gap:10px}.of-tm li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;font-size:13.5px}.of-tm p{margin:4px 0 0;color:var(--ink2);line-height:1.6;white-space:pre-line;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}.of-tm time{color:var(--muted);font-size:12px}.of-tm .of-av{width:30px;height:30px;font-size:13px;border-radius:9px}.of-tm .of-av i{display:none}
 .of-d.flash{box-shadow:0 0 0 2px var(--gold)}
+.of-3d{padding:0;overflow:hidden}.o3-slot,.o3-host{height:100%}.o3-wrap{position:relative;height:min(68vh,620px);min-height:380px;background:#DCE6EA;border-radius:14px;overflow:hidden;outline:none;touch-action:none}.o3-wrap:focus-visible{box-shadow:0 0 0 2px var(--accent)}.o3-wrap:fullscreen{height:100vh;border-radius:0}.o3-wrap canvas{display:block;width:100%;height:100%;cursor:grab}
+.o3-ui{position:absolute;inset:0;pointer-events:none;font-family:var(--f-display)}.o3-ui button{pointer-events:auto;font:inherit;cursor:pointer}
+.o3-spots{position:absolute;top:10px;inset-inline:10px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.o3-spots button{flex:0 0 auto;border:0;border-radius:999px;padding:6px 12px;font-size:12.5px;background:rgba(14,59,48,.78);color:#fff;backdrop-filter:blur(6px)}.o3-spots button[aria-pressed=true]{background:#C9A24F;color:#2A1F08}
+.o3-tip{position:absolute;top:52px;left:50%;transform:translateX(-50%);background:rgba(20,24,22,.82);color:#fff;border-radius:8px;padding:5px 10px;font-size:13px;white-space:nowrap}.o3-tip:empty{display:none}
+.o3-pad{position:absolute;bottom:12px;left:12px;display:grid;grid-template-columns:repeat(3,40px);grid-template-rows:repeat(2,40px);gap:4px;direction:ltr}.o3-pad button{border:0;border-radius:10px;background:rgba(255,255,255,.82);color:#0E3B30;font-size:15px;touch-action:none;user-select:none}.o3-pad [data-mv=f]{grid-column:2}.o3-pad [data-mv=l]{grid-column:1;grid-row:2}.o3-pad [data-mv=b]{grid-column:2;grid-row:2}.o3-pad [data-mv=r]{grid-column:3;grid-row:2}
+.o3-full{position:absolute;bottom:12px;right:12px;width:40px;height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.82);color:#0E3B30;font-size:18px}
+.o3-enter{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);border:0;border-radius:999px;padding:12px 26px;font-size:16px;font-weight:700;background:#C9A24F;color:#2A1F08;box-shadow:0 8px 24px rgba(0,0,0,.25)}.o3-enter[hidden]{display:none}
+.o3-ui button:focus-visible{outline:2px solid #C9A24F;outline-offset:2px}
+@media (max-width:640px){.o3-wrap{height:62vh;min-height:320px}.o3-spots button{font-size:12px;padding:6px 10px}}
 .of-plan{padding:12px}.ofp-wrap{overflow-x:auto;border-radius:14px}.ofp{display:block;width:100%;min-width:720px;height:auto;font-family:var(--f-display)}
 .ofp-floor{fill:color-mix(in srgb,var(--gold-soft) 55%,var(--surface))}.ofp-room{fill:color-mix(in srgb,var(--info-soft) 45%,var(--surface))}.ofp-room.alt{fill:color-mix(in srgb,var(--gold-soft) 85%,var(--surface))}
 .ofp-out{fill:none;stroke:var(--ink2);stroke-width:8}.ofp-wall{fill:none;stroke:var(--ink2);stroke-width:6;stroke-linecap:round}.ofp-door{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:4 4}.ofp-gap{stroke:color-mix(in srgb,var(--gold-soft) 55%,var(--surface));stroke-width:10}.ofp-div{stroke:var(--line);stroke-width:2;stroke-dasharray:6 6}
@@ -2047,7 +2056,7 @@ function ofFxReplay() { const L = document.getElementById('ofpFx'); if (!L) retu
     kf.sort((a, b) => a.offset - b.offset); kf[0].offset = 0; kf[kf.length - 1].offset = 1;
     const wait = f.t0 - now; const a = g.animate(kf.map((x, i) => ({ ...x, offset: Math.min(1, Math.max(i ? kf[i - 1].offset : 0, x.offset)) })), { duration: f.dur, delay: Math.max(0, wait), fill: 'both' }); if (wait < 0) a.currentTime = -wait;
     const c = g.querySelector('.ofp-carry'); if (c && f.holdAt) { const ca = c.animate([{ opacity: 1 }, { opacity: 1, offset: f.times[f.holdAt] / f.dur - f.hold / f.dur }, { opacity: 0, offset: Math.min(1, f.times[f.holdAt] / f.dur - f.hold / f.dur + 0.02) }, { opacity: 0 }], { duration: f.dur, delay: Math.max(0, wait), fill: 'both' }); if (wait < 0) ca.currentTime = -wait; } } }
-function ofPlanRefresh() { const el = document.querySelector('#t-office .of-plan'); if (el && OF_LAYOUT === 'floor' && OF_VIEW === 'office') { el.innerHTML = renderPlan(); ofFxReplay(); } }
+function ofPlanRefresh() { if (OF_LAYOUT === '3d' && OF_VIEW === 'office') return of3dSync(); const el = document.querySelector('#t-office .of-plan'); if (el && OF_LAYOUT === 'floor' && OF_VIEW === 'office') { el.innerHTML = renderPlan(); ofFxReplay(); } }
 // تكليف أو إحالة: يمشي المرسل إلى مكتب زميله ويسلّمه الورقة ثم يعود
 function ofFxVisit(a, b) { if (!OF_SEATS[a] || !OF_SEATS[b] || a === b || ofAway().has(a)) return; const [bx, by] = OF_SEATS[b]; const v = by < 200 ? [bx + 52, by + 120] : [bx + 46, by + 104];
   const to = ofRoute(ofExit(a), [v, ...ofExit(b).slice(1)]); const back = to.slice(0, -1).reverse(); ofWalk(a, [...to, ...back], { holdAt: to.length - 1, hold: 1100, paper: 1 }); }
@@ -2089,10 +2098,20 @@ function renderPlan() { const m = OFC.meet; const meetToday = m && ofKsaDay(m.at
   <div class="ofp-key"><span><i class="k-busy"></i>يعمل الآن</span><span><i class="k-wait"></i>ينتظر موافقتك</span><span><i class="k-idle"></i>متاح</span><span class="of-mut">اضغط على أي موظف لتفتح محادثته، وعلى غرفة الاجتماعات لمحضر اليوم</span></div>`; }
 function renderFloor() { const seen = new Set(OF_ZONES.flatMap(z => z[1])); const zones = OF_ZONES.map(([t, ks]) => [t, ks.filter(k => OF_EMPS[k])]); const rest = Object.keys(OF_EMPS).filter(k => !seen.has(k)); if (rest.length) zones[zones.length - 1][1].push(...rest);
   const L = ofNewSorted();
-  return `<div class="of-floor"><div class="of-fz"><div class="panel of-plan">${renderPlan()}</div>${renderMeet()}</div>
+  return `<div class="of-floor"><div class="of-fz">${OF_LAYOUT === '3d' ? '<div class="panel of-3d"><div class="o3-slot" id="of3dSlot"></div></div>' : `<div class="panel of-plan">${renderPlan()}</div>`}${renderMeet()}</div>
     <aside class="panel of-owner"><div class="ph"><div><h3 style="margin:0">صندوق المالك</h3><small>الأهم أولاً · ${L.length} بانتظارك</small></div></div>
       <ol class="of-ol">${L.length ? L.slice(0, 8).map(d => { const [pl, pc] = OF_PL(ofPrio(d)); return `<li><button class="of-oi" data-odid="${esc(d.id)}">${ofAv(d.emp)}<span><b>${esc(d.title || (OF_KIND[d.kind] || [d.kind])[0])}</b><small>${esc(ofEmp(d.emp).name)} · ${esc((OF_KIND[d.kind] || [d.kind])[0])}${d.targetName ? ' · ' + esc(d.targetName) : ''}</small></span><span class="pill ${pc}">${pl}</span></button></li>`; }).join('') : '<li class="of-mut">لا شيء بانتظارك الآن.</li>'}</ol>
       ${L.length > 8 ? `<button class="btn sm" data-of-f="new" style="margin:0 16px 14px">عرض الكل (${L.length})</button>` : ''}</aside></div>`; }
+// جولة ثلاثية الأبعاد: تُحمَّل عند الطلب، ويبقى المشهد حياً بين إعادات الرسم (نعيد تركيبه في مكانه بعد كل رسم)
+let OF3 = null, OF3P = null; const OF3_EL = document.createElement('div'); OF3_EL.className = 'o3-host';
+const of3dState = () => ({ sel: OF_EMP, meeting: OF_MEETING, attend: ofMeetSeats().map(x => x[0]), meetToday: !!(OFC.meet && ofKsaDay(OFC.meet.at) === ofKsaDay(nowIso())),
+  emps: Object.keys(OF_EMPS).map(k => { const e = ofEmp(k); return { k, name: e.name, role: e.role, look: OF_LOOK[k] || ['hair', '#4B5563'], status: ofStat(k)[0], n: OFC.drafts.filter(d => d.emp === k && d.status === 'new').length }; }) });
+async function of3dSync() { const slot = document.getElementById('of3dSlot'); if (!slot) return; slot.appendChild(OF3_EL);
+  try { if (!OF3) { if (!OF3P) { OF3_EL.innerHTML = '<div class="empty">جارٍ تجهيز المكتب…</div>'; OF3P = import('./office3d.js').then(M => { OF3_EL.innerHTML = '';
+      OF3 = M.mount(OF3_EL, { onPick: k => { OF_EMP = k; renderOffice(); const c = document.querySelector('#t-office .of-chat'); if (c) c.scrollIntoView({ behavior: ofRM() ? 'auto' : 'smooth', block: 'start' }); },
+        onMeet: () => { if (OFC.meet && ofKsaDay(OFC.meet.at) === ofKsaDay(nowIso())) { OF_MEETOPEN = true; renderOffice(); const m = document.querySelector('#t-office .of-meet'); if (m) m.scrollIntoView({ behavior: ofRM() ? 'auto' : 'smooth', block: 'start' }); } else if (!OF_MEETING) ofMeetNow(); } }); }); } await OF3P; }
+    OF3.update(of3dState()); }
+  catch (e) { console.error(e); OF3 = null; OF3P = null; OF3_EL.innerHTML = '<div class="empty">تعذر تشغيل الجولة ثلاثية الأبعاد على هذا الجهاز أو المتصفح. اختر عرض «المكتب».</div>'; } }
 // غرفة الاجتماعات: آخر اجتماع صباحي، وما قاله كل موظف، وخلاصة ماجد، والمالك يوجّه الفريق
 const ofKsaDay = iso => new Date(new Date(iso).getTime() + 3 * 3600e3).toISOString().slice(0, 10);
 function renderMeet() { const m = OFC.meet; const isToday = m && ofKsaDay(m.at) === ofKsaDay(nowIso()); const on = OFA && OFA.meet && OFA.meet.on !== false;
@@ -2126,8 +2145,8 @@ async function renderOffice() {
   box.innerHTML = views + `
   <div class="of-hero"><div><b>${allNew ? `${allNew} مسودة بانتظار اعتمادك` : 'لا شيء بانتظارك الآن'}</b><small>الموظفون يقرؤون بيانات المنصة ويكتبون المسودات، ولا يُرسل شيء لأي عميل إلا بضغطة منك.</small></div>
     <div class="of-hs"><span><b>${u.n}</b> مهمة اليوم</span><span><b>${OFC.queue.filter(x => x.status === 'queued').length}</b> في طابور البرمجة</span><button class="btn sm pri" id="ofDay" ${OF_BUSY.ceo ? 'disabled' : ''} title="ماجد يقرأ الوضع ويكلّف الفريق، والخبراء يراجعون كل مسودة">ابدأ يوم العمل</button><button class="btn sm" id="ofAll">تقرير من الجميع</button><button class="ib" id="ofAuto" title="إعدادات التشغيل التلقائي" aria-label="إعدادات التشغيل التلقائي">${svg('gear')}</button>
-    <span class="of-lay" role="group" aria-label="طريقة العرض">${[['cards', 'بطاقات'], ['floor', 'المكتب']].map(([k, l]) => `<button data-olay="${k}" aria-pressed="${OF_LAYOUT === k}" class="${OF_LAYOUT === k ? 'on' : ''}">${l}</button>`).join('')}</span></div></div>
-  ${OF_LAYOUT === 'floor' ? renderFloor() : [['الإدارة', k => OF_EMPS[k].mgmt], ['الفريق', k => !OF_EMPS[k].mgmt]].map(([g, f]) => `<div class="of-gl">${g}</div><div class="of-team${g === 'الإدارة' ? ' mg' : ''}">${Object.keys(OF_EMPS).filter(f).map(k => { const e = ofEmp(k); const n = pend(k); return `<button class="of-card${k === OF_EMP ? ' on' : ''}" data-oe="${k}">
+    <span class="of-lay" role="group" aria-label="طريقة العرض">${[['cards', 'بطاقات'], ['floor', 'المكتب'], ['3d', 'جولة في المكتب']].map(([k, l]) => `<button data-olay="${k}" aria-pressed="${OF_LAYOUT === k}" class="${OF_LAYOUT === k ? 'on' : ''}">${l}</button>`).join('')}</span></div></div>
+  ${OF_LAYOUT !== 'cards' ? renderFloor() : [['الإدارة', k => OF_EMPS[k].mgmt], ['الفريق', k => !OF_EMPS[k].mgmt]].map(([g, f]) => `<div class="of-gl">${g}</div><div class="of-team${g === 'الإدارة' ? ' mg' : ''}">${Object.keys(OF_EMPS).filter(f).map(k => { const e = ofEmp(k); const n = pend(k); return `<button class="of-card${k === OF_EMP ? ' on' : ''}" data-oe="${k}">
     ${ofAv(k)}<span class="of-nm"><b>${esc(e.name)}</b><small>${esc(e.role)}</small></span>${OF_BUSY[k] ? '<span class="of-st busy">يعمل الآن</span>' : n ? `<span class="of-st">${n} مسودة</span>` : '<span class="of-st idle">متاح</span>'}
     <span class="of-job">${esc(e.job)}</span>${OFC.reviews[k] ? `<span class="of-sc ${OFC.reviews[k].score >= 8 ? 'ok' : OFC.reviews[k].score >= 5 ? 'warn' : 'crit'}" title="آخر تقييم خبير">تقييم الخبير ${OFC.reviews[k].score}/10</span>` : ''}</button>`; }).join('')}</div>`).join('') + renderMeet()}
   <div class="of-two">${renderFeed()}${renderMsgs()}</div>
@@ -2147,7 +2166,7 @@ async function renderOffice() {
       <div class="of-drafts">${list.length ? list.slice(0, 60).map(ofDraft).join('') : '<div class="empty">لا توجد مسودات هنا. اطلب من أي موظف «تقرير اليوم».</div>'}</div></div>
   </div>
   <p class="of-foot">${u.n ? `استهلاك اليوم: ${u.n} مهمة · ${Math.round((u.in || 0) / 1000)} ألف رمز قراءة · ${Math.round((u.out || 0) / 1000)} ألف رمز كتابة.` : ''} يعمل المكتب بمفتاح الذكاء الاصطناعي في إعدادات Netlify.</p>`;
-  const m = $('#ofMsgs'); if (m) m.scrollTop = m.scrollHeight; badge('ofBadge', allNew, true); ofFxReplay();
+  const m = $('#ofMsgs'); if (m) m.scrollTop = m.scrollHeight; badge('ofBadge', allNew, true); ofFxReplay(); of3dSync();
 }
 let OF_RV = {};
 const ofCall = async body => { const tk = await auth.currentUser.getIdToken(); const r = await fetch('/.netlify/functions/office', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tk }, body: JSON.stringify(body) });
