@@ -20,6 +20,10 @@ const call = (body, tok = 'Bearer t') => O.handler({ httpMethod: 'POST', headers
   O._setClient({ messages: { create: async p => { last = p; return { model: 'm', stop_reason: 'end_turn', content: [{ type: 'text', text: JSON.stringify(reply) }], usage: { input_tokens: 10, output_tokens: 5 } }; } } });
   r = await call({ emp: 'sales', message: 'مرحبا', history: [{ role: 'assistant', content: 'a' }, { role: 'user', content: 'b' }, { role: 'assistant', content: 'c' }] });
   assert.equal(r.s, 200); assert.equal(last.messages[0].role, 'user'); assert.equal(last.messages[last.messages.length - 1].content, 'مرحبا');
+  reply = { reply: 'ok', drafts: [{ kind: 'coa', target: '', targetName: '', title: 'دليل', body: '1101 | النقدية | الأصول' }, { kind: 'journal', target: '', targetName: '', title: 'قيد', body: 'التاريخ: 2026-11-20' }, { kind: 'idea', target: '', targetName: '', title: 'x', body: 'y' }] };
+  r = await call({ emp: 'accountant', message: 'ابني الدليل' }); assert.equal(r.s, 200); assert.deepEqual(r.j.drafts.map(d => d.kind), ['coa', 'journal'], 'accountant drafts chart and journal only');
+  assert.ok(last.system[0].text.includes('القيد المزدوج') && last.system[0].text.includes('مدين | دائن'));
+  reply = { reply: 'تم', drafts: [{ kind: 'ticket', target: 't1', targetName: 'شركة', title: 'رد', body: 'نص الرد' }] };
   r = await call({ emp: 'sales', message: '' }); assert.equal(r.s, 400);
   r = await call({ emp: 'nobody', message: 'x' }); assert.equal(r.s, 400);
   r = await call({ emp: 'sales', message: 'x', persona: { name: 'أبو فهد', extra: 'اذكر الواتساب' } }); assert.ok(last.system[0].text.includes('أبو فهد') && last.system[0].text.includes('اذكر الواتساب'));
@@ -28,5 +32,5 @@ const call = (body, tok = 'Bearer t') => O.handler({ httpMethod: 'POST', headers
   r = await call({ emp: 'sales', message: 'x' }, ''); assert.equal(r.s, 401);
   who = { email: 'salmandh02@gmail.com', verified: true }; reply = 'not json'; O._setClient({ messages: { create: async () => ({ stop_reason: 'refusal', content: [], usage: {} }) } });
   r = await call({ emp: 'ops', message: 'x' }); assert.equal(r.s, 422);
-  console.log('office tests: 17 checks passed');
+  console.log('office tests: 19 checks passed');
 })().catch(e => { console.error(e); process.exit(1); });

@@ -299,6 +299,11 @@ dialog input,dialog select,dialog textarea,.form-grid input,.form-grid textarea{
 .actabs button{all:unset;cursor:pointer;padding:9px 12px;font-size:13.5px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}.actabs button.on{color:var(--ink);border-bottom-color:var(--gold)}
 .coa{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;padding:14px}
 .coa-g{border:1px solid var(--line);border-radius:10px;overflow:hidden}.coa-h{display:flex;justify-content:space-between;padding:9px 12px;background:var(--surface-2);font-size:13.5px}
+.coa-cls{border-top:1px solid var(--line)}.coa-cls:first-of-type{border-top:0}.coa-ch{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px 0}.coa-ch small{color:var(--muted)}
+.coa-a code,.mini-list code,.tw code{font:12px ui-monospace,monospace;color:var(--muted);direction:ltr;display:inline-block;min-width:34px}
+.je{border-top:1px solid var(--line);padding:10px 14px}.je-h{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px}.je-h span{flex:1}.je-h small{color:var(--muted)}
+.je-t{width:100%;border-collapse:collapse;font-size:13.5px}.je-t th,.je-t td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:start}.je-t th:not(:first-child),.je-t td:not(:first-child){width:110px}.je-t .tot td{font-weight:600}
+.je-rs{display:grid;gap:6px}.je-r{display:grid;grid-template-columns:1fr 100px 100px;gap:6px}.je-r select,.je-r input{min-width:0;font:inherit;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:inherit}
 .coa-a{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:7px 12px;border-top:1px solid var(--line);font-size:13.5px}.coa-a .lnk{font-size:12px}
 .mini-list.is>div{padding:8px 18px}.mini-list.is>div.h{background:var(--surface-2);font-weight:600}.mini-list.is>div.tot{background:var(--gold-soft)}
 .vtog{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2,var(--ink));padding:0 6px;cursor:pointer;white-space:nowrap}
@@ -1466,8 +1471,8 @@ const OF_EMPS = {
     sug: ['اكتب ردوداً لكل التذاكر المفتوحة', 'ما أكثر مشكلة تتكرر عند العملاء؟', 'أي تذكرة تأخرنا في الرد عليها؟'] },
   sales: { name: 'خالد', role: 'المبيعات', ic: 'building', tint: 'ok', job: 'يتابع طلبات التسجيل والتجارب ويكتب رسائل المتابعة',
     sug: ['من الشركات الأقرب للاشتراك هذا الأسبوع؟', 'اكتب رسائل متابعة للتجارب التي تنتهي قريباً', 'اقترح عرضاً للشركات المنتهية غير المجددة'] },
-  accountant: { name: 'نورة', role: 'المحاسبة', ic: 'book', tint: 'warn', job: 'تراجع الفواتير والتحصيل والمصروفات وتكتب تذكيرات السداد',
-    sug: ['لخّص الوضع المالي هذا الشهر', 'اكتب تذكيرات للفواتير المتأخرة', 'هل في المصروفات شيء غير معتاد؟'] },
+  accountant: { name: 'نورة', role: 'المحاسبة', ic: 'book', tint: 'warn', job: 'تبني دليل الحسابات وتجهّز القيود والميزانية وتتابع التحصيل',
+    sug: ['ابني الدليل المحاسبي الكامل لمسار', 'أودعت 50 ألف رأس مال في البنك، جهّزي القيد', 'لخّصي المركز المالي والميزانية هذا الشهر', 'اكتب تذكيرات للفواتير المتأخرة'] },
   marketing: { name: 'فهد', role: 'التسويق', ic: 'mega', tint: 'violet', job: 'يكتب منشورات وإعلانات ورسائل حملات للمنصة',
     sug: ['اكتب 3 منشورات لينكدإن لهذا الأسبوع', 'اكتب نص إعلان قصير لشركات التأجير', 'اقترح خطة محتوى لشهر كامل'] },
   ideas: { name: 'عمر', role: 'التطوير والأفكار', ic: 'chart', tint: 'info', job: 'يبحث ويحلل ويعرض عليك مقترحات تطوير المنصة وسير العمل',
@@ -1477,7 +1482,7 @@ const OF_EMPS = {
   ops: { name: 'ريم', role: 'تحليل العمليات', ic: 'pulse', tint: 'crit', job: 'ترصد الشركات الخاملة والمعرضة للإلغاء وتقترح الإجراء',
     sug: ['من الشركات المعرضة لعدم التجديد ولماذا؟', 'أي شركة تحتاج تدريباً؟', 'لخّص استخدام النظام هذا الأسبوع'] }
 };
-const OF_KIND = { idea: ['مقترح تطوير', 'p-info'], bug: ['خلل للمبرمج', 'p-crit'], dev: ['طلب تنفيذ', 'p-pending'], ticket: ['رد على تذكرة', 'p-info'], message: ['رسالة لعميل', 'p-ok'], note: ['ملاحظة في ملف الشركة', 'p-off'], post: ['محتوى تسويقي', 'p-pending'], task: ['مهمة مقترحة', 'p-warn'], report: ['تقرير', 'p-off'] };
+const OF_KIND = { coa: ['دليل حسابات', 'p-info'], journal: ['قيد يومية', 'p-pending'], idea: ['مقترح تطوير', 'p-info'], bug: ['خلل للمبرمج', 'p-crit'], dev: ['طلب تنفيذ', 'p-pending'], ticket: ['رد على تذكرة', 'p-info'], message: ['رسالة لعميل', 'p-ok'], note: ['ملاحظة في ملف الشركة', 'p-off'], post: ['محتوى تسويقي', 'p-pending'], task: ['مهمة مقترحة', 'p-warn'], report: ['تقرير', 'p-off'] };
 let OF_LOAD = null; let OFC = null, OF_EMP = 'support', OF_F = 'new', OF_BUSY = {};
 const ofEmp = k => ({ ...OF_EMPS[k], ...((OFC && OFC.persona && OFC.persona[k]) || {}) });
 async function loadOffice() { return OF_LOAD || (OF_LOAD = loadOffice0()); }
@@ -1532,6 +1537,11 @@ async function ofData(emp) {
     d.أكبر_القيود_الأخيرة = (B.expenses || []).filter(x => String(x.date) >= from).sort((a, b) => (+b.amount || 0) - (+a.amount || 0)).slice(0, 15).map(x => ({ التاريخ: x.date, البند: accOf(x.acc).name, الوصف: cut(x.desc, 80), المبلغ: x.amount }));
     d.الموظفون_على_المسير = (B.employees || []).filter(e => e.active !== false).length;
     d.المسيرات = Object.fromEntries(Object.entries(B.payrolls || {}).sort().slice(-4).map(([m, p]) => [m, p && p.total != null ? p.total : 'معتمد']));
+    d.مجموعات_الحسابات = Object.entries(AGRP).map(([g, l]) => `${clsOf(g)} · ${l}`);
+    const cum = balances('', today());
+    d.دليل_الحسابات_الحالي = accSort(B.accounts).map(a => ({ الرمز: a.code, الاسم: a.name, المجموعة: AGRP[a.grp], الرصيد: natBal(a, cum[a.id]) }));
+    d.قيود_اليومية_الأخيرة = (B.journal || []).slice(-15).map(j => ({ التاريخ: j.date, البيان: j.desc, الأطراف: j.lines.map(l => `${accLbl(accOf(l.acc))}: ${+l.dr ? 'مدين ' + l.dr : 'دائن ' + l.cr}`) }));
+    d.الترحيل_التلقائي = 'الفواتير المدفوعة: من حـ/1102 البنك إلى حـ/4101 إيرادات الاشتراكات و2104 ضريبة المخرجات. المصروفات والإيرادات المسجلة في القيود تُرحّل تلقائياً على البنك (أو الصندوق إذا كانت نقداً). لا تكرري قيداً لهذه.';
   }
   if (emp === 'marketing') {
     const vs = live.reduce((t, c) => t + (+(STATS[c.id] || {}).vehicles || 0), 0); const cities = {}; live.forEach(c => { const x = (c.profile || {}).city; if (x) cities[x] = (cities[x] || 0) + 1; });
@@ -1635,7 +1645,9 @@ function ofDraft(d) {
   const done = d.status !== 'new'; const p = (c && c.profile) || {}; const wa = c && waNum(p.contactMobile || c.phone || p.companyPhone); const mail = c && (p.officialEmail || c.ownerEmail);
   let acts = '';
   if (!done) {
-    if (d.kind === 'idea') acts = `<button class="btn sm pri" data-od="queue">اعتماد وإحالة للمبرمج</button>`;
+    if (d.kind === 'coa') acts = `<button class="btn sm pri" data-od="coa">اعتماد وتطبيق على الدليل</button>`;
+    else if (d.kind === 'journal') acts = `<button class="btn sm pri" data-od="jpost">اعتماد وترحيل القيد</button>`;
+    else if (d.kind === 'idea') acts = `<button class="btn sm pri" data-od="queue">اعتماد وإحالة للمبرمج</button>`;
     else if (d.kind === 'bug') acts = `<button class="btn sm pri" data-od="queue">إحالة للمبرمج</button>`;
     else if (d.kind === 'dev') acts = `<button class="btn sm pri" data-od="copydev">نسخ طلب التنفيذ</button><button class="btn sm" data-od="built">تم التنفيذ</button>`;
     else if (d.kind === 'ticket') acts = tk ? `<button class="btn sm pri" data-od="send">إرسال الرد للعميل</button>` : '<small class="of-warn">التذكرة غير موجودة</small>';
@@ -1645,7 +1657,7 @@ function ofDraft(d) {
     acts += `<button class="btn sm" data-od="skip">تجاهل</button>`;
   }
   return `<article class="of-d${done ? ' done' : ''}" data-did="${esc(d.id)}"><header>${ofAv(d.emp)}<div><span class="pill ${kc}">${kl}</span> <b>${esc(d.title || '')}</b><small>${esc(e.name)} · ${esc(d.targetName || (c && c.name) || (tk && tk.companyName) || '')} · ${esc(String(d.at || '').slice(0, 16).replace('T', ' '))}</small></div>
-    ${done ? `<span class="pill ${d.status === 'skip' ? 'p-off' : 'p-ok'}">${d.status === 'skip' ? 'تم تجاهلها' : d.status === 'queued' ? 'أُحيلت للمبرمج' : d.status === 'built' ? 'نُفّذت' : 'معتمدة'}</span>` : ''}</header>
+    ${done ? `<span class="pill ${d.status === 'skip' ? 'p-off' : 'p-ok'}">${d.status === 'skip' ? 'تم تجاهلها' : d.status === 'queued' ? 'أُحيلت للمبرمج' : d.status === 'built' ? 'نُفّذت' : d.status === 'posted' ? 'رُحّلت للدفاتر' : 'معتمدة'}</span>` : ''}</header>
     ${done ? `<div class="of-body">${esc(d.body)}</div>` : `<textarea class="of-ed" rows="${Math.min(10, Math.max(3, String(d.body).split("\n").length + Math.ceil(String(d.body).length / 80)))}">${esc(d.body)}</textarea>`}
     ${acts ? `<div class="of-acts">${acts}</div>` : ''}</article>`;
 }
@@ -1657,6 +1669,16 @@ async function ofAct(d, a, body) {
       notify({ action: 'ticket', ticketId: t.id, text: body }); plog('رد على تذكرة (مسودة ' + E.name + ')', `${t.companyName} · ${t.subject}`); toast('أُرسل الرد للعميل ✓'); loadTk(); }
     catch (x) { return toast('تعذر الإرسال'); } }
   if (a === 'note') { try { await F.addDoc(F.collection(fs, 'crm'), { cid: d.target, kind: 'ملاحظة', text: body, by: ME.email, byName: (ME.name || '') + ' · ' + E.name, at: now }); toast('حُفظت في ملف الشركة ✓'); } catch (x) { return toast('تعذر الحفظ'); } }
+  if (a === 'coa' || a === 'jpost') { if (BOOKS === null) await loadBooks();
+    if (a === 'coa') { const { out } = parseCoa(body); if (!out.length) return toast('لم أجد حسابات بالصيغة: الرمز | الاسم | المجموعة'); let add = 0, upd = 0;
+      out.forEach(x => { const e = BOOKS.accounts.find(y => String(y.code) === x.code) || BOOKS.accounts.find(y => y.name === x.name);
+        if (e) { if (e.name !== x.name || e.grp !== x.grp || String(e.code) !== x.code) { if (!BOOKS.accounts.some(y => y !== e && String(y.code) === x.code)) e.code = x.code; e.name = x.name; e.grp = x.grp; upd++; } }
+        else { BOOKS.accounts.push({ id: uid('a'), code: x.code, name: x.name, grp: x.grp }); add++; } });
+      codeAccounts(); if (!(await saveBooks(`الدليل: أُضيف ${add} وعُدّل ${upd} ✓`))) return; plog('اعتماد دليل الحسابات (مسودة ' + E.name + ')', `${add} جديد · ${upd} معدل`); }
+    else { const j = parseJe(body); if (j.bad.length) return toast('حسابات غير موجودة في الدليل: ' + j.bad.slice(0, 3).join('، ')); const err = jeCheck(j.lines); if (err) return toast(err);
+      BOOKS.journal.push({ id: uid('j'), date: j.date, branch: 'hq', desc: j.desc || d.title || '', lines: j.lines, by: ME.email, byName: (ME.name || '') + ' · ' + E.name, at: now, draft: d.id });
+      if (!(await saveBooks('رُحّل القيد ✓'))) { BOOKS.journal.pop(); return; } plog('ترحيل قيد يومية (مسودة ' + E.name + ')', j.desc || d.title || '', `${r2(sum(j.lines, l => l.dr))} ريال`); }
+    d.status = 'posted'; d.doneAt = now; await saveOffice(); if (TAB === 'accounting') renderAccounting(); return renderOffice(); }
   if (a === 'queue') { OFC.queue.push({ id: uid('q'), from: d.kind, src: d.id, title: d.title || cut(body, 80), body, status: 'queued', at: now }); d.status = 'queued'; d.doneAt = now;
     await saveOffice(); plog(d.kind === 'idea' ? 'اعتماد مقترح تطوير' : 'إحالة عطل للمبرمج', d.title || ''); toast('أُحيل إلى ياسر في طابور البرمجة ✓'); return renderOffice(); }
   if (a === 'copydev') { try { await navigator.clipboard.writeText(`نفّذ في منصة ${APP_NAME_OF()} (لوحة المالك admin.html وتطبيق الشركات index.html):\n\n${d.title ? d.title + '\n' : ''}${body}`); toast('نُسخ طلب التنفيذ. الصقه لـClaude في محادثة المشروع'); } catch (x) { toast('تعذر النسخ'); } return saveOffice(); }
@@ -1689,12 +1711,20 @@ $('#t-office').addEventListener('input', e => { if (!e.target.classList.contains
 /* ---------- 6) نظام المحاسبة الداخلي (platform/books) ---------- */
 // المستند الواحد يحمل: دليل الحسابات، الفروع، الموظفين، المسيّرات، المصروفات الثابتة، والقيود (expenses)
 let BOOKS = null, AC_P = 'm0', AC_V = 'over', AC_F = { kind: '', acc: '', br: '', q: '' };
-const AGRP = { pay: 'الرواتب والأجور', branch: 'الفروع والمقرات والسكن', ops: 'التشغيل والتقنية', mkt: 'التسويق والمبيعات', gov: 'الرسوم الحكومية والزكاة', fin: 'الرسوم البنكية والمالية', other: 'مصروفات أخرى', inc: 'إيرادات أخرى' };
+const AGRP = { ast: 'الأصول', lia: 'الخصوم', eq: 'حقوق الملكية', inc: 'الإيرادات', pay: 'الرواتب والأجور', branch: 'الفروع والمقرات والسكن', ops: 'التشغيل والتقنية', mkt: 'التسويق والمبيعات', gov: 'الرسوم الحكومية والزكاة', fin: 'الرسوم البنكية والمالية', other: 'مصروفات أخرى' };
+const BSG = ['ast', 'lia', 'eq'], EXPG = ['pay', 'branch', 'ops', 'mkt', 'gov', 'fin', 'other'];
+const GCLS = { ast: 1, lia: 2, eq: 3, inc: 4 }; const clsOf = g => GCLS[g] || 5; const CLS_N = { 1: 'الأصول', 2: 'الخصوم', 3: 'حقوق الملكية', 4: 'الإيرادات', 5: 'المصروفات' };
+const GBASE = { ast: 1100, lia: 2100, eq: 3100, inc: 4100, pay: 5100, branch: 5200, ops: 5300, mkt: 5400, gov: 5500, fin: 5600, other: 5900 };
 const ACC0 = { pay: ['الراتب الأساسي', 'بدل السكن', 'بدل النقل', 'بدلات أخرى ومكافآت', 'التأمينات الاجتماعية (GOSI)', 'التأمين الطبي', 'الإقامات والتأشيرات ورخص العمل', 'تذاكر السفر', 'مكافأة نهاية الخدمة'],
   branch: ['إيجار المقر والفروع', 'سكن الموظفين', 'الكهرباء والماء', 'الإنترنت والاتصالات', 'الصيانة والنظافة', 'الأثاث والمستلزمات المكتبية'],
   ops: ['الاستضافة والخوادم', 'الاشتراكات والبرمجيات', 'الذكاء الاصطناعي', 'الأجهزة والمعدات', 'الاستشارات والخدمات المهنية', 'المواصلات والوقود'],
   mkt: ['الإعلانات الرقمية', 'العمولات', 'المعارض والمطبوعات', 'الضيافة والهدايا'], gov: ['السجل التجاري والغرفة', 'البلدية والرخص', 'الزكاة', 'رسوم حكومية أخرى'],
-  fin: ['رسوم بوابة الدفع', 'الرسوم البنكية'], other: ['مصروفات متنوعة'], inc: ['إيرادات خدمات واستشارات', 'إيرادات متنوعة'] };
+  fin: ['رسوم بوابة الدفع', 'الرسوم البنكية'], other: ['مصروفات متنوعة', 'مصروف الإهلاك'], inc: ['إيرادات خدمات واستشارات', 'إيرادات متنوعة'] };
+// حسابات الميزانية بأرقام ثابتة، وتُستخدم في الترحيل التلقائي (البنك، الصندوق، الضريبة، إيرادات الاشتراكات)
+const ACC_BS = [['ast1', '1101', 'النقدية في الصندوق'], ['ast2', '1102', 'البنك'], ['ast3', '1103', 'العملاء (ذمم مدينة)'], ['ast4', '1104', 'ضريبة القيمة المضافة - مدخلات'], ['ast5', '1105', 'مصروفات مدفوعة مقدماً'], ['ast6', '1106', 'سلف وعهد الموظفين'], ['ast7', '1201', 'الأجهزة والمعدات'], ['ast8', '1202', 'الأثاث والتجهيزات'], ['ast9', '1209', 'مجمع الإهلاك'],
+  ['lia1', '2101', 'الموردون (ذمم دائنة)'], ['lia2', '2102', 'رواتب مستحقة'], ['lia3', '2103', 'التأمينات الاجتماعية المستحقة'], ['lia4', '2104', 'ضريبة القيمة المضافة - مخرجات'], ['lia5', '2105', 'إيرادات مقدمة'], ['lia6', '2106', 'مصروفات مستحقة'], ['lia7', '2201', 'قروض طويلة الأجل'], ['lia8', '2202', 'مخصص مكافأة نهاية الخدمة'],
+  ['eq1', '3101', 'رأس المال'], ['eq2', '3102', 'جاري المالك'], ['eq3', '3103', 'الأرباح المحتجزة'], ['inc0', '4101', 'إيرادات الاشتراكات']];
+const ACC_DEF = () => [...ACC_BS.map(([id, code, name]) => ({ id, code, name, grp: id.replace(/\d+$/, '') })), ...Object.entries(ACC0).flatMap(([g, L]) => L.map((n, i) => ({ id: g + (i + 1), name: n, grp: g })))];
 const PAYC = [['basic', 'الراتب الأساسي'], ['housing', 'بدل السكن'], ['transport', 'بدل النقل'], ['other', 'بدلات أخرى ومكافآت']];
 const METH = ['تحويل بنكي', 'نقداً', 'بطاقة', 'خصم مباشر'];
 const AC_PER = () => { const t = today(), y = +t.slice(0, 4), m = +t.slice(5, 7); const q0 = Math.floor((m - 1) / 3) * 3 + 1; const pad = n => String(n).padStart(2, '0');
@@ -1707,19 +1737,45 @@ const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(
 async function loadBooks() {
   try { const s = await F.getDoc(F.doc(fs, 'platform', 'books')); BOOKS = s.exists() ? s.data() : {}; } catch (e) { BOOKS = {}; toast('تعذر تحميل الدفاتر'); }
   const B = BOOKS; B.expenses = B.expenses || []; B.branches = B.branches || []; B.employees = B.employees || []; B.recurring = B.recurring || []; B.payrolls = B.payrolls || {};
-  if (!B.accounts || !B.accounts.length) B.accounts = Object.entries(ACC0).flatMap(([g, L]) => L.map((n, i) => ({ id: g + (i + 1), name: n, grp: g })));
+  B.journal = B.journal || [];
+  if (!B.accounts || !B.accounts.length) B.accounts = ACC_DEF();
+  else ACC_DEF().forEach(a => { if (!B.accounts.some(x => x.id === a.id || x.name === a.name)) B.accounts.push(a); });
+  B.accounts.forEach(a => { if (!AGRP[a.grp]) a.grp = 'other'; });
+  codeAccounts();
   if (!B.branches.length) B.branches = [{ id: 'hq', name: 'المقر الرئيسي', city: '' }];
   // قيود أقدم مسجلة باسم البند فقط
   B.expenses.forEach(x => { if (!x.acc) { const a = B.accounts.find(a => a.name === x.cat) || B.accounts.find(a => x.cat && a.name.includes(String(x.cat).split(' ')[0])); x.acc = a ? a.id : 'other1'; } if (!x.kind) x.kind = 'exp'; if (!x.branch) x.branch = 'hq'; });
 }
 async function saveBooks(msg) {
-  const B = BOOKS; try { await F.setDoc(F.doc(fs, 'platform', 'books'), { expenses: B.expenses, accounts: B.accounts, branches: B.branches, employees: B.employees, recurring: B.recurring, payrolls: B.payrolls, updatedAt: nowIso() }, { merge: true }); if (msg) toast(msg); return true; }
+  const B = BOOKS; try { await F.setDoc(F.doc(fs, 'platform', 'books'), { expenses: B.expenses, journal: B.journal, accounts: B.accounts, branches: B.branches, employees: B.employees, recurring: B.recurring, payrolls: B.payrolls, updatedAt: nowIso() }, { merge: true }); if (msg) toast(msg); return true; }
   catch (e) { toast('تعذر الحفظ: ' + (e.code || e.message)); return false; }
 }
 const accOf = id => BOOKS.accounts.find(a => a.id === id) || { id, name: 'غير مصنف', grp: 'other' };
+// ترقيم الحسابات: 1 أصول، 2 خصوم، 3 حقوق ملكية، 4 إيرادات، 5 مصروفات
+function codeAccounts() { const A = BOOKS.accounts; Object.keys(GBASE).forEach(g => { let mx = Math.max(GBASE[g], ...A.filter(a => a.grp === g && a.code).map(a => +a.code || 0)); A.filter(a => a.grp === g && !a.code).forEach(a => { a.code = String(++mx); }); }); }
+const accSort = L => L.slice().sort((a, b) => String(a.code).localeCompare(String(b.code)));
+const accLbl = a => `${a.code ? a.code + ' · ' : ''}${a.name}`;
+const accByRef = r => { r = String(r || '').trim(); const c = (r.match(/^\d{3,6}/) || [])[0]; return (c && BOOKS.accounts.find(a => String(a.code) === c)) || BOOKS.accounts.find(a => a.name === r.replace(/^\d+\s*[·.-]?\s*/, '')) || null; };
+// كل الحركات بالقيد المزدوج: الفواتير المدفوعة، المصروفات والإيرادات المسجلة، وقيود اليومية
+function postings(from, to) {
+  const inR = d => d && (!from || d >= from) && (!to || d <= to); const out = []; const P = (acc, dr, cr, d) => { if (r2(dr) || r2(cr)) out.push({ acc, dr: r2(dr), cr: r2(cr), d }); };
+  const cashOf = m => m === 'نقداً' ? 'ast1' : 'ast2';
+  INVS.filter(i => i.status === 'paid').forEach(i => { const d = String(i.paidAt || i.issueDate || '').slice(0, 10); if (!inR(d)) return; P('ast2', +i.total || 0, 0, d); P('inc0', 0, +i.subtotal || 0, d); P('lia4', 0, +i.vat || 0, d); });
+  BOOKS.expenses.forEach(x => { if (!inR(x.date)) return; const a = +x.amount || 0, v = +x.vat || 0;
+    if (x.kind === 'inc') { P(cashOf(x.method), a + v, 0, x.date); P(x.acc, 0, a, x.date); P('lia4', 0, v, x.date); }
+    else { if (vatOn()) { P(x.acc, a, 0, x.date); P('ast4', v, 0, x.date); } else P(x.acc, a + v, 0, x.date); P(cashOf(x.method), 0, a + v, x.date); } });
+  BOOKS.journal.forEach(j => { if (inR(j.date)) j.lines.forEach(l => P(l.acc, +l.dr || 0, +l.cr || 0, j.date)); });
+  return out;
+}
+const balances = (from, to) => { const m = {}; postings(from, to).forEach(p => { const x = m[p.acc] = m[p.acc] || { dr: 0, cr: 0 }; x.dr += p.dr; x.cr += p.cr; }); return m; };
+const natBal = (a, b) => { if (!b) return 0; const n = b.dr - b.cr; return [1, 5].includes(clsOf(a.grp)) ? r2(n) : r2(-n); };
+// قيود اليومية التي تمس الإيرادات والمصروفات تظهر في قائمة الدخل والفروع والتقارير
+const jPseudo = () => BOOKS.journal.flatMap(j => j.lines.map(l => { const a = accOf(l.acc); const c = clsOf(a.grp); if (c < 4) return null;
+  return { id: '', kind: c === 4 ? 'inc' : 'exp', date: j.date, acc: l.acc, branch: j.branch || 'hq', desc: j.desc, amount: r2(c === 4 ? (+l.cr || 0) - (+l.dr || 0) : (+l.dr || 0) - (+l.cr || 0)), vat: 0, src: 'j:' + j.id }; }).filter(Boolean));
+const allEnts = () => [...BOOKS.expenses, ...jPseudo()];
 const brOf = id => BOOKS.branches.find(b => b.id === id) || { id, name: 'عام' };
 const ecost = x => +x.amount + (vatOn() ? 0 : +x.vat || 0);
-const accSel = (cur, kind) => { const gs = kind === 'inc' ? ['inc'] : Object.keys(AGRP).filter(g => g !== 'inc'); return gs.map(g => `<optgroup label="${AGRP[g]}">${BOOKS.accounts.filter(a => a.grp === g).map(a => `<option value="${a.id}" ${a.id === cur ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}</optgroup>`).join(''); };
+const accSel = (cur, kind) => { const gs = kind === 'inc' ? ['inc'] : kind === 'all' ? Object.keys(AGRP) : EXPG; return gs.map(g => `<optgroup label="${AGRP[g]}">${accSort(BOOKS.accounts.filter(a => a.grp === g)).map(a => `<option value="${a.id}" ${a.id === cur ? 'selected' : ''}>${esc(accLbl(a))}</option>`).join('')}</optgroup>`).join(''); };
 const brSel = cur => BOOKS.branches.map(b => `<option value="${b.id}" ${b.id === cur ? 'selected' : ''}>${esc(b.name)}</option>`).join('');
 const gosiOf = e => r2(Math.min(45000, (+e.basic || 0) + (+e.housing || 0)) * (e.saudi ? 11.75 : 2) / 100);
 const grossOf = e => PAYC.reduce((t, [k]) => t + (+e[k] || 0), 0);
@@ -1727,7 +1783,7 @@ const fld = 'style="font:inherit;padding:9px 11px;border:1px solid var(--line);b
 
 function acData() {
   const P = AC_PER(); const [pl, from, to] = P[AC_P]; const inP = d => d && d.slice(0, 10) >= from && d.slice(0, 10) <= to;
-  const inv = INVS.filter(i => i.status === 'paid' && inP(i.paidAt || i.issueDate)); const E = BOOKS.expenses.filter(x => inP(x.date));
+  const inv = INVS.filter(i => i.status === 'paid' && inP(i.paidAt || i.issueDate)); const E = allEnts().filter(x => inP(x.date));
   const exp = E.filter(x => x.kind !== 'inc'), oinc = E.filter(x => x.kind === 'inc');
   const subRev = sum(inv, i => i.subtotal), othRev = sum(oinc, x => x.amount), rev = subRev + othRev, cost = sum(exp, ecost);
   const outVat = sum(inv, i => i.vat) + sum(oinc, x => x.vat), inVat = sum(exp, x => x.vat);
@@ -1737,7 +1793,7 @@ async function renderAccounting() {
   const box = $('#t-accounting');
   if (BOOKS === null) { box.innerHTML = '<div class="panel"><div class="empty">جارٍ التحميل…</div></div>'; await loadBooks(); }
   const P = AC_PER(); const D = acData();
-  const VIEWS = [['over', 'نظرة عامة'], ['led', 'القيود'], ['pay', 'الرواتب'], ['br', 'الفروع'], ['rec', 'المصروفات الثابتة'], ['coa', 'دليل الحسابات'], ['rep', 'التقارير']];
+  const VIEWS = [['over', 'نظرة عامة'], ['led', 'القيود'], ['jr', 'قيود اليومية'], ['pay', 'الرواتب'], ['br', 'الفروع'], ['rec', 'المصروفات الثابتة'], ['coa', 'دليل الحسابات'], ['bs', 'الميزانية'], ['rep', 'التقارير']];
   box.innerHTML = `<div class="actabs" id="acTabs">${VIEWS.map(([k, l]) => `<button data-av="${k}" class="${k === AC_V ? 'on' : ''}">${l}</button>`).join('')}</div>
     <div class="head" style="margin-top:-4px"><div class="seg" id="acSeg">${Object.entries(P).map(([k, [l]]) => `<button data-ap="${k}" class="${k === AC_P ? 'on' : ''}">${l}</button>`).join('')}</div>
       <div class="acts"><label class="vtog" title="عند الإيقاف: الفواتير الجديدة بدون ضريبة، ولا يظهر ملخص الإقرار"><span class="sw2 ${vatOn() ? 'on' : ''}" data-ac="vat"></span>الضريبة ${vatOn() ? vatRate() + '%' : 'غير مفعّلة'}</label>
@@ -1748,7 +1804,7 @@ async function renderAccounting() {
 }
 const kpi = (v, l, c) => `<div class="kpi"><b ${c ? `style="color:${c}"` : ''}>${v}</b><span>${l}</span></div>`;
 const bars = (L, col) => { const mx = Math.max(1, ...L.map(x => x[1])); return L.length ? `<div class="mini-list">${L.map(([n, v, s]) => `<div class="cat"><span>${esc(n)}${s ? ` <small>${esc(s)}</small>` : ''}</span><span class="cbar"><i style="width:${v / mx * 100}%;${col ? 'background:' + col : ''}"></i></span><b>${money(v)}</b></div>`).join('')}</div>` : '<div class="empty">لا توجد مصروفات في هذه الفترة</div>'; };
-const byGrp = exp => Object.keys(AGRP).filter(g => g !== 'inc').map(g => [AGRP[g], sum(exp.filter(x => accOf(x.acc).grp === g), ecost)]).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
+const byGrp = exp => EXPG.map(g => [AGRP[g], sum(exp.filter(x => accOf(x.acc).grp === g), ecost)]).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
 const byBr = exp => BOOKS.branches.map(b => [b.name, sum(exp.filter(x => (x.branch || 'hq') === b.id), ecost), b.city]).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
 const vt = () => vatOn() ? ' (قبل الضريبة)' : '';
 const AV = {
@@ -1767,7 +1823,7 @@ const AV = {
       : `<div class="panel"><div class="ph"><h3>ضريبة القيمة المضافة غير مفعّلة</h3><span class="pill p-off">غير مسجّل</span></div><div class="roles" style="font-size:14px">الفواتير الجديدة تصدر «فاتورة» بدون ضريبة ولا رمز QR، وأي ضريبة تدفعها للموردين تُحسب ضمن تكلفة المصروف. عند التسجيل في الهيئة (إلزامي إذا تجاوزت الإيرادات 375,000 ريال خلال 12 شهراً) أدخل الرقم الضريبي في الإعدادات ثم فعّل الزر.</div></div>`}`; },
   led: D => `<div class="panel"><div class="bar"><input type="search" data-lf="q" placeholder="بحث في البيان أو المورد" value="${esc(AC_F.q)}">
       <select data-lf="kind"><option value="">كل القيود</option><option value="inv" ${AC_F.kind === 'inv' ? 'selected' : ''}>فواتير الاشتراكات</option><option value="inc" ${AC_F.kind === 'inc' ? 'selected' : ''}>إيرادات أخرى</option><option value="exp" ${AC_F.kind === 'exp' ? 'selected' : ''}>مصروفات</option></select>
-      <select data-lf="acc"><option value="">كل الحسابات</option>${accSel(AC_F.acc).replace(/<optgroup label="([^"]+)">/g, '<optgroup label="$1">')}${`<optgroup label="${AGRP.inc}">${BOOKS.accounts.filter(a => a.grp === 'inc').map(a => `<option value="${a.id}" ${a.id === AC_F.acc ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}</optgroup>`}</select>
+      <select data-lf="acc"><option value="">كل الحسابات</option>${accSel(AC_F.acc, 'inc')}${accSel(AC_F.acc)}</select>
       <select data-lf="br"><option value="">كل الفروع</option>${brSel(AC_F.br)}</select><button class="btn" data-ac="csv">تصدير Excel</button></div>
     <div class="tw"><table><thead><tr><th>التاريخ</th><th>النوع</th><th>الحساب</th><th>الفرع</th><th>البيان</th><th>المبلغ</th>${vatOn() ? '<th>الضريبة</th>' : ''}<th></th></tr></thead><tbody id="ledT">${ledRows(D)}</tbody></table></div></div>`,
   pay: () => { const L = BOOKS.employees; const act = L.filter(e => e.active !== false); const mp = ymOf(today()); const done = BOOKS.payrolls[mp];
@@ -1790,12 +1846,32 @@ const AV = {
     ${BOOKS.recurring.length ? BOOKS.recurring.map(r => `<tr style="${r.on === false ? 'opacity:.5' : ''}"><td><b>${esc(r.desc || accOf(r.acc).name)}</b><small>${esc(r.vendor || '')}</small></td><td>${esc(accOf(r.acc).name)}</td><td>${esc(brOf(r.branch).name)}</td><td>${money(r.amount)}${+r.vat ? ` <small>+ ضريبة ${money(r.vat)}</small>` : ''}</td><td>${esc(r.day || 1)}</td>
       <td>${BOOKS.expenses.some(x => x.src === `rec:${r.id}:${mp}`) ? '<span class="pill p-ok">مُرحّل</span>' : r.on === false ? '<span class="pill p-off">موقوف</span>' : '<span class="pill p-warn">لم يُرحّل</span>'}</td><td><button class="btn sm" data-ac="rec-edit" data-id="${r.id}">تعديل</button></td></tr>`).join('')
       : '<tr><td colspan="7" class="empty">أضف المصروفات المتكررة (إيجار الفرع، سكن الموظفين، الاستضافة…) ثم رحّلها كل شهر بضغطة واحدة.</td></tr>'}</tbody></table></div></div>`; },
-  coa: D => `<div class="panel"><div class="bar"><h3 style="flex:1">دليل الحسابات</h3><button class="btn pri" data-ac="acc-new">إضافة حساب</button></div>
-    <div class="coa">${Object.entries(AGRP).map(([g, gl]) => { const A = BOOKS.accounts.filter(a => a.grp === g); const src = g === 'inc' ? D.oinc : D.exp; const gt = sum(src.filter(x => accOf(x.acc).grp === g), ecost);
-      return `<div class="coa-g"><div class="coa-h"><b>${gl}</b><span>${money(gt)}</span></div>${A.map(a => `<div class="coa-a"><span>${esc(a.name)}</span><span>${money(sum(src.filter(x => x.acc === a.id), ecost))}</span><button class="lnk" data-ac="acc-edit" data-id="${a.id}">تعديل</button></div>`).join('')}</div>`; }).join('')}</div>
-    <div class="roles">المبالغ للفترة المختارة. تقدر تضيف حسابات جديدة أو تعيد تسميتها، والقيود السابقة تبقى مرتبطة بها.</div></div>`,
+  coa: D => { const mv = balances(D.from, D.to), cum = balances('', D.to);
+    return `<div class="panel"><div class="bar"><h3 style="flex:1">دليل الحسابات <small style="color:var(--muted);font-weight:400">${BOOKS.accounts.length} حساباً</small></h3><button class="btn" data-ac="ask-coa">اطلب من نورة مراجعته</button><button class="btn pri" data-ac="acc-new">إضافة حساب</button></div>
+    ${[1, 2, 3, 4, 5].map(c => { const gs = Object.keys(AGRP).filter(g => clsOf(g) === c); const bsC = c < 4; const src = bsC ? cum : mv;
+      return `<div class="coa-cls"><div class="coa-ch"><b>${c} · ${CLS_N[c]}</b><small>${bsC ? 'الرصيد حتى ' + D.to : 'حركة ' + D.pl}</small></div><div class="coa">${gs.map(g => { const A = accSort(BOOKS.accounts.filter(a => a.grp === g));
+        return `<div class="coa-g"><div class="coa-h"><b>${AGRP[g]}</b><span>${money(sum(A, a => natBal(a, src[a.id])))}</span></div>${A.map(a => `<div class="coa-a"><span><code>${esc(a.code || '')}</code> ${esc(a.name)}</span><span>${money(natBal(a, src[a.id]))}</span><button class="lnk" data-ac="acc-edit" data-id="${a.id}">تعديل</button></div>`).join('')}</div>`; }).join('')}</div></div>`; }).join('')}
+    <div class="roles">الترقيم: 1 الأصول، 2 الخصوم، 3 حقوق الملكية، 4 الإيرادات، 5 المصروفات. الفواتير المدفوعة والمصروفات والإيرادات تُرحَّل تلقائياً بالقيد المزدوج على البنك أو الصندوق والضريبة.</div></div>`; },
+  jr: D => { const L = BOOKS.journal.filter(j => j.date >= D.from && j.date <= D.to).sort((a, b) => b.date.localeCompare(a.date));
+    return `<div class="panel"><div class="bar"><h3 style="flex:1">قيود اليومية <small style="color:var(--muted);font-weight:400">رأس المال، القروض، شراء الأصول، الإهلاك، التسويات…</small></h3><button class="btn" data-ac="ask-je">اطلب قيداً من نورة</button><button class="btn pri" data-ac="je-new">قيد جديد</button></div>
+    ${L.length ? L.map(j => `<div class="je"><div class="je-h"><b>${esc(j.date)}</b><span>${esc(j.desc || '')}</span><small>${esc(j.byName || '')}</small><button class="btn sm bad" data-ac="je-del" data-id="${j.id}">حذف</button></div>
+      <table class="je-t"><thead><tr><th>الحساب</th><th>مدين</th><th>دائن</th></tr></thead><tbody>${j.lines.map(l => `<tr><td>${esc(accLbl(accOf(l.acc)))}</td><td>${+l.dr ? money(l.dr) : ''}</td><td>${+l.cr ? money(l.cr) : ''}</td></tr>`).join('')}
+      <tr class="tot"><td>الإجمالي</td><td>${money(sum(j.lines, l => +l.dr || 0))}</td><td>${money(sum(j.lines, l => +l.cr || 0))}</td></tr></tbody></table></div>`).join('')
+      : '<div class="empty">لا توجد قيود يومية في هذه الفترة. سجّل رأس المال أولاً، أو اكتب لنورة مثلاً: «أودعت 50 ألف رأس مال في البنك».</div>'}</div>`; },
+  bs: D => { const cum = balances('', D.to); const A = g => accSort(BOOKS.accounts.filter(a => a.grp === g)); const gb = g => sum(A(g), a => natBal(a, cum[a.id]));
+    const ni = sum(BOOKS.accounts.filter(a => clsOf(a.grp) === 4), a => natBal(a, cum[a.id])) - sum(BOOKS.accounts.filter(a => clsOf(a.grp) === 5), a => natBal(a, cum[a.id]));
+    const ta = gb('ast'), tl = gb('lia'), te = gb('eq') + ni; const ok = Math.abs(ta - tl - te) < 0.02;
+    const sec = (g, extra = '') => `<div class="h"><span>${AGRP[g]}</span><b>${money(gb(g) + (g === 'eq' ? ni : 0))}</b></div>${A(g).filter(a => natBal(a, cum[a.id])).map(a => `<div><span><code>${esc(a.code)}</code> ${esc(a.name)}</span><span>${money(natBal(a, cum[a.id]))}</span></div>`).join('')}${extra}`;
+    const tb = accSort(BOOKS.accounts).map(a => { const b = cum[a.id]; if (!b || (!r2(b.dr) && !r2(b.cr))) return ''; const n = r2(b.dr - b.cr); return `<tr><td><code>${esc(a.code)}</code> ${esc(a.name)}</td><td>${n > 0 ? money(n) : ''}</td><td>${n < 0 ? money(-n) : ''}</td></tr>`; }).join('');
+    const tdr = sum(Object.values(cum), b => Math.max(0, b.dr - b.cr)), tcr = sum(Object.values(cum), b => Math.max(0, b.cr - b.dr));
+    return `<div class="panel"><div class="ph"><h3>الميزانية العمومية</h3><small>كما في ${D.to} ${ok ? '<span class="pill p-ok">متوازنة</span>' : '<span class="pill p-crit">غير متوازنة</span>'}</small></div><div class="mini-list is">
+      ${sec('ast')}<div class="h tot"><span>إجمالي الأصول</span><b>${money(ta)}</b></div>
+      ${sec('lia')}${sec('eq', `<div><span>صافي ${ni >= 0 ? 'الربح' : 'الخسارة'} المتراكم</span><span>${money(ni)}</span></div>`)}<div class="h tot"><span>إجمالي الخصوم وحقوق الملكية</span><b>${money(tl + te)}</b></div></div>
+      ${ta === 0 && tl === 0 ? '<div class="roles">سجّل رأس المال والأرصدة الافتتاحية (البنك، الأصول، القروض) من «قيود اليومية» لتكتمل الميزانية.</div>' : ''}</div>
+    <div class="panel"><div class="ph"><h3>ميزان المراجعة</h3><small>حتى ${D.to}</small></div><div class="tw"><table><thead><tr><th>الحساب</th><th>مدين</th><th>دائن</th></tr></thead><tbody>${tb || '<tr><td colspan="3" class="empty">لا توجد حركات</td></tr>'}
+      <tr class="tot"><td><b>الإجمالي</b></td><td><b>${money(tdr)}</b></td><td><b>${money(tcr)}</b></td></tr></tbody></table></div></div>`; },
   rep: D => { const ms = Array.from({ length: 12 }, (_, i) => ymAdd(ymOf(today()), i - 11)); const pm = paidByMonth();
-    const row = m => { const E = BOOKS.expenses.filter(x => ymOf(x.date) === m); const r = (pm[m] || 0) + sum(E.filter(x => x.kind === 'inc'), x => x.amount); const c = sum(E.filter(x => x.kind !== 'inc'), ecost); return [m, r, c, r - c]; };
+    const AE = allEnts(); const row = m => { const E = AE.filter(x => ymOf(x.date) === m); const r = (pm[m] || 0) + sum(E.filter(x => x.kind === 'inc'), x => x.amount); const c = sum(E.filter(x => x.kind !== 'inc'), ecost); return [m, r, c, r - c]; };
     const R = ms.map(row);
     return `<div class="panel"><div class="ph"><h3>قائمة الدخل</h3><small>${D.pl}</small></div><div class="mini-list is">
       <div class="h"><span>الإيرادات</span><b>${money(D.rev)}</b></div><div><span>اشتراكات الشركات</span><span>${money(D.subRev)}</span></div><div><span>إيرادات أخرى</span><span>${money(D.othRev)}</span></div>
@@ -1804,7 +1880,7 @@ const AV = {
     <div class="panel"><div class="ph"><h3>الأداء الشهري</h3><small>آخر 12 شهراً</small></div><div class="tw"><table><thead><tr><th>الشهر</th><th>الإيرادات</th><th>المصروفات</th><th>صافي الربح</th></tr></thead><tbody>
       ${R.slice().reverse().map(([m, r, c, p]) => `<tr><td>${ymLabel(m)} ${m.slice(0, 4)}</td><td>${money(r)}</td><td>${money(c)}</td><td><b style="color:${p < 0 ? 'var(--crit)' : 'var(--ok)'}">${money(p)}</b></td></tr>`).join('')}
       <tr><td><b>الإجمالي</b></td><td><b>${money(sum(R, x => x[1]))}</b></td><td><b>${money(sum(R, x => x[2]))}</b></td><td><b>${money(sum(R, x => x[3]))}</b></td></tr></tbody></table></div></div>
-    <div class="panel"><div class="ph"><h3>المصروفات حسب الحساب</h3><button class="btn sm" data-ac="csv">تصدير Excel</button></div>${bars(BOOKS.accounts.filter(a => a.grp !== 'inc').map(a => [a.name, sum(D.exp.filter(x => x.acc === a.id), ecost), AGRP[a.grp]]).filter(x => x[1]).sort((a, b) => b[1] - a[1]))}</div>`; }
+    <div class="panel"><div class="ph"><h3>المصروفات حسب الحساب</h3><button class="btn sm" data-ac="csv">تصدير Excel</button></div>${bars(BOOKS.accounts.filter(a => EXPG.includes(a.grp)).map(a => [a.name, sum(D.exp.filter(x => x.acc === a.id), ecost), AGRP[a.grp]]).filter(x => x[1]).sort((a, b) => b[1] - a[1]))}</div>`; }
 };
 function ledList(D) {
   return [...D.inv.map(i => ({ d: String(i.paidAt || i.issueDate).slice(0, 10), t: 'inv', acc: '', br: '', desc: `${i.number} · ${i.companyName}`, a: +i.subtotal || 0, v: +i.vat || 0 })),
@@ -1814,7 +1890,7 @@ function ledList(D) {
 }
 function ledRows(D) {
   const L = ledList(D); const T = { inv: ['اشتراك', 'p-ok'], inc: ['إيراد', 'p-info'], exp: ['مصروف', 'p-crit'] };
-  return L.length ? L.map(r => `<tr><td>${esc(r.d)}</td><td><span class="pill ${T[r.t][1]}">${T[r.t][0]}</span></td><td>${r.acc ? esc(accOf(r.acc).name) : 'اشتراكات الشركات'}</td><td>${r.br ? esc(brOf(r.br).name) : '—'}</td><td>${esc(r.desc)}${r.src ? ' <small>تلقائي</small>' : ''}</td>
+  return L.length ? L.map(r => `<tr><td>${esc(r.d)}</td><td><span class="pill ${T[r.t][1]}">${T[r.t][0]}</span></td><td>${r.acc ? esc(accOf(r.acc).name) : 'اشتراكات الشركات'}</td><td>${r.br ? esc(brOf(r.br).name) : '—'}</td><td>${esc(r.desc)}${r.src ? ` <small>${String(r.src).startsWith('j:') ? 'قيد يومية' : 'تلقائي'}</small>` : ''}</td>
     <td><b>${r.t === 'exp' ? '−' : ''}${money(vatOn() ? r.a : r.a + r.v)}</b></td>${vatOn() ? `<td>${money(r.v)}</td>` : ''}<td>${r.id ? `<div class="acts"><button class="btn sm" data-ac="ent-edit" data-id="${r.id}">تعديل</button><button class="btn sm bad" data-ac="del" data-id="${r.id}">حذف</button></div>` : ''}</td></tr>`).join('')
     + `<tr><td colspan="5"><b>الإجمالي (${L.length} قيد)</b></td><td><b>${money(sum(L, r => (r.t === 'exp' ? -1 : 1) * (vatOn() ? r.a : r.a + r.v)))}</b></td>${vatOn() ? '<td></td>' : ''}<td></td></tr>`
     : `<tr><td colspan="${vatOn() ? 8 : 7}" class="empty">لا توجد قيود</td></tr>`;
@@ -1853,9 +1929,14 @@ async function acClick(e) {
   if (a === 'rec-post') { const m = ymOf(today()); const L = B.recurring.filter(r => r.on !== false && !B.expenses.some(x => x.src === `rec:${r.id}:${m}`)); if (!L.length) return toast('كل المصروفات الثابتة مُرحّلة لهذا الشهر');
     const out = L.map(r => ({ id: uid('r'), kind: 'exp', date: `${m}-${String(Math.min(28, +r.day || 1)).padStart(2, '0')}`, acc: r.acc, branch: r.branch, desc: r.desc, vendor: r.vendor || '', amount: r2(r.amount), vat: vatOn() ? r2(r.vat) : 0, method: r.method || '', src: `rec:${r.id}:${m}`, by: ME.email, at: nowIso() }));
     B.expenses.push(...out); if (await saveBooks(`رُحّل ${out.length} مصروف ثابت ✓`)) { plog('ترحيل المصروفات الثابتة', ymLabel(m), `${out.length} قيد · ${r2(sum(out, x => x.amount))} ريال`); renderAccounting(); } else B.expenses = B.expenses.filter(x => !out.includes(x)); return; }
+  if (a === 'je-new') return jeDialog();
+  if (a === 'je-del') { const x = B.journal.find(y => y.id === id); if (!x) return;
+    return dialog(`<h3>حذف قيد اليومية؟</h3><div class="sum">${esc(x.date)} · ${esc(x.desc || '')}</div>`, async () => { B.journal = B.journal.filter(y => y.id !== id); if (await saveBooks('حُذف القيد')) { plog('حذف قيد يومية', x.desc || '', x.date); renderAccounting(); } }, 'حذف'); }
+  if (a === 'ask-coa' || a === 'ask-je') { OF_EMP = 'accountant'; location.hash = 'office'; (OFC === null ? loadOffice() : Promise.resolve()).then(() => ofAsk('accountant', 'chat', a === 'ask-coa' ? 'راجعي دليل الحسابات الحالي واقترحي ما ينقصه لمنصة اشتراكات سحابية في السعودية، كمسودة دليل حسابات.' : 'جهّزي قيود اليومية التي تنقص دفاترنا (رأس المال والأرصدة الافتتاحية والإهلاك إن لزم)، واسأليني عن أي مبلغ لا تعرفينه.')); return; }
   if (a === 'acc-new' || a === 'acc-edit') { const x = B.accounts.find(y => y.id === id);
-    return dialog(`<h3>${x ? 'تعديل حساب' : 'حساب جديد'}</h3><label>اسم الحساب<input name="n" required value="${esc(x ? x.name : '')}"></label><label>المجموعة<select name="g">${Object.entries(AGRP).map(([g, l]) => `<option value="${g}" ${x && x.grp === g ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`, async fd => {
-      if (x) Object.assign(x, { name: fd.get('n').trim(), grp: fd.get('g') }); else B.accounts.push({ id: uid('a'), name: fd.get('n').trim(), grp: fd.get('g') });
+    return dialog(`<h3>${x ? 'تعديل حساب' : 'حساب جديد'}</h3><div class="g2"><label>رقم الحساب<input name="c" inputmode="numeric" pattern="\\d{3,6}" placeholder="تلقائي" value="${esc(x ? x.code || '' : '')}"></label><label>اسم الحساب<input name="n" required value="${esc(x ? x.name : '')}"></label></div><label>المجموعة<select name="g">${Object.entries(AGRP).map(([g, l]) => `<option value="${g}" ${x && x.grp === g ? 'selected' : ''}>${clsOf(g)} · ${l}</option>`).join('')}</select></label>`, async fd => {
+      const c = String(fd.get('c') || '').trim(); if (c && B.accounts.some(y => y !== x && String(y.code) === c)) return toast('رقم الحساب مستخدم');
+      if (x) Object.assign(x, { name: fd.get('n').trim(), grp: fd.get('g'), code: c || (x.grp === fd.get('g') ? x.code : '') }); else B.accounts.push({ id: uid('a'), name: fd.get('n').trim(), grp: fd.get('g'), code: c }); codeAccounts();
       if (await saveBooks('تم الحفظ')) { plog(x ? 'تعديل حساب' : 'إضافة حساب', fd.get('n')); renderAccounting(); } }, 'حفظ'); }
 }
 function entryDialog(x, kind) {
@@ -1873,6 +1954,31 @@ function entryDialog(x, kind) {
   if (!f.auto) return; const auto = () => { if (f.auto.checked) f.vat.value = r2((+f.amount.value || 0) * 15 / 100); f.vat.readOnly = f.auto.checked; };
   f.amount.oninput = auto; f.auto.onchange = auto; auto();
 }
+function jeDialog() {
+  const row = i => `<div class="je-r"><select name="a${i}"><option value="">—</option>${accSel('', 'all')}</select><input name="d${i}" type="number" min="0" step="0.01" placeholder="مدين"><input name="c${i}" type="number" min="0" step="0.01" placeholder="دائن"></div>`;
+  const f = dialog(`<h3>قيد يومية</h3><div class="g2"><label>التاريخ<input name="date" type="date" required value="${today()}"></label><label>الفرع<select name="branch">${brSel('hq')}</select></label></div><label>البيان<input name="desc" required placeholder="مثال: إيداع رأس المال في البنك"></label>
+    <div class="je-rs">${[0, 1, 2, 3, 4, 5].map(row).join('')}</div><div class="sum" id="jeSum">مدين 0 · دائن 0</div>`, async fd => {
+    const lines = [0, 1, 2, 3, 4, 5].map(i => ({ acc: fd.get('a' + i), dr: r2(fd.get('d' + i)), cr: r2(fd.get('c' + i)) })).filter(l => l.acc && (l.dr || l.cr));
+    const e = jeCheck(lines); if (e) return toast(e);
+    BOOKS.journal.push({ id: uid('j'), date: fd.get('date'), branch: fd.get('branch'), desc: String(fd.get('desc')).trim(), lines, by: ME.email, byName: ME.name || '', at: nowIso() });
+    if (await saveBooks('رُحّل القيد ✓')) { plog('قيد يومية', fd.get('desc'), `${r2(sum(lines, l => l.dr))} ريال`); renderAccounting(); } }, 'ترحيل');
+  f.oninput = () => { let d = 0, c = 0; [0, 1, 2, 3, 4, 5].forEach(i => { d += +f['d' + i].value || 0; c += +f['c' + i].value || 0; }); f.querySelector('#jeSum').innerHTML = `مدين ${money(d)} · دائن ${money(c)} ${Math.abs(d - c) < 0.01 && d ? '<span class="pill p-ok">متوازن</span>' : '<span class="pill p-warn">غير متوازن</span>'}`; };
+}
+const jeCheck = L => { if (L.length < 2) return 'القيد يحتاج حسابين على الأقل'; if (L.some(l => l.dr && l.cr)) return 'كل سطر إما مدين أو دائن';
+  const d = r2(sum(L, l => +l.dr || 0)), c = r2(sum(L, l => +l.cr || 0)); if (!d) return 'أدخل المبالغ'; if (Math.abs(d - c) >= 0.01) return `القيد غير متوازن: مدين ${d} ودائن ${c}`; return ''; };
+const numAr = x => +String(x || '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[٬,\s]/g, '').replace('٫', '.') || 0;
+// مسودات نورة: دليل حسابات بصيغة «الرمز | الاسم | المجموعة» وقيد يومية بصيغة «الحساب | مدين | دائن»
+function parseCoa(body) { const out = [], bad = [];
+  String(body).split('\n').forEach(l => { if (!l.includes('|')) return; const c = l.split('|').map(x => x.trim()); if (!/^\d{3,6}$/.test(numAr(c[0]) ? String(numAr(c[0])) : c[0])) return;
+    const code = String(numAr(c[0])), name = c[1], gl = c[2] || ''; if (!name) return bad.push(l);
+    let grp = Object.keys(AGRP).find(g => AGRP[g] === gl || g === gl) || Object.keys(AGRP).find(g => gl && (AGRP[g].includes(gl) || gl.includes(AGRP[g])));
+    if (!grp) grp = { 1: 'ast', 2: 'lia', 3: 'eq', 4: 'inc' }[code[0]] || 'other'; out.push({ code, name, grp }); });
+  return { out, bad }; }
+function parseJe(body) { const t = String(body); const date = (t.match(/التاريخ\s*[:：]\s*([0-9٠-٩]{4}-[0-9٠-٩]{2}-[0-9٠-٩]{2})/) || [])[1]; const desc = ((t.match(/البيان\s*[:：]\s*(.+)/) || [])[1] || '').trim();
+  const lines = [], bad = []; t.split('\n').forEach(l => { if (!l.includes('|')) return; const c = l.split('|').map(x => x.trim()); if (/^(الحساب|رمز)/.test(c[0])) return;
+    const a = accByRef(c[0]) || accByRef(c[0] + ' ' + (c.length > 3 ? c[1] : '')) || (c.length > 3 && accByRef(c[1])); const n = c.slice(-2).map(numAr);
+    if (!a) return bad.push(c.slice(0, c.length - 2).join(' ')); lines.push({ acc: a.id, dr: r2(n[0]), cr: r2(n[1]) }); });
+  return { date: date ? date.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)) : today(), desc, lines: lines.filter(l => l.dr || l.cr), bad }; }
 const expenseDialog = () => (BOOKS === null ? loadBooks() : Promise.resolve()).then(() => entryDialog(null, 'exp'));
 function empDialog(x) {
   const n = k => x ? esc(x[k] || 0) : '';
