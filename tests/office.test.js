@@ -11,6 +11,7 @@ const call = (body, tok = 'Bearer t') => O.handler({ httpMethod: 'POST', headers
   assert.equal(r.s, 200); assert.equal(r.j.drafts.length, 1, 'kind not allowed for this employee is dropped'); assert.equal(r.j.drafts[0].kind, 'ticket');
   assert.ok(last.system[0].text.includes('الدعم')); assert.ok(last.system[1].text.includes('{"x":1}')); assert.equal(last.output_config.format.type, 'json_schema');
   assert.deepEqual(last.output_config.format.schema.properties.drafts.items.properties.kind.enum, ['ticket', 'note', 'task']);
+  r = await call({ emp: 'dev', task: 'brief', data: '{}' }); assert.equal(r.s, 200); assert.ok(last.system[0].text.includes('مهندس'));
   r = await call({ emp: 'sales', message: 'مرحبا', history: [{ role: 'assistant', content: 'a' }, { role: 'user', content: 'b' }, { role: 'assistant', content: 'c' }] });
   assert.equal(r.s, 200); assert.equal(last.messages[0].role, 'user'); assert.equal(last.messages[last.messages.length - 1].content, 'مرحبا');
   r = await call({ emp: 'sales', message: '' }); assert.equal(r.s, 400);
