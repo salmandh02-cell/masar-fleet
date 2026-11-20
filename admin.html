@@ -1498,10 +1498,12 @@ const OF_EMPS = {
     sug: ['ابحث عن أهم 5 مزايا عند منافسينا وليست عندنا', 'ما أهم 5 تحسينات للمنصة الآن؟', 'أين يتعطل سير العمل عندنا وكيف نسرّعه؟'] },
   coder: { name: 'ياسر', role: 'البرمجة', ic: 'gear', tint: 'ok', job: 'يستلم المقترحات المعتمدة وأعطال الدعم ويجهز طلبات التنفيذ',
     sug: ['جهّز طلبات تنفيذ لكل بنود الطابور', 'ابدأ بأخطر عطل مسجل', 'ما الذي يمكن إنجازه هذا الأسبوع؟'] },
+  legal: { name: 'بدر', role: 'مراجعة الأنظمة', ic: 'book', tint: 'violet', job: 'يتابع الأنظمة السعودية الجديدة ويطابق المنصة وسياساتها معها',
+    sug: ['ما الجديد في الأنظمة التي تمس المنصة هذا الشهر؟', 'راجع سياسة الخصوصية مقابل نظام حماية البيانات الشخصية', 'ما المطلوب نظامياً لاستخدام الذكاء الاصطناعي في المنصة؟'] },
   ops: { name: 'ريم', role: 'تحليل العمليات', ic: 'pulse', tint: 'crit', job: 'ترصد الشركات الخاملة والمعرضة للإلغاء وتقترح الإجراء',
     sug: ['من الشركات المعرضة لعدم التجديد ولماذا؟', 'أي شركة تحتاج تدريباً؟', 'لخّص استخدام النظام هذا الأسبوع'] }
 };
-const OF_KIND = { assign: ['تكليف لموظف', 'p-pending'], coa: ['دليل حسابات', 'p-info'], journal: ['قيد يومية', 'p-pending'], idea: ['مقترح تطوير', 'p-info'], bug: ['خلل للمبرمج', 'p-crit'], dev: ['طلب تنفيذ', 'p-pending'], ticket: ['رد على تذكرة', 'p-info'], message: ['رسالة لعميل', 'p-ok'], note: ['ملاحظة في ملف الشركة', 'p-off'], post: ['محتوى تسويقي', 'p-pending'], task: ['مهمة مقترحة', 'p-warn'], report: ['تقرير', 'p-off'], handoff: ['إحالة لزميل', 'p-info'] };
+const OF_KIND = { assign: ['تكليف لموظف', 'p-pending'], coa: ['دليل حسابات', 'p-info'], journal: ['قيد يومية', 'p-pending'], idea: ['مقترح تطوير', 'p-info'], bug: ['خلل للمبرمج', 'p-crit'], dev: ['طلب تنفيذ', 'p-pending'], ticket: ['رد على تذكرة', 'p-info'], message: ['رسالة لعميل', 'p-ok'], note: ['ملاحظة في ملف الشركة', 'p-off'], post: ['محتوى تسويقي', 'p-pending'], task: ['مهمة مقترحة', 'p-warn'], report: ['تقرير', 'p-off'], handoff: ['إحالة لزميل', 'p-info'], law: ['مرجع نظامي', 'p-info'] };
 // دليل العمل الافتراضي لكل وظيفة. يقرؤه الموظف في كل مهمة، ويقيّم الخبير عمله على أساسه. المالك يعدّله من «دليل العمل»
 const OF_SOP = {
   ceo: `الغرض: توجيه الفريق نحو أهداف المالك: الإيراد، ورضا العملاء، والنمو.
@@ -1595,6 +1597,17 @@ const OF_SOP = {
 معايير الجودة: طلب يفهمه المطوّر دون أسئلة، ويبقي بيانات كل شركة معزولة، ولا يكسر ميزة قائمة.
 لا تفعل: لا تدّعِ أنك نفّذت أو نشرت، ولا تطلب تعطيل قواعد الأمان، ولا تضع مفاتيح في الكود.
 المرجعية: ملف CLAUDE.md في المستودع، وسياسة الخصوصية، ونظام حماية البيانات الشخصية.`,
+  legal: `الغرض: أن تبقى المنصة وسياساتها متوافقة مع الأنظمة السعودية النافذة، وأن يعرف المالك بالجديد قبل نفاذه.
+المدخلات: المراجع المعتمدة (ومنها الأنظمة المحفوظة)، وسياسات المنصة وشروطها، ومزايا المنصة وطريقة تشغيلها، وبحث الويب.
+خطوات العمل:
+1. ابحث في المصادر الرسمية أولاً: هيئة الخبراء بمجلس الوزراء، ثم الجهة المختصة (وزارة التجارة، هيئة الزكاة والضريبة والجمارك، سدايا، هيئة الاتصالات والفضاء والتقنية، الهيئة الوطنية للأمن السيبراني، هيئة الحكومة الرقمية، الهيئة العامة لتنظيم الإعلام)، ثم منصة «استطلاع» للمشروعات المقترحة.
+2. لكل نظام أو تعديل: الجهة، وتاريخ الصدور والنفاذ، والحالة (نافذ أو مقترح)، والمواد التي تمس المنصة برقمها.
+3. قارنه بالمراجع والسياسات الحالية، وحدّد الفجوة وأثرها ومهلة الامتثال.
+4. اكتب مسودة law لما يستحق الحفظ في المراجع، ومسودة task لكل فجوة تحتاج قرار المالك مرتبة حسب المهلة والخطورة.
+5. أحِل التطبيق إلى المختص: الضريبة والفوترة لنورة، والخصوصية والأمن في الكود لياسر، والشروط والردود لسارة.
+معايير الجودة: كل معلومة لها مصدر ورابط وتاريخ، ولا خلط بين النافذ والمقترح، ولا رقم مادة دون التحقق منه.
+لا تفعل: لا تقدّم رأياً قانونياً ملزماً، ولا تعتمد على ملخص غير رسمي إذا توفر النص الرسمي، ولا تخترع مادة أو تاريخاً.
+المرجعية: الأنظمة واللوائح المحفوظة في المراجع، ومنصة هيئة الخبراء بمجلس الوزراء.`,
   ops: `الغرض: رفع استخدام الشركات للنظام ومنع الإلغاء.
 المدخلات: إحصاءات الشركات (السيارات، المستخدمون، آخر نشاط، المخاطر).
 خطوات العمل:
@@ -1608,16 +1621,17 @@ const OF_SOP = {
 المرجعية: دليل استخدام النظام، وسياسة الدعم.`
 };
 // الخبراء: من يقيّم كل موظف (يطابق EXPERTS في functions/office.js)
-const OF_XP = { ceo: 'مستشار إداري واستراتيجي للشركات الناشئة', coo: 'مستشار تشغيل وتحسين عمليات', support: 'خبير خدمة عملاء ودعم فني لأنظمة SaaS في السوق السعودي', sales: 'خبير مبيعات B2B للبرمجيات في السعودية والخليج', accountant: 'محاسب قانوني سعودي (SOCPA) خبير في الزكاة والضريبة والفوترة الإلكترونية', marketing: 'خبير تسويق رقمي ومحتوى للشركات في السوق السعودي', ideas: 'مدير منتج أول لمنصات إدارة الأساطيل', coder: 'مهندس برمجيات أول خبير في الويب وFirebase وأمن البيانات', ops: 'خبير عمليات ونجاح العملاء في شركات SaaS' };
+const OF_XP = { ceo: 'مستشار إداري واستراتيجي للشركات الناشئة', coo: 'مستشار تشغيل وتحسين عمليات', support: 'خبير خدمة عملاء ودعم فني لأنظمة SaaS في السوق السعودي', sales: 'خبير مبيعات B2B للبرمجيات في السعودية والخليج', accountant: 'محاسب قانوني سعودي (SOCPA) خبير في الزكاة والضريبة والفوترة الإلكترونية', marketing: 'خبير تسويق رقمي ومحتوى للشركات في السوق السعودي', ideas: 'مدير منتج أول لمنصات إدارة الأساطيل', coder: 'مهندس برمجيات أول خبير في الويب وFirebase وأمن البيانات', ops: 'خبير عمليات ونجاح العملاء في شركات SaaS', legal: 'محامٍ سعودي متخصص في التجارة الإلكترونية وحماية البيانات وتقنية المعلومات' };
 // مكتبة المراجع: التصنيف ومن يقرؤه افتراضياً
 const OF_RCAT = {
   pricing: ['الأسعار والباقات والخصومات', ['ceo', 'sales', 'accountant', 'marketing', 'support']],
-  policy: ['سياسات الدعم والاسترجاع والإلغاء', ['coo', 'support', 'sales', 'accountant']],
-  terms: ['الشروط والأحكام والخصوصية', ['ceo', 'support', 'sales', 'ideas', 'coder']],
-  tax: ['الزكاة والضريبة والفوترة الإلكترونية', ['accountant']],
+  policy: ['سياسات الدعم والاسترجاع والإلغاء', ['coo', 'support', 'sales', 'accountant', 'legal']],
+  law: ['الأنظمة واللوائح', ['legal', 'ceo', 'accountant', 'support', 'ideas', 'coder']],
+  terms: ['الشروط والأحكام والخصوصية', ['ceo', 'support', 'sales', 'ideas', 'coder', 'legal']],
+  tax: ['الزكاة والضريبة والفوترة الإلكترونية', ['accountant', 'legal']],
   tone: ['دليل الأسلوب والهوية', ['support', 'sales', 'marketing']],
   product: ['دليل استخدام النظام', ['support', 'sales', 'marketing', 'ops', 'ideas', 'coder']],
-  other: ['مراجع أخرى', ['ceo', 'coo', 'support', 'sales', 'accountant', 'marketing', 'ideas', 'coder', 'ops']]
+  other: ['مراجع أخرى', ['ceo', 'coo', 'support', 'sales', 'accountant', 'marketing', 'ideas', 'coder', 'legal', 'ops']]
 };
 let OF_LOAD = null; let OFC = null, OF_EMP = 'support', OF_F = 'new', OF_BUSY = {};
 const ofEmp = k => ({ ...OF_EMPS[k], ...((OFC && OFC.persona && OFC.persona[k]) || {}) });
@@ -1720,6 +1734,14 @@ async function ofData(emp) {
     if (emp === 'coder') { delete d.استخدام_المزايا; delete d.مؤشرات_سير_العمل;
       d.طابور_البرمجة = OFC.queue.filter(x => x.status === 'queued').map(x => ({ id: x.id, النوع: x.from === 'bug' ? 'عطل من الدعم' : 'مقترح معتمد', العنوان: x.title, التفاصيل: cut(x.body, 2500), أحيل_في: fmt(x.at) }));
       d.منفذ_سابقاً = OFC.queue.filter(x => x.status === 'done').slice(-15).map(x => x.title); }
+  }
+  if (emp === 'legal') {
+    d.المنصة = { الوصف: 'منصة سحابية (SaaS) لإدارة أساطيل المركبات تبيع اشتراكات شهرية وسنوية للمنشآت في السعودية', العملاء: 'منشآت (B2B)', الشركات_المشتركة: live.length,
+      البيانات_المعالجة: 'بيانات المنشآت ومستخدميها، وبيانات السائقين وأرقام هوياتهم، والمحاضر بالصور والتوقيع الإلكتروني، والمخالفات والحوادث', الاستضافة: 'Google Cloud / Firebase وNetlify (خوادم خارج المملكة)',
+      الدفع: 'بوابة ميسّر', الذكاء_الاصطناعي: 'Anthropic لقراءة المستندات والمساعد الذكي ومكتب الموظفين', الفوترة: SET.vatRegistered === false ? 'غير مسجلة في ضريبة القيمة المضافة' : 'مسجلة في ضريبة القيمة المضافة وتصدر فواتير ضريبية' };
+    d.مزايا_النظام = OF_FEATURES;
+    d.المراجع_المحفوظة = KB.docs.map(r => ({ العنوان: r.title, التصنيف: (OF_RCAT[r.cat] || OF_RCAT.other)[0], أضيف: fmt(r.at) }));
+    d.مراجع_نظامية_سابقة = OFC.drafts.filter(x => x.kind === 'law').slice(0, 30).map(x => ({ العنوان: x.title, الحالة: x.status === 'new' ? 'بانتظار المالك' : x.status === 'skip' ? 'رفضها المالك' : 'حُفظت' }));
   }
   if (emp === 'ops') {
     d.الشركات = live.map(coRow);
@@ -1936,6 +1958,7 @@ function ofDraft(d) {
     if (d.kind === 'assign' || d.kind === 'handoff') acts = OF_EMPS[d.target] ? `<button class="btn sm pri" data-od="assign">${d.kind === 'assign' ? 'اعتماد وتكليف ' : 'اعتماد وإحالة إلى '}${esc(ofEmp(d.target).name)}</button>` : '<small class="of-warn">موظف غير معروف</small>';
     else if (d.kind === 'coa') acts = `<button class="btn sm pri" data-od="coa">اعتماد وتطبيق على الدليل</button>`;
     else if (d.kind === 'journal') acts = `<button class="btn sm pri" data-od="jpost">اعتماد وترحيل القيد</button>`;
+    else if (d.kind === 'law') acts = `<button class="btn sm pri" data-od="addref">اعتماد وإضافة إلى المراجع</button>${/^https?:\/\//.test(d.target) ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(d.target)}">المصدر</a>` : ''}`;
     else if (d.kind === 'idea') acts = `<button class="btn sm pri" data-od="queue">اعتماد وإحالة للمبرمج</button>`;
     else if (d.kind === 'bug') acts = `<button class="btn sm pri" data-od="queue">إحالة للمبرمج</button>`;
     else if (d.kind === 'dev') acts = `<a class="btn sm pri" target="_blank" rel="noopener" data-od="gh" href="${ghIssueUrl(d)}">فتح طلب التنفيذ في GitHub</a><button class="btn sm" data-od="copydev">نسخ طلب التنفيذ</button><button class="btn sm" data-od="built">تم التنفيذ</button>`;
@@ -1946,7 +1969,7 @@ function ofDraft(d) {
     acts += `<button class="btn sm" data-od="skip">تجاهل</button><button class="btn sm of-xb" data-od="review" ${OF_RV[d.id] ? 'disabled' : ''}>${OF_RV[d.id] ? 'الخبير يراجع…' : d.review ? 'إعادة التقييم' : 'قيّمها بخبير'}</button>`;
   }
   return `<article class="of-d${done ? ' done' : ''}" data-did="${esc(d.id)}"><header>${ofAv(d.emp)}<div><span class="pill ${kc}">${kl}</span> <b>${esc(d.title || '')}</b><small>${esc(e.name)}${d.from && OF_EMPS[d.from] ? ` (بتكليف من ${esc(ofEmp(d.from).name)})` : ''}${(d.kind === 'assign' || d.kind === 'handoff') && OF_EMPS[d.target] ? ` ← ${esc(ofEmp(d.target).name)}` : ''} · ${esc(d.targetName || (c && c.name) || (tk && tk.companyName) || '')} · ${esc(String(d.at || '').slice(0, 16).replace('T', ' '))}</small></div>
-    ${done ? `<span class="pill ${d.status === 'skip' ? 'p-off' : 'p-ok'}">${d.status === 'skip' ? 'تم تجاهلها' : d.status === 'queued' ? 'أُحيلت للمبرمج' : d.status === 'built' ? 'نُفّذت' : d.status === 'posted' ? 'رُحّلت للدفاتر' : d.status === 'assigned' ? (d.auto ? 'كُلّف تلقائياً' : 'كُلّف الموظف') : d.status === 'handed' ? (d.auto ? 'أُحيلت تلقائياً' : 'أُحيلت للزميل') : 'معتمدة'}</span>` : OF_RV[d.id] ? '<span class="pill p-pending">الخبير يراجع…</span>' : d.review ? `<span class="pill ${d.review.score >= 8 ? 'p-ok' : d.review.score >= 5 ? 'p-warn' : 'p-crit'}" title="تقييم الخبير">${d.review.score}/10</span>` : ''}</header>
+    ${done ? `<span class="pill ${d.status === 'skip' ? 'p-off' : 'p-ok'}">${d.status === 'skip' ? 'تم تجاهلها' : d.status === 'queued' ? 'أُحيلت للمبرمج' : d.status === 'built' ? 'نُفّذت' : d.status === 'posted' ? 'رُحّلت للدفاتر' : d.status === 'assigned' ? (d.auto ? 'كُلّف تلقائياً' : 'كُلّف الموظف') : d.status === 'handed' ? (d.auto ? 'أُحيلت تلقائياً' : 'أُحيلت للزميل') : d.status === 'ref' ? 'أُضيفت للمراجع' : 'معتمدة'}</span>` : OF_RV[d.id] ? '<span class="pill p-pending">الخبير يراجع…</span>' : d.review ? `<span class="pill ${d.review.score >= 8 ? 'p-ok' : d.review.score >= 5 ? 'p-warn' : 'p-crit'}" title="تقييم الخبير">${d.review.score}/10</span>` : ''}</header>
     ${done ? `<div class="of-body">${esc(d.body)}</div>` : `<textarea class="of-ed" rows="${Math.min(10, Math.max(3, String(d.body).split("\n").length + Math.ceil(String(d.body).length / 80)))}">${esc(d.body)}</textarea>`}
     ${d.review ? ofRevBox(d) : ''}${acts ? `<div class="of-acts">${acts}</div>` : ''}</article>`;
 }
@@ -1971,6 +1994,11 @@ async function ofAct(d, a, body) {
       BOOKS.journal.push({ id: uid('j'), date: j.date, branch: 'hq', desc: j.desc || d.title || '', lines: j.lines, by: ME.email, byName: (ME.name || '') + ' · ' + E.name, at: now, draft: d.id });
       if (!(await saveBooks('رُحّل القيد ✓'))) { BOOKS.journal.pop(); return; } plog('ترحيل قيد يومية (مسودة ' + E.name + ')', j.desc || d.title || '', `${r2(sum(j.lines, l => l.dr))} ريال`); }
     d.status = 'posted'; d.doneAt = now; await saveOffice(); if (TAB === 'accounting') renderAccounting(); return renderOffice(); }
+  if (a === 'addref') { if (KB === null) await loadKb(); const text = `${body}${d.target ? '\nالمصدر: ' + d.target : ''}`.slice(0, 60000);
+    if (kbUsed() + text.length > KB_MAX) return toast('مساحة المراجع لا تكفي. احذف مرجعاً قديماً');
+    KB.docs.unshift({ id: uid('r'), title: d.title || 'مرجع نظامي', cat: 'law', text, emps: OF_RCAT.law[1], at: now, src: d.id });
+    if (!(await saveKb('أُضيف إلى المراجع ✓'))) { KB.docs.shift(); return; }
+    d.status = 'ref'; d.doneAt = now; ofFeed(d.emp, `أُضيف «${d.title || ''}» إلى المراجع`); await saveOffice(); plog('مكتب الموظفين: إضافة مرجع نظامي', d.title || ''); return renderOffice(); }
   if (a === 'queue') { OFC.queue.push({ id: uid('q'), from: d.kind, src: d.id, title: d.title || cut(body, 80), body, status: 'queued', at: now }); d.status = 'queued'; d.doneAt = now;
     await saveOffice(); plog(d.kind === 'idea' ? 'اعتماد مقترح تطوير' : 'إحالة عطل للمبرمج', d.title || ''); toast('أُحيل إلى ياسر في طابور البرمجة ✓'); return renderOffice(); }
   if (a === 'gh') { d.ghAt = now; await saveOffice(); plog('فتح طلب تنفيذ في GitHub', d.title || ''); return toast('اضغط Submit new issue في GitHub، وClaude يبدأ التنفيذ ويرسل لك طلب دمج'); }

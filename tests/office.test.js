@@ -57,8 +57,14 @@ const call = (body, tok = 'Bearer t') => O.handler({ httpMethod: 'POST', headers
   who = { email: 'staff@x.sa', verified: true }; r = await call({ task: 'extract', file: { name: 'p.pdf', type: 'application/pdf', b64: 'AA' } }); assert.equal(r.s, 403, 'extract owner only'); who = { email: 'salmandh02@gmail.com', verified: true };
   who = { email: 'staff@x.sa', verified: true }; r = await call({ emp: 'sales', message: 'x' }); assert.equal(r.s, 403, 'staff blocked');
   who = { email: 'salmandh02@gmail.com', verified: false }; r = await call({ emp: 'sales', message: 'x' }); assert.equal(r.s, 403, 'unverified blocked');
+  who = { email: 'salmandh02@gmail.com', verified: true };
+  // مراجع الأنظمة: يبحث بخمس عمليات ويصوغ مسودات أنظمة، وخبيره محامٍ
+  reply = { reply: 'تم', drafts: [{ kind: 'law', target: 'https://zatca.gov.sa/x.pdf', targetName: 'هيئة الزكاة', title: 'لائحة', body: 'المادة 53' }, { kind: 'post', target: '', targetName: '', title: 'x', body: 'ممنوع' }] };
+  r = await call({ emp: 'legal', message: 'ما الجديد؟' }); assert.equal(r.s, 200); assert.deepEqual(r.j.drafts.map(d => d.kind), ['law'], 'legal drafts laws only');
+  assert.equal(last.tools[0].max_uses, 5, 'legal searches 5 times'); assert.ok(last.output_config.format.schema.properties.drafts.items.properties.kind.enum.includes('law'));
+  r = await call({ emp: 'legal', task: 'review', item: 'مادة' }); assert.equal(r.s, 200); assert.ok(last.system.includes('محامٍ سعودي'), 'legal expert persona');
   r = await call({ emp: 'sales', message: 'x' }, ''); assert.equal(r.s, 401);
   who = { email: 'salmandh02@gmail.com', verified: true }; reply = 'not json'; O._setClient({ messages: { create: async () => ({ stop_reason: 'refusal', content: [], usage: {} }) } });
   r = await call({ emp: 'ops', message: 'x' }); assert.equal(r.s, 422);
-  console.log('office tests: 40 checks passed');
+  console.log('office tests: 45 checks passed');
 })().catch(e => { console.error(e); process.exit(1); });
