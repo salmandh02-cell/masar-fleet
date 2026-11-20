@@ -378,6 +378,18 @@ body.va{overflow:hidden}
 .ofp-nm{fill:var(--ink);font-size:15px;font-weight:700;text-anchor:middle}.ofp-rl{fill:var(--muted);font-size:12px;text-anchor:middle}
 .ofp-u,.ofp-meet{cursor:pointer;outline:none}.ofp-u:hover .ofp-desk,.ofp-u:focus-visible .ofp-desk{stroke:var(--accent);stroke-width:2.5}.ofp-meet:hover .ofp-table,.ofp-meet:focus-visible .ofp-table{stroke:var(--accent);stroke-width:2.5}
 .ofp-ring{fill:color-mix(in srgb,var(--accent) 12%,transparent);stroke:var(--accent);stroke-width:2.5}.ofp-cloth{stroke:#BDB7AA;stroke-width:.8}.ofp-u.on .ofp-desk{stroke:var(--accent);stroke-width:2.5}.ofp-u.busy .ofp-mon{fill:var(--info)}
+.ofp-fig,.ofp-hd,.ofp-hand,.ofp-arm{transform-box:fill-box;transform-origin:center}
+.ofp-u:not(.busy) .ofp-hd{animation:ofpLook 7s ease-in-out infinite}.ofp-u:not(.busy) .ofp-fig{animation:ofpSit 9s ease-in-out infinite}
+.ofp-u.busy .ofp-hand{animation:ofpType .28s ease-in-out infinite alternate}.ofp-u.busy .ofp-hand.r{animation-delay:.14s}.ofp-u.busy .ofp-mon{animation:ofpGlow 1.4s ease-in-out infinite}
+.ofp-walker{pointer-events:none}.ofp-walker .ofp-fig{animation:ofpStep .32s ease-in-out infinite alternate}.ofp-walker .ofp-hand{animation:ofpSwing .32s ease-in-out infinite alternate}.ofp-walker .ofp-hand.r{animation-direction:alternate-reverse}
+.ofp-carry rect{fill:#fff;stroke:var(--gold-ink);stroke-width:1.2}.ofp-carry path{stroke:var(--muted);stroke-width:1.2}
+.of-fly{position:fixed;z-index:60;width:18px;height:22px;border-radius:3px;background:#fff;border:1.5px solid var(--gold-ink);box-shadow:0 4px 12px rgba(0,0,0,.18);pointer-events:none}
+@keyframes ofpLook{0%,70%,100%{transform:rotate(0)}78%,86%{transform:rotate(-14deg)}90%,96%{transform:rotate(10deg)}}
+@keyframes ofpSit{0%,100%{transform:rotate(0)}50%{transform:rotate(2.5deg)}}
+@keyframes ofpType{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+@keyframes ofpGlow{0%,100%{fill:var(--info)}50%{fill:color-mix(in srgb,var(--info) 55%,#fff)}}
+@keyframes ofpStep{from{transform:scale(1)}to{transform:scale(1.035)}}@keyframes ofpSwing{from{transform:translateY(-4px)}to{transform:translateY(5px)}}
+@media (prefers-reduced-motion:reduce){.ofp-fig,.ofp-hd,.ofp-hand,.ofp-mon,.ofp-walker *{animation:none!important}}
 .ofp-bub rect{fill:var(--surface);stroke:var(--info);stroke-width:1.5}.ofp-bub circle{fill:var(--info);animation:ofpDot 1.2s infinite}.ofp-bub circle:nth-child(3){animation-delay:.2s}.ofp-bub circle:nth-child(4){animation-delay:.4s}
 @keyframes ofpDot{0%,80%,100%{opacity:.25}40%{opacity:1}}@media (prefers-reduced-motion:reduce){.ofp-bub circle{animation:none}}
 .ofp-wait circle{fill:var(--gold);stroke:var(--surface);stroke-width:2}.ofp-wait text{fill:#2A1F08;font-size:12px;font-weight:700;text-anchor:middle}
@@ -1807,7 +1819,7 @@ async function ofAsk(emp, task, message, depth = 0, from = '') {
     if (from && OF_EMPS[from]) { ofMsg(emp, from, j.reply || 'أنهيت المطلوب', 'reply'); ofFeed(emp, 'ردّ على زميله بما أنجز', from); }
     const day = today(); const u = OFC.usage[day] = OFC.usage[day] || { n: 0, in: 0, out: 0 }; u.n++; u.in += (j.usage || {}).in || 0; u.out += (j.usage || {}).out || 0;
     await saveOffice(); plog('مكتب الموظفين: ' + (task === 'brief' ? 'تقرير اليوم' : 'طلب'), E.name + ' · ' + E.role, ids.length ? `${ids.length} مسودة` : '');
-    if (ids.length) toast(`${E.name} كتب ${ids.length} مسودة بانتظار اعتمادك`);
+    if (ids.length) { toast(`${E.name} كتب ${ids.length} مسودة بانتظار اعتمادك`); setTimeout(() => ofFxPaper(emp, ids.length), 60); }
   } catch (e) { chat.push({ role: 'assistant', content: '⚠️ ' + e.message, err: true, at: nowIso() }); ofFeed(emp, 'تعذر إكمال العمل: ' + e.message); }
   OF_BUSY[emp] = false; renderOffice();
   // التشغيل التلقائي: التكليف والإحالة (بعمق مرحلتين على الأكثر حتى لا تدور الإحالات)، ثم مراجعة الخبير لبقية المسودات
@@ -1883,7 +1895,7 @@ async function ofInbox() {
     const day = String(x.at || nowIso()).slice(0, 10); const u = OFC.usage[day] = OFC.usage[day] || { n: 0, in: 0, out: 0 }; u.n++; u.in += (x.usage || {}).in || 0; u.out += (x.usage || {}).out || 0; }
   if (!(await saveOffice())) return;
   await Promise.all(L.map(x => F.deleteDoc(F.doc(fs, 'officeinbox', x._id)).catch(() => {})));
-  if (fresh.length) toast(`أنجز الموظفون ${L.length} مهمة تلقائياً و${fresh.length} مسودة بانتظارك`);
+  if (fresh.length) { toast(`أنجز الموظفون ${L.length} مهمة تلقائياً و${fresh.length} مسودة بانتظارك`); setTimeout(() => [...new Set(fresh.map(d => d.emp))].slice(0, 4).forEach((k, i) => setTimeout(() => ofFxPaper(k, 1), i * 350)), 120); }
   if (OF_VIEW === 'office' && ($('#t-office') || {}).offsetParent) renderOffice();
   if (OFC.auto.review) ofAutoReview(fresh.filter(d => !['assign', 'handoff'].includes(d.kind)));
 }
@@ -1892,6 +1904,7 @@ async function ofDelegate(d, depth, auto) {
   const E = ofEmp(d.emp), t = d.target, T = ofEmp(t); d.status = d.kind === 'assign' ? 'assigned' : 'handed'; d.doneAt = nowIso(); if (auto) d.auto = 1;
   ofFeed(d.emp, `${d.kind === 'assign' ? 'كلّف' : 'أحال إلى'} ${T.name}: ${d.title || cut(d.body, 120)}`, t); ofMsg(d.emp, t, `${d.title ? d.title + ': ' : ''}${d.body}`, d.kind);
   plog((d.kind === 'assign' ? 'تكليف موظف من ' : 'إحالة بين الموظفين من ') + E.name + (auto ? ' (تلقائي)' : ''), T.name, cut(d.body, 120));
+  ofFxVisit(d.emp, t);
   return ofAsk(t, 'chat', `${d.kind === 'assign' ? 'تكليف' : 'إحالة'} من ${E.name} (${E.role})${auto ? '' : '، معتمد من المالك'}:\n${d.title ? d.title + '\n' : ''}${d.body}`, depth, d.emp);
 }
 // مراجعة الخبراء التلقائية: اثنتان في وقت واحد
@@ -1987,25 +2000,68 @@ const OF_SEATS = { ceo: [855, 78], coo: [595, 78], support: [130, 318], sales: [
 // هيئة كل موظف من الأعلى: شماغ أو غترة وثوب، أو حجاب، أو شعر وقميص (تُعدَّل هنا)
 const OF_LOOK = { ceo: ['shm'], sales: ['gh'], legal: ['shm'], ideas: ['gh'], marketing: ['hair', '#2F5D8A'], coder: ['hair', '#3A3F4B'], coo: ['hj', '#1F2937', '#3D4A5C'], support: ['hj', '#7A2E3A', '#E9E2D6'], accountant: ['hj', '#2E3D5C', '#1E1E24'], ops: ['hj', '#6B5440', '#C9B79C'] };
 // الشكل حول الرأس عند (0,0) متجهاً للأعلى (اليدان نحو المكتب)
-function ofFig(k, cx, cy, sc = 1, rot = 0) { const [t, c1, c2] = OF_LOOK[k] || ['hair', '#4B5563']; const skin = '#D9A47E';
+function ofFig(k, cx, cy, sc = 1, rot = 0, chair = true) { const [t, c1, c2] = OF_LOOK[k] || ['hair', '#4B5563']; const skin = '#D9A47E';
   const thobe = t === 'shm' || t === 'gh'; const top = thobe ? '#F4F2EC' : t === 'hj' ? (c2 || '#1E1E24') : c1;
   const head = t === 'shm' ? `<path class="ofp-cloth" d="M-17 -4Q-20 14 -26 23H26Q20 14 17 -4Z" fill="url(#ofpShm)"/><circle class="ofp-cloth" r="13.5" fill="url(#ofpShm)"/><circle r="8" fill="none" stroke="#141414" stroke-width="3.2"/>`
     : t === 'gh' ? `<path class="ofp-cloth" d="M-17 -4Q-20 14 -26 23H26Q20 14 17 -4Z" fill="#FBFBF8"/><circle class="ofp-cloth" r="13.5" fill="#FBFBF8"/><circle r="8" fill="none" stroke="#141414" stroke-width="3.2"/>`
     : t === 'hj' ? `<path d="M-16 -2Q-18 13 -23 19H23Q18 13 16 -2Z" fill="${c1}"/><circle r="14" fill="${c1}"/><circle cx="-4" cy="-5" r="6" fill="#fff" opacity=".12"/>`
     : `<circle cx="-13" cy="1" r="3.5" fill="${skin}"/><circle cx="13" cy="1" r="3.5" fill="${skin}"/><circle r="13" fill="#2B1D14"/><path d="M-3 -12Q0 -2 2 6" stroke="#4A3527" stroke-width="1.6" fill="none"/>`;
-  return `<g transform="translate(${cx} ${cy}) rotate(${rot}) scale(${sc})"><rect class="ofp-chair" x="-25" y="6" width="50" height="34" rx="13"/>
-    <path d="M-23 10L-19 -21M23 10L19 -21" stroke="${top}" stroke-width="9" stroke-linecap="round"${thobe ? ' class="ofp-cloth"' : ''}/><circle cx="-19" cy="-24" r="4.6" fill="${skin}"/><circle cx="19" cy="-24" r="4.6" fill="${skin}"/>
-    <path d="M-31 18Q-31 3 -16 1H16Q31 3 31 18Q31 29 0 29Q-31 29 -31 18Z" fill="${top}"${thobe ? ' class="ofp-cloth"' : ''}/>${head}</g>`; }
+  const dl = (String(k).charCodeAt(0) % 7) * -0.9;
+  return `<g transform="translate(${cx} ${cy}) rotate(${rot}) scale(${sc})">${chair ? '<rect class="ofp-chair" x="-25" y="6" width="50" height="34" rx="13"/>' : ''}<g class="ofp-fig" style="animation-delay:${dl}s">
+    <path class="ofp-arm${thobe ? ' ofp-cloth' : ''}" d="M-23 10L-19 -21" stroke="${top}" stroke-width="9" stroke-linecap="round"/><path class="ofp-arm r${thobe ? ' ofp-cloth' : ''}" d="M23 10L19 -21" stroke="${top}" stroke-width="9" stroke-linecap="round"/><circle class="ofp-hand" cx="-19" cy="-24" r="4.6" fill="${skin}"/><circle class="ofp-hand r" cx="19" cy="-24" r="4.6" fill="${skin}"/>
+    <path d="M-31 18Q-31 3 -16 1H16Q31 3 31 18Q31 29 0 29Q-31 29 -31 18Z" fill="${top}"${thobe ? ' class="ofp-cloth"' : ''}/><g class="ofp-hd">${head}</g></g></g>`; }
 function ofPerson(k, x, y) { const e = ofEmp(k); const [sc] = ofStat(k); const n = OFC.drafts.filter(d => d.emp === k && d.status === 'new').length; const on = k === OF_EMP; const t = OF_EMPS[k].tint || 'info';
   return `<g class="ofp-u${on ? ' on' : ''}${sc === 'busy' ? ' busy' : ''}" data-oe="${k}" role="button" tabindex="0" aria-label="${esc(e.name)}، ${esc(e.role)}: ${esc(ofStat(k)[1])}">
     <rect class="ofp-desk" x="${x - 58}" y="${y}" width="116" height="46" rx="6"/><rect class="ofp-mon" x="${x - 24}" y="${y + 8}" width="48" height="7" rx="2"/><rect class="ofp-kb" x="${x - 16}" y="${y + 27}" width="32" height="9" rx="2"/>
-    ${on ? `<ellipse class="ofp-ring" cx="${x}" cy="${y + 68}" rx="40" ry="34"/>` : ''}${ofFig(k, x, y + 62)}
+    ${on ? `<ellipse class="ofp-ring" cx="${x}" cy="${y + 68}" rx="40" ry="34"/>` : ''}${ofAway().has(k) ? `<rect class="ofp-chair" x="${x - 25}" y="${y + 68}" width="50" height="34" rx="13"/>` : ofFig(k, x, y + 62)}
     <text class="ofp-nm" x="${x}" y="${y + 122}">${esc(e.name)}</text><text class="ofp-rl" x="${x}" y="${y + 138}">${esc(e.role)}</text>
     ${sc === 'busy' ? `<g class="ofp-bub"><rect x="${x + 16}" y="${y + 30}" width="38" height="20" rx="10"/><circle cx="${x + 26}" cy="${y + 40}" r="2.6"/><circle cx="${x + 35}" cy="${y + 40}" r="2.6"/><circle cx="${x + 44}" cy="${y + 40}" r="2.6"/></g>`
       : n ? `<g class="ofp-wait"><circle cx="${x + 34}" cy="${y + 50}" r="11"/><text x="${x + 34}" y="${y + 54.5}">${n > 9 ? '+9' : n}</text></g>` : ''}</g>`; }
+// ---------- الحركة: مشي الموظفين بين المكاتب وغرفة الاجتماعات، والأوراق إلى صندوق المالك ----------
+// تُحفظ كل حركة بوقت بدايتها، فإذا أُعيد رسم المكتب أثناءها تُستأنف من موضعها
+const OF_MCH = [[160, 72], [220, 72], [280, 72], [340, 72], [160, 196], [220, 196], [280, 196], [340, 196]];
+const ofMeetSeats = () => { const L = ['coo', 'support', 'sales', 'accountant', 'ideas', 'legal'].filter(k => OF_EMPS[k] && OF_SEATS[k]); return [...L.map((k, i) => [k, OF_MCH[i]]), ...(OF_EMPS.ceo ? [['ceo', [96, 134]]] : [])]; };
+const OF_LANES = [200, 370, 540, 680, 815, 960]; let OF_FX = [];
+const ofRM = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+const ofFxActive = () => { const now = Date.now(); return OF_FX.filter(f => now < f.t0 + f.dur); };
+const ofAway = () => new Set([...ofFxActive().map(f => f.k), ...(OF_MEETING ? ofMeetSeats().map(x => x[0]) : [])]);
+// من المقعد إلى الممر الرئيسي (y=275)
+function ofExit(k, at) { if (at) { const [cx, cy] = at; return cy === 72 ? [[cx, cy], [cx, 46], [66, 46], [66, 228], [230, 228], [230, 275]] : cy === 196 ? [[cx, cy], [cx, 228], [230, 228], [230, 275]] : [[cx, cy], [66, cy], [66, 228], [230, 228], [230, 275]]; }
+  const [x, y] = OF_SEATS[k]; if (y < 200) { const d = k === 'ceo' ? 850 : 590; return [[x, y + 62], [x, y + 137], [d, y + 137], [d, 275]]; }
+  if (y > 400) return [[x, y + 62], [x, 612], [680, 612], [680, 275]];
+  const ln = OF_LANES.reduce((a, b) => Math.abs(b - x) < Math.abs(a - x) ? b : a); return [[x, y + 62], [x, 455], [ln, 455], [ln, 275]]; }
+const ofRoute = (a, b) => [...a, ...b.slice().reverse()];
+// حركة على مسار: hold = توقف عند نقطة (للتسليم)، paper = يحمل ورقة حتى تلك النقطة
+function ofWalk(k, pts, o = {}) { if (ofRM() || !OF_SEATS[k]) { if (o.done) o.done(); return; }
+  const sp = 0.17; let t = 0; const times = [0]; for (let i = 1; i < pts.length; i++) { t += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]) / sp; if (o.holdAt === i) t += o.hold || 0; times.push(t); }
+  const f = { k, pts, times, t0: Date.now() + (o.delay || 0), dur: t + (o.delay || 0), paper: o.paper || 0, holdAt: o.holdAt, hold: o.hold || 0 }; f.dur = t; OF_FX.push(f);
+  ofPlanRefresh(); setTimeout(() => { OF_FX = OF_FX.filter(x => x !== f); ofPlanRefresh(); if (o.done) o.done(); }, (o.delay || 0) + t + 40); }
+function ofFxReplay() { const L = document.getElementById('ofpFx'); if (!L) return; const now = Date.now(); L.innerHTML = '';
+  for (const f of ofFxActive()) { const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'ofp-walker');
+    g.innerHTML = ofFig(f.k, 0, 0, .9, 0, false) + (f.paper ? '<g class="ofp-carry"><rect x="-9" y="-44" width="18" height="22" rx="2"/><path d="M-5 -38h10M-5 -33h10M-5 -28h6"/></g>' : ''); L.appendChild(g);
+    const n = f.pts.length, kf = []; const ang = i => { const a = f.pts[Math.min(i + 1, n - 1)], b = f.pts[Math.min(i, n - 2)]; return Math.atan2(a[1] - b[1], a[0] - b[0]) * 180 / Math.PI + 90; };
+    for (let i = 0; i < n; i++) { const [x, y] = f.pts[i]; const off = f.dur ? f.times[i] / f.dur : 0;
+      if (i > 0) kf.push({ offset: Math.max(0, off - (i === f.holdAt ? f.hold / f.dur : 0)), transform: `translate(${x}px,${y}px) rotate(${ang(i - 1)}deg)` });
+      if (i === f.holdAt && f.hold) kf.push({ offset: Math.max(0, off - 220 / f.dur), transform: `translate(${x}px,${y}px) rotate(${ang(i - 1)}deg)` });
+      kf.push({ offset: Math.min(1, off + (i > 0 && i < n - 1 ? 0.0001 : 0)), transform: `translate(${x}px,${y}px) rotate(${ang(i)}deg)` }); }
+    kf.sort((a, b) => a.offset - b.offset); kf[0].offset = 0; kf[kf.length - 1].offset = 1;
+    const wait = f.t0 - now; const a = g.animate(kf.map((x, i) => ({ ...x, offset: Math.min(1, Math.max(i ? kf[i - 1].offset : 0, x.offset)) })), { duration: f.dur, delay: Math.max(0, wait), fill: 'both' }); if (wait < 0) a.currentTime = -wait;
+    const c = g.querySelector('.ofp-carry'); if (c && f.holdAt) { const ca = c.animate([{ opacity: 1 }, { opacity: 1, offset: f.times[f.holdAt] / f.dur - f.hold / f.dur }, { opacity: 0, offset: Math.min(1, f.times[f.holdAt] / f.dur - f.hold / f.dur + 0.02) }, { opacity: 0 }], { duration: f.dur, delay: Math.max(0, wait), fill: 'both' }); if (wait < 0) ca.currentTime = -wait; } } }
+function ofPlanRefresh() { const el = document.querySelector('#t-office .of-plan'); if (el && OF_LAYOUT === 'floor' && OF_VIEW === 'office') { el.innerHTML = renderPlan(); ofFxReplay(); } }
+// تكليف أو إحالة: يمشي المرسل إلى مكتب زميله ويسلّمه الورقة ثم يعود
+function ofFxVisit(a, b) { if (!OF_SEATS[a] || !OF_SEATS[b] || a === b || ofAway().has(a)) return; const [bx, by] = OF_SEATS[b]; const v = by < 200 ? [bx + 52, by + 120] : [bx + 46, by + 104];
+  const to = ofRoute(ofExit(a), [v, ...ofExit(b).slice(1)]); const back = to.slice(0, -1).reverse(); ofWalk(a, [...to, ...back], { holdAt: to.length - 1, hold: 1100, paper: 1 }); }
+// اجتماع الصباح: الحضور يمشون إلى الكراسي، ثم يعودون بعد انتهائه
+function ofFxMeet(go) { ofMeetSeats().forEach(([k, ch], i) => { const r = ofRoute(ofExit(k), ofExit(k, ch)); ofWalk(k, go ? r : r.slice().reverse(), { delay: i * 380 }); }); }
+// المسودة الجاهزة: ورقة تطير من مكتب الموظف إلى صندوق المالك
+function ofFxPaper(k, n) { if (ofRM() || OF_LAYOUT !== 'floor') return; const from = document.querySelector(`.ofp [data-oe="${k}"] .ofp-mon`), to = document.querySelector('.of-owner .ph'); if (!from || !to) return;
+  const a = from.getBoundingClientRect(), b = to.getBoundingClientRect(); if (!a.width || !b.width) return;
+  for (let i = 0; i < Math.min(n || 1, 3); i++) { const d = document.createElement('div'); d.className = 'of-fly'; d.style.left = a.left + a.width / 2 - 9 + 'px'; d.style.top = a.top - 6 + 'px'; document.body.appendChild(d);
+    const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + 14 - a.top;
+    d.animate([{ transform: 'translate(0,0) rotate(0) scale(1)', opacity: 0 }, { opacity: 1, offset: .1 }, { transform: `translate(${dx / 2}px,${Math.min(dy, 0) - 90}px) rotate(-14deg) scale(1.15)`, offset: .5 }, { transform: `translate(${dx}px,${dy}px) rotate(8deg) scale(.7)`, opacity: .9 }], { duration: 1300, delay: i * 260, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'both' }).onfinish = () => d.remove(); } }
 function renderPlan() { const m = OFC.meet; const meetToday = m && ofKsaDay(m.at) === ofKsaDay(nowIso());
   const chairs = [[160, 72], [220, 72], [280, 72], [340, 72], [160, 196], [220, 196], [280, 196], [340, 196]];
-  const att = OF_MEETING ? (m && m.items.length ? m.items.map(i => i.emp) : ['coo', 'support', 'sales', 'accountant', 'ideas', 'legal']).concat('ceo') : [];
+  const busyFx = new Set(ofFxActive().map(f => f.k));
   const plant = (x, y) => `<g class="ofp-plant"><circle cx="${x}" cy="${y}" r="13"/><circle cx="${x - 6}" cy="${y - 5}" r="7"/><circle cx="${x + 6}" cy="${y + 4}" r="7"/></g>`;
   const seats = Object.keys(OF_EMPS).filter(k => OF_SEATS[k]); const extra = Object.keys(OF_EMPS).filter(k => !OF_SEATS[k]);
   return `<div class="ofp-wrap"><svg class="ofp" viewBox="0 0 1000 650" role="group" aria-label="مخطط المكتب">
@@ -2019,7 +2075,7 @@ function renderPlan() { const m = OFC.meet; const meetToday = m && ofKsaDay(m.at
     <g class="ofp-meet" data-omeet role="button" tabindex="0" aria-label="غرفة الاجتماعات: ${meetToday ? 'افتح محضر اليوم' : 'اعقد اجتماع اليوم'}">
       ${chairs.map(([x, y]) => `<circle class="ofp-chair" cx="${x}" cy="${y}" r="17"/>`).join('')}<circle class="ofp-chair" cx="96" cy="134" r="17"/><circle class="ofp-chair" cx="404" cy="134" r="17"/>
       <rect class="ofp-table" x="120" y="92" width="260" height="84" rx="42"/><rect class="ofp-screen" x="20" y="100" width="8" height="68" rx="3"/>
-      ${att.map((k, i) => { const [x, y] = i === att.length - 1 ? [96, 134] : (chairs[i] || chairs[0]); const t = (OF_EMPS[k] || {}).tint || 'info'; return ofFig(k, x, y, .62, x === 96 ? 90 : y < 134 ? 180 : 0); }).join('')}
+      ${OF_MEETING ? ofMeetSeats().filter(([k]) => !busyFx.has(k)).map(([k, [x, y]]) => ofFig(k, x, y, .62, x === 96 ? 90 : y < 134 ? 180 : 0)).join('') : ''}
       ${meetToday && !OF_MEETING ? `<g class="ofp-note"><rect x="226" y="116" width="48" height="36" rx="4"/><path d="M234 127h32M234 134h32M234 141h20"/></g>` : ''}
       <text class="ofp-st" x="250" y="232">${OF_MEETING ? 'الاجتماع جارٍ الآن…' : meetToday ? 'محضر اجتماع اليوم جاهز' : 'لم يُعقد اجتماع اليوم بعد'}</text></g>
     <rect class="ofp-shelf" x="730" y="70" width="12" height="120" rx="3"/><rect class="ofp-sofa" x="935" y="120" width="40" height="100" rx="12"/>${plant(960, 45)}${plant(500, 45)}${plant(700, 225)}
@@ -2028,7 +2084,7 @@ function renderPlan() { const m = OFC.meet; const meetToday = m && ofKsaDay(m.at
     <g class="ofp-lounge"><rect class="ofp-sofa" x="60" y="520" width="170" height="40" rx="14"/><rect class="ofp-sofa" x="60" y="575" width="40" height="55" rx="12"/><rect class="ofp-table" x="120" y="580" width="90" height="40" rx="10"/><circle class="ofp-cup" cx="150" cy="600" r="6"/><circle class="ofp-cup" cx="180" cy="598" r="6"/>
       <text class="ofp-zl" x="290" y="560">الاستراحة</text>${plant(300, 610)}${plant(40, 500)}</g>
     <text class="ofp-zl" x="500" y="625">المدخل</text>${plant(420, 600)}${plant(580, 600)}
-    ${seats.map(k => ofPerson(k, ...OF_SEATS[k])).join('')}
+    ${seats.map(k => ofPerson(k, ...OF_SEATS[k])).join('')}<g id="ofpFx"></g>
   </svg></div>${extra.length ? `<div class="of-desks">${extra.map(ofDesk).join('')}</div>` : ''}
   <div class="ofp-key"><span><i class="k-busy"></i>يعمل الآن</span><span><i class="k-wait"></i>ينتظر موافقتك</span><span><i class="k-idle"></i>متاح</span><span class="of-mut">اضغط على أي موظف لتفتح محادثته، وعلى غرفة الاجتماعات لمحضر اليوم</span></div>`; }
 function renderFloor() { const seen = new Set(OF_ZONES.flatMap(z => z[1])); const zones = OF_ZONES.map(([t, ks]) => [t, ks.filter(k => OF_EMPS[k])]); const rest = Object.keys(OF_EMPS).filter(k => !seen.has(k)); if (rest.length) zones[zones.length - 1][1].push(...rest);
@@ -2050,11 +2106,11 @@ function renderMsgs() { const L = OFC.msgs.slice(0, OF_MSGALL ? 40 : 5);
   return `<div class="panel of-team-msgs"><div class="ph"><div><h3 style="margin:0">مراسلات الفريق</h3><small>ما يتبادله الموظفون من تكليفات وإحالات وردود</small></div>${OFC.msgs.length > 5 ? `<button class="btn sm" id="ofMsgAll">${OF_MSGALL ? 'أقل' : 'عرض الكل'}</button>` : ''}</div>
     <ol class="of-tm">${L.length ? L.map(m => `<li>${ofAv(m.from)}<div><b>${esc(ofEmp(m.from).name)} <span class="of-arr">←</span> ${esc(ofEmp(m.to).name)}</b>${m.kind === 'assign' ? ' <span class="pill p-info">تكليف</span>' : m.kind === 'handoff' ? ' <span class="pill p-off">إحالة</span>' : m.kind === 'reply' ? ' <span class="pill p-ok">رد</span>' : ''}<p>${esc(m.text)}</p></div><time>${esc(String(m.at).slice(11, 16))}</time></li>`).join('') : '<li class="of-mut">لا مراسلات بعد. حين يكلّف ماجد أو لمى أحداً، أو يحيل موظف عملاً لزميله، تظهر المراسلة هنا.</li>'}</ol></div>`; }
 let OF_MEETING = false, OF_MEETOPEN = false, OF_MSGALL = false;
-async function ofMeetNow() { OF_MEETING = true; renderOffice(); toast('بدأ اجتماع الصباح: يتكلم كل موظف ثم يلخّص ماجد. قد يستغرق دقيقتين');
+async function ofMeetNow() { OF_FX = OF_FX.filter(f => !ofMeetSeats().some(x => x[0] === f.k)); OF_MEETING = true; ofFxMeet(true); renderOffice(); toast('بدأ اجتماع الصباح: يتكلم كل موظف ثم يلخّص ماجد. قد يستغرق دقيقتين');
   try { await fetch('/.netlify/functions/office-run-background', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ meet: true }) }); } catch (e) { OF_MEETING = false; toast('تعذر بدء الاجتماع'); return renderOffice(); }
   plog('مكتب الموظفين: اجتماع الصباح الآن', ofEmp('ceo').name);
   for (let i = 0; i < 12 && OF_MEETING; i++) { await new Promise(r => setTimeout(r, 20e3)); await ofInbox(); if (OFC.meet && ofKsaDay(OFC.meet.at) === ofKsaDay(nowIso())) { OF_MEETING = false; OF_MEETOPEN = true; toast('انتهى اجتماع الصباح ✓'); } }
-  if (OF_MEETING) { OF_MEETING = false; toast('لم يصل محضر الاجتماع بعد، سيظهر عند فتح المكتب لاحقاً'); } renderOffice(); }
+  if (OF_MEETING) { OF_MEETING = false; toast('لم يصل محضر الاجتماع بعد، سيظهر عند فتح المكتب لاحقاً'); } ofFxMeet(false); renderOffice(); }
 const ofAv = (k, big) => { if (!OF_EMPS[k]) return `<span class="of-av t-warn${big ? ' big' : ''}">خ<i></i></span>`; const E = ofEmp(k); return `<span class="of-av t-${OF_EMPS[k].tint}${big ? ' big' : ''}">${esc(String(E.name || '؟').trim().charAt(0))}<i></i></span>`; };
 const waNum = s => { let d = String(s || '').replace(/\D/g, ''); if (d.startsWith('00')) d = d.slice(2); if (d.startsWith('05')) d = '966' + d.slice(1); else if (d.length === 9 && d.startsWith('5')) d = '966' + d; return d.length >= 11 ? d : ''; };
 
@@ -2091,7 +2147,7 @@ async function renderOffice() {
       <div class="of-drafts">${list.length ? list.slice(0, 60).map(ofDraft).join('') : '<div class="empty">لا توجد مسودات هنا. اطلب من أي موظف «تقرير اليوم».</div>'}</div></div>
   </div>
   <p class="of-foot">${u.n ? `استهلاك اليوم: ${u.n} مهمة · ${Math.round((u.in || 0) / 1000)} ألف رمز قراءة · ${Math.round((u.out || 0) / 1000)} ألف رمز كتابة.` : ''} يعمل المكتب بمفتاح الذكاء الاصطناعي في إعدادات Netlify.</p>`;
-  const m = $('#ofMsgs'); if (m) m.scrollTop = m.scrollHeight; badge('ofBadge', allNew, true);
+  const m = $('#ofMsgs'); if (m) m.scrollTop = m.scrollHeight; badge('ofBadge', allNew, true); ofFxReplay();
 }
 let OF_RV = {};
 const ofCall = async body => { const tk = await auth.currentUser.getIdToken(); const r = await fetch('/.netlify/functions/office', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tk }, body: JSON.stringify(body) });
