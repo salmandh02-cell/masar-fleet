@@ -342,7 +342,7 @@ body.va{overflow:hidden}
 /* مكتب الموظفين الأذكياء */
 .of-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .of-hero b{display:block;font:600 16px var(--f-display)}.of-hero small{color:var(--muted);font-size:13px}
-.of-hs{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)}.of-hs b{color:var(--ink);font:600 18px var(--f-display);margin-inline-end:4px}
+.of-hs{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;font-size:13px;color:var(--muted);min-width:0}.of-hs b{color:var(--ink);font:600 18px var(--f-display);margin-inline-end:4px}
 .of-team{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.of-team.mg{grid-template-columns:repeat(2,minmax(0,1fr))}.of-gl{font:600 13px var(--f-display);color:var(--muted);margin-bottom:-8px}
 .of-card{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"av nm" "st st" "job job";gap:8px 10px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);transition:border-color .15s,box-shadow .15s}
 .of-card:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
@@ -351,7 +351,21 @@ body.va{overflow:hidden}
 .of-card .of-av{grid-area:av}.of-nm{grid-area:nm;min-width:0}.of-nm b{display:block;font:600 15px var(--f-display)}.of-nm small{color:var(--muted);font-size:12.5px}
 .of-job{grid-area:job;color:var(--muted);font-size:12.5px;line-height:1.5}
 .of-st{grid-area:st;justify-self:start;font-size:12px;padding:2px 9px;border-radius:999px;background:var(--warn-soft);color:var(--warn)}
-.of-st.idle{background:var(--ok-soft);color:var(--ok)}.of-st.busy{background:var(--info-soft);color:var(--info)}
+.of-st.idle{background:var(--ok-soft);color:var(--ok)}.of-st.busy{background:var(--info-soft);color:var(--info)}.of-st.wait{background:var(--gold-soft);color:var(--gold-ink)}
+.of-lay{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.of-lay button{all:unset;cursor:pointer;padding:7px 12px;font-size:13px;color:var(--muted)}.of-lay button.on{background:var(--accent);color:var(--accent-ink)}.of-lay button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.of-floor{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}.of-fz{flex:999 1 620px;min-width:0;display:grid;gap:16px}.of-owner{flex:1 1 300px;min-width:0}
+.of-zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}.of-zone{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:10px;align-content:start}.of-zone h4{margin:0;font:600 13px var(--f-display);color:var(--gold-ink)}
+.of-desks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.of-desk{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"av nm" "st st" "now now" "nx nx";gap:6px 10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface);min-height:150px;align-content:start}
+.of-desk:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}.of-desk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.of-desk.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.of-desk .of-av{grid-area:av}.of-now{grid-area:now;font-size:12.5px;color:var(--ink2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.of-now time{color:var(--muted)}.of-nx{grid-area:nx;font-size:12px;color:var(--muted);display:flex;gap:4px;align-items:center}.of-nx svg{width:13px;height:13px}
+.of-ol{list-style:none;margin:0;padding:6px 10px 12px;display:grid;gap:6px}.of-oi{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 8px;border-radius:12px}.of-oi:hover{background:var(--hov)}.of-oi:focus-visible{outline:2px solid var(--accent)}.of-oi b{display:block;font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.of-oi small{color:var(--muted);font-size:12px}.of-oi .of-av{width:30px;height:30px;font-size:13px;border-radius:9px}.of-oi .of-av i{display:none}
+.of-meet .ph{align-items:center}.of-mi{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--info-soft);color:var(--info);flex:none}.of-mi svg{width:20px;height:20px}
+.of-att{display:flex}.of-att .of-av{width:30px;height:30px;font-size:12px;border-radius:50%;margin-inline-start:-8px;border:2px solid var(--surface)}.of-att .of-av i{display:none}
+.of-md{padding:0 16px 14px}.of-md summary{cursor:pointer;font-size:13.5px;color:var(--accent);padding:4px 0 10px}.of-mt{display:grid;gap:10px;margin-bottom:12px}.of-mt-i{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px;border:1px solid var(--line);border-radius:12px;font-size:13.5px;line-height:1.7}.of-mt-i.sum{background:var(--gold-soft);border-color:color-mix(in srgb,var(--gold) 40%,var(--line))}.of-mt-i.err{opacity:.7}.of-mt-i b{display:block;margin-bottom:2px}
+.of-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}.of-tm{list-style:none;margin:0;padding:6px 16px 14px;display:grid;gap:10px}.of-tm li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;font-size:13.5px}.of-tm p{margin:4px 0 0;color:var(--ink2);line-height:1.6;white-space:pre-line;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}.of-tm time{color:var(--muted);font-size:12px}.of-tm .of-av{width:30px;height:30px;font-size:13px;border-radius:9px}.of-tm .of-av i{display:none}
+.of-d.flash{box-shadow:0 0 0 2px var(--gold)}
+@media (max-width:560px){.of-desks{grid-template-columns:minmax(0,1fr)}}
 .of-av{position:relative;width:38px;height:38px;border-radius:12px;display:inline-grid;place-items:center;font:600 16px var(--f-display);flex:none}
 .of-av.big{width:44px;height:44px;font-size:18px}
 .of-av i{position:absolute;inset-inline-end:-3px;bottom:-3px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:1px solid var(--line)}
@@ -1640,9 +1654,9 @@ async function loadOffice() { return OF_LOAD || (OF_LOAD = loadOffice0()); }
 async function loadOffice0() {
   let o = {}; try { const s = await F.getDoc(F.doc(fs, 'platform', 'office')); o = s.exists() ? s.data() : {}; } catch (e) { toast('تعذر تحميل المكتب'); }
   if (KB === null) await loadKb(); OFC = o;
-  OFC.drafts = OFC.drafts || []; OFC.feed = OFC.feed || []; OFC.auto = OFC.auto || { review: true, assign: true, handoff: true }; OFC.queue = OFC.queue || []; OFC.reviews = OFC.reviews || {}; OFC.chats = OFC.chats || {}; OFC.persona = OFC.persona || {}; OFC.usage = OFC.usage || {};
+  OFC.drafts = OFC.drafts || []; OFC.feed = OFC.feed || []; OFC.auto = OFC.auto || { review: true, assign: true, handoff: true }; OFC.queue = OFC.queue || []; OFC.reviews = OFC.reviews || {}; OFC.chats = OFC.chats || {}; OFC.persona = OFC.persona || {}; OFC.usage = OFC.usage || {}; OFC.msgs = OFC.msgs || []; OFC.meet = OFC.meet || null;
   try { const a = await F.getDoc(F.doc(fs, 'platform', 'officeauto')); OFA = a.exists() ? a.data() : ofaDef(); } catch (e) { OFA = ofaDef(); }
-  OFA.sched = Array.isArray(OFA.sched) ? OFA.sched : ofaDef().sched;
+  OFA.sched = Array.isArray(OFA.sched) ? OFA.sched : ofaDef().sched; OFA.meet = OFA.meet || ofaDef().meet;
   ofAutoSync(); await ofInbox(); clearInterval(OF_INBOX_T); OF_INBOX_T = setInterval(() => ofInbox(), 10 * 60e3);
 }
 // المستند الواحد محدود بحجم 1MB: نُبقي آخر 16 رسالة لكل موظف، وآخر 120 مسودة (المعلّقة أولاً)
@@ -1650,7 +1664,7 @@ async function saveOffice() {
   const keep = [...OFC.drafts.filter(d => d.status === 'new'), ...OFC.drafts.filter(d => d.status !== 'new')].slice(0, 120); OFC.drafts = OFC.drafts.filter(d => keep.includes(d));
   Object.keys(OFC.chats).forEach(k => { OFC.chats[k] = OFC.chats[k].slice(-16); });
   const days = Object.keys(OFC.usage).sort().slice(-60); OFC.usage = Object.fromEntries(days.map(d => [d, OFC.usage[d]]));
-  try { await F.setDoc(F.doc(fs, 'platform', 'office'), { drafts: OFC.drafts, feed: OFC.feed.slice(0, 150), auto: OFC.auto, queue: OFC.queue.slice(-80), reviews: OFC.reviews, chats: OFC.chats, persona: OFC.persona, usage: OFC.usage, updatedAt: nowIso() }); return true; }
+  try { await F.setDoc(F.doc(fs, 'platform', 'office'), { drafts: OFC.drafts, feed: OFC.feed.slice(0, 150), auto: OFC.auto, queue: OFC.queue.slice(-80), reviews: OFC.reviews, chats: OFC.chats, persona: OFC.persona, usage: OFC.usage, msgs: OFC.msgs.slice(0, 80), meet: OFC.meet || null, updatedAt: nowIso() }); return true; }
   catch (e) { toast('تعذر حفظ المكتب: ' + (e.code || e.message)); return false; }
 }
 
@@ -1772,6 +1786,7 @@ async function ofAsk(emp, task, message, depth = 0, from = '') {
     const ids = (j.drafts || []).map(x => { const id = uid('d'); OFC.drafts.unshift({ id, emp, ...x, status: 'new', at: nowIso(), ...(from ? { from } : {}) }); return id; });
     fresh = ids.map(id => OFC.drafts.find(x => x.id === id)); ofFeed(emp, ids.length ? `أنهى العمل وكتب ${ids.length} مسودة` : 'أنهى العمل ورفع رده');
     chat.push({ role: 'assistant', content: (j.reply || '') + (j.cut ? '\n\n(انقطع الرد لطوله، اطلب التكملة)' : ''), drafts: ids.length, at: nowIso() });
+    if (from && OF_EMPS[from]) { ofMsg(emp, from, j.reply || 'أنهيت المطلوب', 'reply'); ofFeed(emp, 'ردّ على زميله بما أنجز', from); }
     const day = today(); const u = OFC.usage[day] = OFC.usage[day] || { n: 0, in: 0, out: 0 }; u.n++; u.in += (j.usage || {}).in || 0; u.out += (j.usage || {}).out || 0;
     await saveOffice(); plog('مكتب الموظفين: ' + (task === 'brief' ? 'تقرير اليوم' : 'طلب'), E.name + ' · ' + E.role, ids.length ? `${ids.length} مسودة` : '');
     if (ids.length) toast(`${E.name} كتب ${ids.length} مسودة بانتظار اعتمادك`);
@@ -1798,6 +1813,8 @@ function ofRefs(k, max = 110000) { let out = '';
   for (const r of (KB ? KB.docs : []).filter(r => kbReaders(r).includes(k))) { const t = `### «${r.title}» (${(OF_RCAT[r.cat] || OF_RCAT.other)[0]}، ${fmt(r.at)})\n${r.text}\n\n`; if (out.length + t.length > max) continue; out += t; }
   return out.trim(); }
 const ofFeed = (emp, text, to) => { OFC.feed.unshift({ at: nowIso(), emp, to: to || '', text: cut(text, 240) }); };
+// مراسلات الفريق: ما يرسله موظف لزميل (تكليف، إحالة، رد على زميل، حاجة في الاجتماع) ظاهرة للمالك كمحادثات الفريق
+const ofMsg = (from, to, text, kind) => { OFC.msgs.unshift({ at: nowIso(), from, to, kind: kind || '', text: cut(text, 600) }); };
 const OF_AUTO_L = { review: 'الخبير يراجع كل مسودة تلقائياً قبل أن تصلك', assign: 'تكليفات ماجد ولمى تُنفَّذ تلقائياً (الموظف يبدأ العمل فوراً)', handoff: 'الإحالة بين الموظفين تُنفَّذ تلقائياً' };
 // ---------- التشغيل التلقائي على الخادم (platform/officeauto + officeinbox) ----------
 // مهام كل موظف حددها المالك (سياسة داخلية). تعمل على الخادم في موعدها بتوقيت الرياض حتى لو كانت اللوحة مغلقة،
@@ -1820,11 +1837,11 @@ const OF_SCHED_DEF = [
   { id: 'leg-week', emp: 'legal', title: 'المراجعة النظامية', freq: 'weekly', dow: 0, hour: 9, prompt: 'راجع الأنظمة ذات الصلة من مصادرها الرسمية فقط، وتابع الأخبار في المنصات الرسمية، واكتب ما تغيّر وتوقعاتك للقادم موصوفة بأنها توقع. أي تحديث لسجل الأنظمة أو السياسات يكون مسودة بانتظار موافقة المالك.' }
 ];
 let OFA = null;
-const ofaDef = () => ({ on: true, support24: true, supportAuto: 'howto', sched: OF_SCHED_DEF.map(x => ({ ...x, on: true })) });
+const ofaDef = () => ({ on: true, support24: true, supportAuto: 'howto', meet: { on: true, hour: 10 }, sched: OF_SCHED_DEF.map(x => ({ ...x, on: true })) });
 const ofSched = t => `${OF_FREQ[t.freq] || ''}${t.freq === 'weekly' ? ' ' + OF_DOW[+t.dow || 0] : t.freq === 'monthly' ? ' يوم ' + (t.dom || 1) : ''} الساعة ${t.hour}`;
 // نسخة يقرؤها الخادم: الجدول، ودليل العمل النهائي لكل موظف، والأسماء، وقرّاء كل تصنيف من المراجع
 async function ofAutoSync() {
-  const snap = { on: OFA.on !== false, support24: OFA.support24 !== false, supportAuto: OFA.supportAuto || 'off', sched: OFA.sched,
+  const snap = { on: OFA.on !== false, support24: OFA.support24 !== false, supportAuto: OFA.supportAuto || 'off', meet: { on: OFA.meet.on !== false, hour: +OFA.meet.hour || 10 }, sched: OFA.sched,
     sop: Object.fromEntries(Object.keys(OF_EMPS).map(k => [k, `${ofSop(k)}\n${OF_RULE}`])), persona: Object.fromEntries(Object.keys(OF_EMPS).map(k => { const e = ofEmp(k); return [k, { name: `${e.name} (${e.role})`, extra: e.extra || '' }]; })),
     rcat: Object.fromEntries(Object.entries(OF_RCAT).map(([c, v]) => [c, v[1]])), features: OF_FEATURES };
   const sig = JSON.stringify(snap); if (sig === OFA._sig) return true; OFA._sig = sig;
@@ -1840,6 +1857,10 @@ async function ofInbox() {
     if (x.type === 'run') { chat.push({ role: 'user', content: `⏰ مهمة مجدولة: ${x.title}`, at: x.at }); chat.push({ role: 'assistant', content: (x.reply || '') + (x.cut ? '\n\n(انقطع الرد لطوله)' : ''), drafts: ids.length, at: x.at }); ofFeed(emp, `أنجز المهمة المجدولة «${x.title}»${ids.length ? ` وكتب ${ids.length} مسودة` : ''}`); }
     else if (x.type === 'ticket') { chat.push({ role: 'assistant', content: x.sent ? `ردّيت تلقائياً على تذكرة «${x.title}» (${x.company}) لأنها سؤال شرح جوابه في المراجع:\n\n${x.reply}` : `وصلت تذكرة «${x.title}» (${x.company}). كتبت الرد مسودة بانتظارك. ${x.note || ''}${x.eta ? `\nمدة الحل المتوقعة: ${x.eta}` : ''}`, drafts: ids.length, at: x.at });
       ofFeed(emp, x.sent ? `ردّت تلقائياً على تذكرة: ${x.title}` : `كتبت رداً على تذكرة جديدة: ${x.title}`); }
+    else if (x.type === 'meet') { const items = (x.items || []).filter(i => OF_EMPS[i.emp]);
+      OFC.meet = { at: x.at, items: items.map(i => ({ emp: i.emp, text: cut(i.text, 1500), err: !!i.err })), summary: x.reply || '', drafts: ids.length };
+      chat.push({ role: 'user', content: '☕ اجتماع الصباح: خلاصة الاجتماع', at: x.at }); chat.push({ role: 'assistant', content: x.reply || '', drafts: ids.length, at: x.at });
+      ofFeed(emp, `عقد اجتماع الصباح بحضور ${items.length} موظفين${ids.length ? ` وكتب ${ids.length} تكليفاً` : ''}`); }
     else if (x.type === 'error') ofFeed(emp, `تعذر تنفيذ المهمة المجدولة «${x.title}»: ${x.text || ''}`);
     const day = String(x.at || nowIso()).slice(0, 10); const u = OFC.usage[day] = OFC.usage[day] || { n: 0, in: 0, out: 0 }; u.n++; u.in += (x.usage || {}).in || 0; u.out += (x.usage || {}).out || 0; }
   if (!(await saveOffice())) return;
@@ -1851,7 +1872,7 @@ async function ofInbox() {
 // تنفيذ تكليف أو إحالة: الموظف المستلم يبدأ العمل، ومسوداته تبقى بانتظار المالك
 async function ofDelegate(d, depth, auto) {
   const E = ofEmp(d.emp), t = d.target, T = ofEmp(t); d.status = d.kind === 'assign' ? 'assigned' : 'handed'; d.doneAt = nowIso(); if (auto) d.auto = 1;
-  ofFeed(d.emp, `${d.kind === 'assign' ? 'كلّف' : 'أحال إلى'} ${T.name}: ${d.title || cut(d.body, 120)}`, t);
+  ofFeed(d.emp, `${d.kind === 'assign' ? 'كلّف' : 'أحال إلى'} ${T.name}: ${d.title || cut(d.body, 120)}`, t); ofMsg(d.emp, t, `${d.title ? d.title + ': ' : ''}${d.body}`, d.kind);
   plog((d.kind === 'assign' ? 'تكليف موظف من ' : 'إحالة بين الموظفين من ') + E.name + (auto ? ' (تلقائي)' : ''), T.name, cut(d.body, 120));
   return ofAsk(t, 'chat', `${d.kind === 'assign' ? 'تكليف' : 'إحالة'} من ${E.name} (${E.role})${auto ? '' : '، معتمد من المالك'}:\n${d.title ? d.title + '\n' : ''}${d.body}`, depth, d.emp);
 }
@@ -1929,6 +1950,44 @@ function ofMd(md) { const lines = esc(md).split('\n'); let o = '', inL = false, 
     if (l.trim()) o += `<p>${inl(l)}</p>`;
   }
   return o + (inT ? '</table>' : '') + (inL ? '</ul>' : ''); }
+// صندوق المالك: الأهم أولاً (المال والعملاء والأنظمة، ثم ما تأخر أو ضعف تقييمه)
+const OF_PRIO = { journal: 3, coa: 3, ticket: 3, bug: 3, law: 3, task: 2, message: 2, dev: 2, assign: 2, handoff: 1, report: 1, note: 1, idea: 1, post: 1 };
+const ofPrio = d => (OF_PRIO[d.kind] || 1) + ((daysAgo(d.at) || 0) >= 1 ? 1 : 0) + (d.review && d.review.score < 5 ? 1 : 0);
+const OF_PL = p => p >= 4 ? ['عاجل', 'p-crit'] : p >= 3 ? ['مهم', 'p-warn'] : ['عادي', 'p-off'];
+const ofNewSorted = () => OFC.drafts.filter(d => d.status === 'new').sort((a, b) => ofPrio(b) - ofPrio(a) || String(b.at).localeCompare(String(a.at)));
+// المكاتب الافتراضية: كل قسم في ركن، ولكل موظف مكتب بحالته وما يعمل عليه الآن وموعد مهمته القادمة
+const OF_ZONES = [['الإدارة', ['ceo', 'coo']], ['خدمة العملاء', ['support', 'sales']], ['المالية والأنظمة', ['accountant', 'legal']], ['النمو والمنتج', ['ideas', 'marketing', 'coder', 'ops']]];
+let OF_LAYOUT = (() => { try { return localStorage.getItem('ofLayout') || 'cards'; } catch (e) { return 'cards'; } })();
+function ofStat(k) { const n = OFC.drafts.filter(d => d.emp === k && d.status === 'new').length;
+  if (OF_BUSY[k]) return ['busy', 'يعمل الآن']; if ((OF_PEND[k] || []).length) return ['busy', 'بانتظار الدور']; if (n) return ['wait', `ينتظرك (${n})`]; return ['idle', 'متاح']; }
+function ofDesk(k) { const e = ofEmp(k); const [sc, sl] = ofStat(k); const f = OFC.feed.find(x => x.emp === k);
+  const nx = (OFA ? OFA.sched : []).filter(t => t.emp === k && t.on !== false).sort((a, b) => a.hour - b.hour)[0];
+  return `<button class="of-desk${k === OF_EMP ? ' on' : ''}" data-oe="${k}" aria-pressed="${k === OF_EMP}">${ofAv(k)}<span class="of-nm"><b>${esc(e.name)}</b><small>${esc(e.role)}</small></span><span class="of-st ${sc}">${sl}</span>
+    <span class="of-now">${f ? `${esc(f.text)} <time>${esc(String(f.at).slice(11, 16))}</time>` : esc(e.job)}</span>${nx ? `<span class="of-nx">${svg('log')} ${esc(nx.title)} · ${esc(ofSched(nx))}</span>` : ''}</button>`; }
+function renderFloor() { const seen = new Set(OF_ZONES.flatMap(z => z[1])); const zones = OF_ZONES.map(([t, ks]) => [t, ks.filter(k => OF_EMPS[k])]); const rest = Object.keys(OF_EMPS).filter(k => !seen.has(k)); if (rest.length) zones[zones.length - 1][1].push(...rest);
+  const L = ofNewSorted();
+  return `<div class="of-floor"><div class="of-fz">${renderMeet()}<div class="of-zones">${zones.map(([t, ks]) => `<section class="of-zone"><h4>${t}</h4><div class="of-desks">${ks.map(ofDesk).join('')}</div></section>`).join('')}</div></div>
+    <aside class="panel of-owner"><div class="ph"><div><h3 style="margin:0">صندوق المالك</h3><small>الأهم أولاً · ${L.length} بانتظارك</small></div></div>
+      <ol class="of-ol">${L.length ? L.slice(0, 8).map(d => { const [pl, pc] = OF_PL(ofPrio(d)); return `<li><button class="of-oi" data-odid="${esc(d.id)}">${ofAv(d.emp)}<span><b>${esc(d.title || (OF_KIND[d.kind] || [d.kind])[0])}</b><small>${esc(ofEmp(d.emp).name)} · ${esc((OF_KIND[d.kind] || [d.kind])[0])}${d.targetName ? ' · ' + esc(d.targetName) : ''}</small></span><span class="pill ${pc}">${pl}</span></button></li>`; }).join('') : '<li class="of-mut">لا شيء بانتظارك الآن.</li>'}</ol>
+      ${L.length > 8 ? `<button class="btn sm" data-of-f="new" style="margin:0 16px 14px">عرض الكل (${L.length})</button>` : ''}</aside></div>`; }
+// غرفة الاجتماعات: آخر اجتماع صباحي، وما قاله كل موظف، وخلاصة ماجد، والمالك يوجّه الفريق
+const ofKsaDay = iso => new Date(new Date(iso).getTime() + 3 * 3600e3).toISOString().slice(0, 10);
+function renderMeet() { const m = OFC.meet; const isToday = m && ofKsaDay(m.at) === ofKsaDay(nowIso()); const on = OFA && OFA.meet && OFA.meet.on !== false;
+  return `<div class="panel of-meet"><div class="ph"><span class="of-mi">${svg('users')}</span><div style="flex:1;min-width:0"><h3 style="margin:0">غرفة الاجتماعات</h3><small>${m ? `${isToday ? 'اجتماع اليوم' : 'آخر اجتماع'}: ${esc(fmt(m.at))} الساعة ${esc(new Date(m.at).toLocaleTimeString('ar-SA', { timeZone: 'Asia/Riyadh', hour: '2-digit', minute: '2-digit' }))} · يديره ${esc(ofEmp('ceo').name)}` : on ? `اجتماع الصباح يومياً الساعة ${+OFA.meet.hour || 10}:00 بتوقيت الرياض، يديره ${esc(ofEmp('ceo').name)}` : 'اجتماع الصباح موقوف من إعدادات التشغيل التلقائي'}</small></div>
+    ${m ? `<span class="of-att">${m.items.map(i => ofAv(i.emp)).join('')}</span>` : ''}${isToday ? '' : `<button class="btn sm" id="ofMeetNow" ${OF_MEETING ? 'disabled' : ''}>${OF_MEETING ? 'الفريق يجتمع…' : 'اعقد اجتماع اليوم الآن'}</button>`}</div>
+    ${m ? `<details class="of-md"${OF_MEETOPEN ? ' open' : ''}><summary>محضر الاجتماع: ما قاله كل موظف وخلاصة ${esc(ofEmp('ceo').name)}</summary>
+      <div class="of-mt">${m.items.map(i => `<div class="of-mt-i${i.err ? ' err' : ''}">${ofAv(i.emp)}<div><b>${esc(ofEmp(i.emp).name)}</b>${ofMd(i.text)}</div></div>`).join('')}
+      <div class="of-mt-i sum">${ofAv('ceo')}<div><b>خلاصة ${esc(ofEmp('ceo').name)}</b>${ofMd(m.summary)}${m.drafts ? `<button class="of-dl" data-of-f="ceo">${m.drafts} تكليف ← صندوق المسودات</button>` : ''}</div></div></div>
+      <form class="of-in" id="ofMeetIn"><textarea name="q" rows="2" maxlength="2000" placeholder="وجّه الفريق بعد الاجتماع… (يستلمه ${esc(ofEmp('ceo').name)} ويكلّف من يلزم)"></textarea><button class="btn pri">إرسال</button></form></details>` : ''}</div>`; }
+function renderMsgs() { const L = OFC.msgs.slice(0, OF_MSGALL ? 40 : 5);
+  return `<div class="panel of-team-msgs"><div class="ph"><div><h3 style="margin:0">مراسلات الفريق</h3><small>ما يتبادله الموظفون من تكليفات وإحالات وردود</small></div>${OFC.msgs.length > 5 ? `<button class="btn sm" id="ofMsgAll">${OF_MSGALL ? 'أقل' : 'عرض الكل'}</button>` : ''}</div>
+    <ol class="of-tm">${L.length ? L.map(m => `<li>${ofAv(m.from)}<div><b>${esc(ofEmp(m.from).name)} <span class="of-arr">←</span> ${esc(ofEmp(m.to).name)}</b>${m.kind === 'assign' ? ' <span class="pill p-info">تكليف</span>' : m.kind === 'handoff' ? ' <span class="pill p-off">إحالة</span>' : m.kind === 'reply' ? ' <span class="pill p-ok">رد</span>' : ''}<p>${esc(m.text)}</p></div><time>${esc(String(m.at).slice(11, 16))}</time></li>`).join('') : '<li class="of-mut">لا مراسلات بعد. حين يكلّف ماجد أو لمى أحداً، أو يحيل موظف عملاً لزميله، تظهر المراسلة هنا.</li>'}</ol></div>`; }
+let OF_MEETING = false, OF_MEETOPEN = false, OF_MSGALL = false;
+async function ofMeetNow() { OF_MEETING = true; renderOffice(); toast('بدأ اجتماع الصباح: يتكلم كل موظف ثم يلخّص ماجد. قد يستغرق دقيقتين');
+  try { await fetch('/.netlify/functions/office-run-background', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ meet: true }) }); } catch (e) { OF_MEETING = false; toast('تعذر بدء الاجتماع'); return renderOffice(); }
+  plog('مكتب الموظفين: اجتماع الصباح الآن', ofEmp('ceo').name);
+  for (let i = 0; i < 12 && OF_MEETING; i++) { await new Promise(r => setTimeout(r, 20e3)); await ofInbox(); if (OFC.meet && ofKsaDay(OFC.meet.at) === ofKsaDay(nowIso())) { OF_MEETING = false; OF_MEETOPEN = true; toast('انتهى اجتماع الصباح ✓'); } }
+  if (OF_MEETING) { OF_MEETING = false; toast('لم يصل محضر الاجتماع بعد، سيظهر عند فتح المكتب لاحقاً'); } renderOffice(); }
 const ofAv = (k, big) => { if (!OF_EMPS[k]) return `<span class="of-av t-warn${big ? ' big' : ''}">خ<i></i></span>`; const E = ofEmp(k); return `<span class="of-av t-${OF_EMPS[k].tint}${big ? ' big' : ''}">${esc(String(E.name || '؟').trim().charAt(0))}<i></i></span>`; };
 const waNum = s => { let d = String(s || '').replace(/\D/g, ''); if (d.startsWith('00')) d = d.slice(2); if (d.startsWith('05')) d = '966' + d.slice(1); else if (d.length === 9 && d.startsWith('5')) d = '966' + d; return d.length >= 11 ? d : ''; };
 
@@ -1938,16 +1997,17 @@ async function renderOffice() {
   const pend = k => OFC.drafts.filter(d => d.emp === k && d.status === 'new').length;
   const u = OFC.usage[today()] || { n: 0 }; const allNew = OFC.drafts.filter(d => d.status === 'new').length;
   const E = ofEmp(OF_EMP); const chat = OFC.chats[OF_EMP] || [];
-  const list = OFC.drafts.filter(d => (OF_F === 'all' || (OF_F === 'new' ? d.status === 'new' : d.emp === OF_F)));
+  const list = OF_F === 'new' ? ofNewSorted() : OFC.drafts.filter(d => (OF_F === 'all' || d.emp === OF_F));
   const views = `<div class="tabs2 of-views">${[['office', 'المكتب'], ['sop', 'دليل العمل'], ['refs', `المراجع (${KB.docs.length})`]].map(([k, l]) => `<button data-ov="${k}" class="${OF_VIEW === k ? 'on' : ''}">${l}</button>`).join('')}</div>`;
   if (OF_VIEW !== 'office') { box.innerHTML = views + (OF_VIEW === 'sop' ? renderSopView() : renderRefsView()); badge('ofBadge', allNew, true); return; }
   box.innerHTML = views + `
   <div class="of-hero"><div><b>${allNew ? `${allNew} مسودة بانتظار اعتمادك` : 'لا شيء بانتظارك الآن'}</b><small>الموظفون يقرؤون بيانات المنصة ويكتبون المسودات، ولا يُرسل شيء لأي عميل إلا بضغطة منك.</small></div>
-    <div class="of-hs"><span><b>${u.n}</b> مهمة اليوم</span><span><b>${OFC.queue.filter(x => x.status === 'queued').length}</b> في طابور البرمجة</span><button class="btn sm pri" id="ofDay" ${OF_BUSY.ceo ? 'disabled' : ''} title="ماجد يقرأ الوضع ويكلّف الفريق، والخبراء يراجعون كل مسودة">ابدأ يوم العمل</button><button class="btn sm" id="ofAll">تقرير من الجميع</button><button class="ib" id="ofAuto" title="إعدادات التشغيل التلقائي" aria-label="إعدادات التشغيل التلقائي">${svg('gear')}</button></div></div>
-  ${[['الإدارة', k => OF_EMPS[k].mgmt], ['الفريق', k => !OF_EMPS[k].mgmt]].map(([g, f]) => `<div class="of-gl">${g}</div><div class="of-team${g === 'الإدارة' ? ' mg' : ''}">${Object.keys(OF_EMPS).filter(f).map(k => { const e = ofEmp(k); const n = pend(k); return `<button class="of-card${k === OF_EMP ? ' on' : ''}" data-oe="${k}">
+    <div class="of-hs"><span><b>${u.n}</b> مهمة اليوم</span><span><b>${OFC.queue.filter(x => x.status === 'queued').length}</b> في طابور البرمجة</span><button class="btn sm pri" id="ofDay" ${OF_BUSY.ceo ? 'disabled' : ''} title="ماجد يقرأ الوضع ويكلّف الفريق، والخبراء يراجعون كل مسودة">ابدأ يوم العمل</button><button class="btn sm" id="ofAll">تقرير من الجميع</button><button class="ib" id="ofAuto" title="إعدادات التشغيل التلقائي" aria-label="إعدادات التشغيل التلقائي">${svg('gear')}</button>
+    <span class="of-lay" role="group" aria-label="طريقة العرض">${[['cards', 'بطاقات'], ['floor', 'مكاتب افتراضية']].map(([k, l]) => `<button data-olay="${k}" aria-pressed="${OF_LAYOUT === k}" class="${OF_LAYOUT === k ? 'on' : ''}">${l}</button>`).join('')}</span></div></div>
+  ${OF_LAYOUT === 'floor' ? renderFloor() : [['الإدارة', k => OF_EMPS[k].mgmt], ['الفريق', k => !OF_EMPS[k].mgmt]].map(([g, f]) => `<div class="of-gl">${g}</div><div class="of-team${g === 'الإدارة' ? ' mg' : ''}">${Object.keys(OF_EMPS).filter(f).map(k => { const e = ofEmp(k); const n = pend(k); return `<button class="of-card${k === OF_EMP ? ' on' : ''}" data-oe="${k}">
     ${ofAv(k)}<span class="of-nm"><b>${esc(e.name)}</b><small>${esc(e.role)}</small></span>${OF_BUSY[k] ? '<span class="of-st busy">يعمل الآن</span>' : n ? `<span class="of-st">${n} مسودة</span>` : '<span class="of-st idle">متاح</span>'}
-    <span class="of-job">${esc(e.job)}</span>${OFC.reviews[k] ? `<span class="of-sc ${OFC.reviews[k].score >= 8 ? 'ok' : OFC.reviews[k].score >= 5 ? 'warn' : 'crit'}" title="آخر تقييم خبير">تقييم الخبير ${OFC.reviews[k].score}/10</span>` : ''}</button>`; }).join('')}</div>`).join('')}
-  ${renderFeed()}
+    <span class="of-job">${esc(e.job)}</span>${OFC.reviews[k] ? `<span class="of-sc ${OFC.reviews[k].score >= 8 ? 'ok' : OFC.reviews[k].score >= 5 ? 'warn' : 'crit'}" title="آخر تقييم خبير">تقييم الخبير ${OFC.reviews[k].score}/10</span>` : ''}</button>`; }).join('')}</div>`).join('') + renderMeet()}
+  <div class="of-two">${renderFeed()}${renderMsgs()}</div>
   <div class="of-main">
     <div class="panel of-chat"><div class="ph">${ofAv(OF_EMP, 1)}<div style="flex:1;min-width:0"><h3 style="margin:0">${esc(E.name)} · ${esc(E.role)}</h3><small>${esc(E.job)}</small><small class="of-xpl">يعمل وفق <button class="of-lnk" data-ov="sop">دليل العمل</button> · ${KB.docs.some(r => kbReaders(r).includes(OF_EMP)) ? `يقرأ ${KB.docs.filter(r => kbReaders(r).includes(OF_EMP)).length} مرجع` : 'بلا مراجع بعد'} · يراجعه ${esc(OF_XP[OF_EMP])}</small></div>
       <button class="btn sm" id="ofBrief" ${OF_BUSY[OF_EMP] ? 'disabled' : ''}>تقرير اليوم</button><button class="btn sm" id="ofPerf" ${OF_RV['p-' + OF_EMP] ? 'disabled' : ''}>${OF_RV['p-' + OF_EMP] ? 'الخبير يقيّم…' : 'تقييم أداء'}</button><button class="ib" id="ofSet" title="تخصيص الموظف" aria-label="تخصيص الموظف">${svg('gear')}</button>${chat.length ? `<button class="ib" id="ofClr" title="محادثة جديدة" aria-label="محادثة جديدة">${svg('log')}</button>` : ''}</div>
@@ -1960,7 +2020,7 @@ async function renderOffice() {
       <div class="of-sug">${OF_EMPS[OF_EMP].sug.map(s => `<button data-os="${esc(s)}">${esc(s)}</button>`).join('')}</div>
       <form class="of-in" id="ofIn"><textarea name="q" rows="2" maxlength="3000" placeholder="اكتب مهمة لـ${esc(E.name)}…" ${OF_BUSY[OF_EMP] ? 'disabled' : ''}></textarea><button class="btn pri" ${OF_BUSY[OF_EMP] ? 'disabled' : ''}>إرسال</button></form></div>
     <div class="panel of-box"><div class="ph"><h3 style="margin:0">صندوق المسودات</h3><small>${OFC.drafts.length} إجمالاً</small></div>
-      <div class="tabs2" style="padding:10px 16px 0"><button data-of-f="new" class="${OF_F === 'new' ? 'on' : ''}">بانتظار الاعتماد (${allNew})</button>${Object.keys(OF_EMPS).map(k => `<button data-of-f="${k}" class="${OF_F === k ? 'on' : ''}">${esc(ofEmp(k).name)}</button>`).join('')}<button data-of-f="all" class="${OF_F === 'all' ? 'on' : ''}">الكل</button></div>
+      <div class="tabs2" style="padding:10px 16px 0"><button data-of-f="new" class="${OF_F === 'new' ? 'on' : ''}">بانتظار الاعتماد، الأهم أولاً (${allNew})</button>${Object.keys(OF_EMPS).map(k => `<button data-of-f="${k}" class="${OF_F === k ? 'on' : ''}">${esc(ofEmp(k).name)}</button>`).join('')}<button data-of-f="all" class="${OF_F === 'all' ? 'on' : ''}">الكل</button></div>
       <div class="of-drafts">${list.length ? list.slice(0, 60).map(ofDraft).join('') : '<div class="empty">لا توجد مسودات هنا. اطلب من أي موظف «تقرير اليوم».</div>'}</div></div>
   </div>
   <p class="of-foot">${u.n ? `استهلاك اليوم: ${u.n} مهمة · ${Math.round((u.in || 0) / 1000)} ألف رمز قراءة · ${Math.round((u.out || 0) / 1000)} ألف رمز كتابة.` : ''} يعمل المكتب بمفتاح الذكاء الاصطناعي في إعدادات Netlify.</p>`;
@@ -2064,11 +2124,17 @@ $('#t-office').addEventListener('click', e => {
   const v = e.target.closest('[data-ov]'); if (v) { OF_VIEW = v.dataset.ov; return renderOffice(); }
   if (e.target.closest('#ofDay')) { OF_EMP = 'ceo'; toast('بدأ ماجد يوم العمل: يقرأ الوضع ويكلّف الفريق'); return ofAsk('ceo', 'chat', 'ابدأ يوم العمل: اقرأ وضع المنصة والفريق وسير العمل الأخير، وحدد أولويات اليوم، وكلّف كل موظف بما يخصه بمسودات assign.'); }
   if (e.target.closest('#ofFeedAll')) { OF_FEEDALL = !OF_FEEDALL; return renderOffice(); }
+  if (e.target.closest('#ofMsgAll')) { OF_MSGALL = !OF_MSGALL; return renderOffice(); }
+  const ly = e.target.closest('[data-olay]'); if (ly) { OF_LAYOUT = ly.dataset.olay; try { localStorage.setItem('ofLayout', OF_LAYOUT); } catch (x) {} return renderOffice(); }
+  if (e.target.closest('#ofMeetNow')) return ofMeetNow();
+  const od = e.target.closest('[data-odid]'); if (od) { OF_F = 'new'; renderOffice(); const a = document.querySelector(`[data-did="${CSS.escape(od.dataset.odid)}"]`); if (a) { a.scrollIntoView({ behavior: 'smooth', block: 'center' }); a.classList.add('flash'); setTimeout(() => a.classList.remove('flash'), 1600); } return; }
   if (e.target.closest('#ofAuto')) { const hrs = Array.from({ length: 24 }, (_, h) => h); const f = dialog(`<h3>التشغيل التلقائي</h3><p class="of-mut">كل ما يصل للعملاء يبقى مسودة بانتظار اعتمادك، عدا ما تسمح به أدناه لسارة. ولا يعدّل أي موظف سياسة أو نظاماً بنفسه.</p>${Object.entries(OF_AUTO_L).map(([k, l]) => `<label class="of-tg"><input type="checkbox" name="${k}"${OFC.auto[k] ? ' checked' : ''}> ${l}</label>`).join('')}
     <h4>العمل على مدار الساعة</h4>
     <label class="of-tg"><input type="checkbox" name="a_on"${OFA.on !== false ? ' checked' : ''}> تشغيل المهام المجدولة على الخادم حتى لو كانت اللوحة مغلقة</label>
     <label class="of-tg"><input type="checkbox" name="a_s24"${OFA.support24 !== false ? ' checked' : ''}> سارة تكتب الرد فور وصول أي تذكرة (24 ساعة)</label>
     <label class="of-tg"><input type="checkbox" name="a_how"${OFA.supportAuto === 'howto' ? ' checked' : ''}> سارة ترسل الرد مباشرة إذا كان سؤال شرح استخدام وجوابه في المراجع المعتمدة (المال والاسترداد والأعطال تنتظرك دائماً)</label>
+    <div class="of-sr"><label class="of-tg"><input type="checkbox" name="m_on"${OFA.meet.on !== false ? ' checked' : ''}> اجتماع الصباح يومياً: يتكلم كل موظف ثم يلخّص ${esc(ofEmp('ceo').name)} ويكتب التكليفات (٧ مهام ذكاء اصطناعي يومياً)</label>
+      <select name="m_hr" title="ساعة الاجتماع">${hrs.map(h => `<option value="${h}"${+OFA.meet.hour === h ? ' selected' : ''}>${String(h).padStart(2, '0')}:00</option>`).join('')}</select></div>
     <h4>جدول المهام <small class="of-mut">بتوقيت الرياض</small></h4>
     <div class="of-sch">${OFA.sched.map((t, i) => `<div class="of-sr"><label class="of-tg"><input type="checkbox" name="on${i}"${t.on !== false ? ' checked' : ''}> <b>${esc(ofEmp(t.emp).name)}</b> · ${esc(t.title)}</label>
       <select name="fq${i}">${Object.entries(OF_FREQ).map(([k, l]) => `<option value="${k}"${t.freq === k ? ' selected' : ''}>${l}</option>`).join('')}</select>
@@ -2078,7 +2144,7 @@ $('#t-office').addEventListener('click', e => {
       <textarea name="pr${i}" rows="2" maxlength="1500">${esc(t.prompt)}</textarea></div>`).join('')}</div>
     <button type="button" class="btn sm" data-ofa="reset">استعادة الجدول الافتراضي</button>`,
     async fd => { Object.keys(OF_AUTO_L).forEach(k => { OFC.auto[k] = fd.get(k) === 'on'; }); await saveOffice();
-      OFA.on = fd.get('a_on') === 'on'; OFA.support24 = fd.get('a_s24') === 'on'; OFA.supportAuto = fd.get('a_how') === 'on' ? 'howto' : 'off';
+      OFA.on = fd.get('a_on') === 'on'; OFA.support24 = fd.get('a_s24') === 'on'; OFA.supportAuto = fd.get('a_how') === 'on' ? 'howto' : 'off'; OFA.meet = { on: fd.get('m_on') === 'on', hour: +fd.get('m_hr') || 0 };
       OFA.sched = OFA.sched.map((t, i) => ({ ...t, on: fd.get('on' + i) === 'on', freq: fd.get('fq' + i) || t.freq, dow: +fd.get('dw' + i) || 0, dom: Math.min(28, Math.max(1, +fd.get('dm' + i) || 1)), hour: +fd.get('hr' + i) || 0, prompt: String(fd.get('pr' + i) || t.prompt).trim().slice(0, 1500) || t.prompt }));
       if (await ofAutoSync()) { toast('حُفظ ✓'); plog('مكتب الموظفين: إعدادات التشغيل التلقائي', OFA.on ? 'مفعّل' : 'موقوف', `${OFA.sched.filter(t => t.on !== false).length} مهمة مجدولة`); } renderOffice(); });
     f.querySelector('[data-ofa="reset"]').onclick = () => { if (!confirm('استعادة الجدول الافتراضي؟ ستُستبدل التعديلات على المهام.')) return; OFA.sched = ofaDef().sched; $('#dlg').close('cancel'); ofAutoSync().then(() => toast('استُعيد الجدول الافتراضي ✓')); };
@@ -2108,7 +2174,10 @@ $('#t-office').addEventListener('click', e => {
     const a = b.dataset.od; if (a === 'wa' || a === 'mail') { d.body = ed ? ed.value : d.body; return; } ofAct(d, a, ed ? ed.value.trim() : d.body); }
 });
 $('#t-office').addEventListener('change', e => { if (e.target.id === 'kbFile') { kbFile(e.target.files[0]); e.target.value = ''; } });
-$('#t-office').addEventListener('submit', e => { if (e.target.id !== 'ofIn') return; e.preventDefault(); const q = e.target.q.value.trim(); if (q) ofAsk(OF_EMP, 'chat', q); });
+$('#t-office').addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('of-md')) OF_MEETOPEN = e.target.open; }, true);
+$('#t-office').addEventListener('submit', e => { if (e.target.id === 'ofMeetIn') { e.preventDefault(); const q = e.target.q.value.trim(); if (!q || !OFC.meet) return; OF_EMP = 'ceo';
+  return ofAsk('ceo', 'chat', `توجيه المالك بعد اجتماع الصباح (${fmt(OFC.meet.at)}):\n${q}\n\nخلاصة الاجتماع كما كتبتها:\n${cut(OFC.meet.summary, 3000)}\n\nنفّذ التوجيه: كلّف من يلزم بمسودات assign.`); }
+  if (e.target.id !== 'ofIn') return; e.preventDefault(); const q = e.target.q.value.trim(); if (q) ofAsk(OF_EMP, 'chat', q); });
 $('#t-office').addEventListener('keydown', e => { if (e.target.name === 'q' && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); e.target.form.requestSubmit(); } });
 // تعديل نص المسودة قبل فتح واتساب أو البريد يُحدّث الرابط
 $('#t-office').addEventListener('input', e => { if (!e.target.classList.contains('of-ed')) return; const art = e.target.closest('[data-did]'); if (!art) return; const v = e.target.value;

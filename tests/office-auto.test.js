@@ -53,5 +53,16 @@ O._setClient({ messages: { create: async p => { last = p; return { model: 'm', s
   r = await R._runTicket('t', { support24: false }, 't1', 's'); assert.equal(r.skipped, 'off');
   r = await R._runTicket('t', {}, '../x', 's'); assert.equal(r.error, 'id');
   assert.ok(last.system[0].text.includes('لا تستشهد بمواد الأنظمة'));
+  // اجتماع الصباح: في موعده فقط، ومرة واحدة في اليوم، وكل موظف يتكلم ثم يلخص ماجد
+  const mc = { meet: { hour: 10, emps: ['support', 'sales'] } };
+  assert.equal(await R._runMeeting('t', mc, { ...n, h: 9 }, false), null, 'not its hour');
+  out = { reply: 'أنجزت كذا', drafts: [{ kind: 'assign', target: 'sales', title: 'تابع', body: 'تابع الطلب' }] };
+  made.length = 0; const calls = []; O._setClient({ messages: { create: async p => { calls.push(p); last = p; return { model: 'm', stop_reason: 'end_turn', content: [{ type: 'text', text: JSON.stringify(out) }], usage: { input_tokens: 5, output_tokens: 3 } }; } } });
+  r = await R._runMeeting('t', mc, { ...n, h: 10 }, false); assert.equal(r.meet, 2); assert.equal(calls.length, 3, 'two standups + CEO');
+  assert.ok(calls[0].messages.at(-1).content.includes('اجتماع الصباح'));
+  assert.ok(last.messages.at(-1).content.includes('أنجزت كذا') && last.system[0].text.includes('المدير التنفيذي'));
+  const mt = made.find(m => m.col === 'officeinbox').data; assert.equal(mt.type, 'meet'); assert.equal(mt.items.length, 2); assert.equal(mt.drafts[0].kind, 'assign'); assert.equal(mt.usage.in, 15);
+  r = await R._runMeeting('t', mc, { ...n, h: 10 }, true); assert.equal(r.skipped, 'done', 'one meeting a day');
+  assert.equal(await R._runMeeting('t', { meet: { on: false } }, { ...n, ymd: '2026-12-01', h: 10 }, false), null, 'meeting off');
   console.log('office auto tests: passed');
 })().catch(e => { console.error(e); process.exit(1); });
