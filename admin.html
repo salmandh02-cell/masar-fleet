@@ -1695,6 +1695,10 @@ async function ofPerf(k) {
 }
 function ofQueue() { const L = OFC.queue.filter(x => x.status === 'queued');
   return `<div class="of-q"><b>طابور البرمجة (${L.length})</b>${L.length ? L.map(x => `<div class="of-qi"><span class="pill ${x.from === 'bug' ? 'p-crit' : 'p-info'}">${x.from === 'bug' ? 'عطل' : 'مقترح'}</span><span>${esc(x.title)}</span><button class="btn sm" data-oq="${esc(x.id)}" title="إزالة من الطابور">إزالة</button></div>`).join('') : '<small>فارغ. اعتمد مقترحات عمر أو أحل أعطال سارة لتظهر هنا.</small>'}</div>`; }
+// طلب تنفيذ ياسر يُفتح كـissue في مستودع المنصة، وفيه @claude فيبدأ Claude التنفيذ ويفتح طلب دمج يعتمده المالك
+const GH_REPO = 'salmandh02-cell/masar-fleet';
+const ghIssueUrl = d => { const body = `@claude نفّذ هذا الطلب في منصة ${APP_NAME_OF()} وافتح طلب دمج (PR) إلى main. اتبع CLAUDE.md، ولا تنشر شيئاً.\n\n${cut(d.body, 5500)}\n\n— طلب تنفيذ من ${ofEmp(d.emp).name} (مكتب الموظفين)`;
+  return `https://github.com/${GH_REPO}/issues/new?title=${encodeURIComponent(d.title || 'طلب تنفيذ')}&body=${encodeURIComponent(body)}`; };
 function ofDraft(d) {
   const e = ofEmp(d.emp); const [kl, kc] = OF_KIND[d.kind] || [d.kind, 'p-off']; const c = COS.find(x => x.id === d.target); const tk = d.kind === 'ticket' && TKS.find(x => x.id === d.target);
   const done = d.status !== 'new'; const p = (c && c.profile) || {}; const wa = c && waNum(p.contactMobile || c.phone || p.companyPhone); const mail = c && (p.officialEmail || c.ownerEmail);
@@ -1705,7 +1709,7 @@ function ofDraft(d) {
     else if (d.kind === 'journal') acts = `<button class="btn sm pri" data-od="jpost">اعتماد وترحيل القيد</button>`;
     else if (d.kind === 'idea') acts = `<button class="btn sm pri" data-od="queue">اعتماد وإحالة للمبرمج</button>`;
     else if (d.kind === 'bug') acts = `<button class="btn sm pri" data-od="queue">إحالة للمبرمج</button>`;
-    else if (d.kind === 'dev') acts = `<button class="btn sm pri" data-od="copydev">نسخ طلب التنفيذ</button><button class="btn sm" data-od="built">تم التنفيذ</button>`;
+    else if (d.kind === 'dev') acts = `<a class="btn sm pri" target="_blank" rel="noopener" data-od="gh" href="${ghIssueUrl(d)}">فتح طلب التنفيذ في GitHub</a><button class="btn sm" data-od="copydev">نسخ طلب التنفيذ</button><button class="btn sm" data-od="built">تم التنفيذ</button>`;
     else if (d.kind === 'ticket') acts = tk ? `<button class="btn sm pri" data-od="send">إرسال الرد للعميل</button>` : '<small class="of-warn">التذكرة غير موجودة</small>';
     else if (d.kind === 'message') acts = `${wa ? `<a class="btn sm pri" target="_blank" rel="noopener" href="https://wa.me/${wa}?text=${encodeURIComponent(d.body)}" data-od="wa">واتساب</a>` : ''}${mail ? `<a class="btn sm" href="mailto:${esc(mail)}?subject=${encodeURIComponent(d.title || '')}&body=${encodeURIComponent(d.body)}" data-od="mail">بريد</a>` : ''}<button class="btn sm" data-od="copy">نسخ</button><button class="btn sm" data-od="done">تم الإرسال</button>`;
     else if (d.kind === 'note') acts = c ? `<button class="btn sm pri" data-od="note">حفظ في ملف الشركة</button>` : '<button class="btn sm" data-od="copy">نسخ</button>';
@@ -1740,6 +1744,7 @@ async function ofAct(d, a, body) {
     d.status = 'posted'; d.doneAt = now; await saveOffice(); if (TAB === 'accounting') renderAccounting(); return renderOffice(); }
   if (a === 'queue') { OFC.queue.push({ id: uid('q'), from: d.kind, src: d.id, title: d.title || cut(body, 80), body, status: 'queued', at: now }); d.status = 'queued'; d.doneAt = now;
     await saveOffice(); plog(d.kind === 'idea' ? 'اعتماد مقترح تطوير' : 'إحالة عطل للمبرمج', d.title || ''); toast('أُحيل إلى ياسر في طابور البرمجة ✓'); return renderOffice(); }
+  if (a === 'gh') { d.ghAt = now; await saveOffice(); plog('فتح طلب تنفيذ في GitHub', d.title || ''); return toast('اضغط Submit new issue في GitHub، وClaude يبدأ التنفيذ ويرسل لك طلب دمج'); }
   if (a === 'copydev') { try { await navigator.clipboard.writeText(`نفّذ في منصة ${APP_NAME_OF()} (لوحة المالك admin.html وتطبيق الشركات index.html):\n\n${d.title ? d.title + '\n' : ''}${body}`); toast('نُسخ طلب التنفيذ. الصقه لـClaude في محادثة المشروع'); } catch (x) { toast('تعذر النسخ'); } return saveOffice(); }
   if (a === 'built') { const q = OFC.queue.find(x => x.id === d.target); if (q) { q.status = 'done'; q.doneAt = now; } d.status = 'built'; d.doneAt = now; await saveOffice(); plog('تنفيذ بند برمجي', d.title || ''); return renderOffice(); }
   if (a === 'copy') { try { await navigator.clipboard.writeText(body); toast('نُسخ النص ✓'); } catch (x) { toast('تعذر النسخ'); } return saveOffice(); }
@@ -1767,7 +1772,8 @@ $('#t-office').addEventListener('keydown', e => { if (e.target.name === 'q' && e
 // تعديل نص المسودة قبل فتح واتساب أو البريد يُحدّث الرابط
 $('#t-office').addEventListener('input', e => { if (!e.target.classList.contains('of-ed')) return; const art = e.target.closest('[data-did]'); const v = e.target.value;
   art.querySelectorAll('[data-od="wa"]').forEach(a => { a.href = a.href.replace(/text=.*$/, 'text=' + encodeURIComponent(v)); });
-  art.querySelectorAll('[data-od="mail"]').forEach(a => { a.href = a.href.replace(/body=.*$/, 'body=' + encodeURIComponent(v)); }); });
+  art.querySelectorAll('[data-od="mail"]').forEach(a => { a.href = a.href.replace(/body=.*$/, 'body=' + encodeURIComponent(v)); });
+  const dd = OFC.drafts.find(x => x.id === art.dataset.did); art.querySelectorAll('[data-od="gh"]').forEach(a => { if (dd) a.href = ghIssueUrl({ ...dd, body: v }); }); });
 
 /* ---------- 6) نظام المحاسبة الداخلي (platform/books) ---------- */
 // المستند الواحد يحمل: دليل الحسابات، الفروع، الموظفين، المسيّرات، المصروفات الثابتة، والقيود (expenses)
