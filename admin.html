@@ -365,6 +365,24 @@ body.va{overflow:hidden}
 .of-md{padding:0 16px 14px}.of-md summary{cursor:pointer;font-size:13.5px;color:var(--accent);padding:4px 0 10px}.of-mt{display:grid;gap:10px;margin-bottom:12px}.of-mt-i{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px;border:1px solid var(--line);border-radius:12px;font-size:13.5px;line-height:1.7}.of-mt-i.sum{background:var(--gold-soft);border-color:color-mix(in srgb,var(--gold) 40%,var(--line))}.of-mt-i.err{opacity:.7}.of-mt-i b{display:block;margin-bottom:2px}
 .of-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}.of-tm{list-style:none;margin:0;padding:6px 16px 14px;display:grid;gap:10px}.of-tm li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;font-size:13.5px}.of-tm p{margin:4px 0 0;color:var(--ink2);line-height:1.6;white-space:pre-line;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}.of-tm time{color:var(--muted);font-size:12px}.of-tm .of-av{width:30px;height:30px;font-size:13px;border-radius:9px}.of-tm .of-av i{display:none}
 .of-d.flash{box-shadow:0 0 0 2px var(--gold)}
+.of-plan{padding:12px}.ofp-wrap{overflow-x:auto;border-radius:14px}.ofp{display:block;width:100%;min-width:720px;height:auto;font-family:var(--f-display)}
+.ofp-floor{fill:color-mix(in srgb,var(--gold-soft) 55%,var(--surface))}.ofp-room{fill:color-mix(in srgb,var(--info-soft) 45%,var(--surface))}.ofp-room.alt{fill:color-mix(in srgb,var(--gold-soft) 85%,var(--surface))}
+.ofp-out{fill:none;stroke:var(--ink2);stroke-width:8}.ofp-wall{fill:none;stroke:var(--ink2);stroke-width:6;stroke-linecap:round}.ofp-door{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:4 4}.ofp-gap{stroke:color-mix(in srgb,var(--gold-soft) 55%,var(--surface));stroke-width:10}.ofp-div{stroke:var(--line);stroke-width:2;stroke-dasharray:6 6}
+.ofp-lbl{fill:var(--gold-ink);font-size:15px;font-weight:600;text-anchor:middle}.ofp-zl{fill:var(--muted);font-size:14px;font-weight:600;text-anchor:middle}.ofp-st{fill:var(--muted);font-size:13px;text-anchor:middle}
+.ofp-desk{fill:color-mix(in srgb,var(--gold) 38%,var(--surface));stroke:color-mix(in srgb,var(--gold-ink) 45%,transparent);stroke-width:1.5}.ofp-mon{fill:var(--ink2)}.ofp-kb{fill:color-mix(in srgb,var(--ink2) 25%,var(--surface))}
+.ofp-chair{fill:color-mix(in srgb,var(--ink2) 30%,var(--surface))}.ofp-table{fill:color-mix(in srgb,var(--gold) 45%,var(--surface));stroke:color-mix(in srgb,var(--gold-ink) 50%,transparent);stroke-width:1.5}.ofp-screen,.ofp-shelf{fill:var(--ink2)}
+.ofp-sofa{fill:color-mix(in srgb,var(--accent) 35%,var(--surface))}.ofp-plant circle{fill:color-mix(in srgb,var(--ok) 70%,var(--surface))}.ofp-cup{fill:var(--surface);stroke:var(--ink2);stroke-width:1.5}
+.ofp-head{fill:#F2D3B3;stroke:var(--surface);stroke-width:2}.ofp-ini{font-size:15px;font-weight:700;text-anchor:middle}.ofp-ini.sm{font-size:12px}
+.ofp-body{fill:var(--accent)}.ofp-ini{fill:var(--ink)}.ofp-body.tinfo{fill:var(--info)}.ofp-body.tok{fill:var(--ok)}.ofp-body.twarn{fill:var(--warn)}.ofp-body.tviolet{fill:var(--violet)}.ofp-body.tcrit{fill:var(--crit)}
+.ofp-ini.tinfo{fill:#1F3F6B}.ofp-ini.tok{fill:#1A5B35}.ofp-ini.twarn{fill:#6E4609}.ofp-ini.tviolet{fill:#46298C}.ofp-ini.tcrit{fill:#7A1F1F}
+.ofp-nm{fill:var(--ink);font-size:15px;font-weight:700;text-anchor:middle}.ofp-rl{fill:var(--muted);font-size:12px;text-anchor:middle}
+.ofp-u,.ofp-meet{cursor:pointer;outline:none}.ofp-u:hover .ofp-desk,.ofp-u:focus-visible .ofp-desk{stroke:var(--accent);stroke-width:2.5}.ofp-meet:hover .ofp-table,.ofp-meet:focus-visible .ofp-table{stroke:var(--accent);stroke-width:2.5}
+.ofp-ring{fill:none;stroke:var(--accent);stroke-width:3}.ofp-u.on .ofp-desk{stroke:var(--accent);stroke-width:2.5}.ofp-u.busy .ofp-mon{fill:var(--info)}
+.ofp-bub rect{fill:var(--surface);stroke:var(--info);stroke-width:1.5}.ofp-bub circle{fill:var(--info);animation:ofpDot 1.2s infinite}.ofp-bub circle:nth-child(3){animation-delay:.2s}.ofp-bub circle:nth-child(4){animation-delay:.4s}
+@keyframes ofpDot{0%,80%,100%{opacity:.25}40%{opacity:1}}@media (prefers-reduced-motion:reduce){.ofp-bub circle{animation:none}}
+.ofp-wait circle{fill:var(--gold);stroke:var(--surface);stroke-width:2}.ofp-wait text{fill:#2A1F08;font-size:12px;font-weight:700;text-anchor:middle}
+.ofp-note rect{fill:var(--surface);stroke:var(--ink2);stroke-width:1.2}.ofp-note path{stroke:var(--muted);stroke-width:1.5}
+.ofp-key{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 4px 0;font-size:12.5px;color:var(--ink2)}.ofp-key span{display:inline-flex;align-items:center;gap:6px}.ofp-key i{width:10px;height:10px;border-radius:50%;display:inline-block}.k-busy{background:var(--info)}.k-wait{background:var(--gold)}.k-idle{background:color-mix(in srgb,var(--ink2) 30%,var(--surface))}
 @media (max-width:560px){.of-desks{grid-template-columns:minmax(0,1fr)}}
 .of-av{position:relative;width:38px;height:38px;border-radius:12px;display:inline-grid;place-items:center;font:600 16px var(--f-display);flex:none}
 .of-av.big{width:44px;height:44px;font-size:18px}
@@ -1964,9 +1982,46 @@ function ofDesk(k) { const e = ofEmp(k); const [sc, sl] = ofStat(k); const f = O
   const nx = (OFA ? OFA.sched : []).filter(t => t.emp === k && t.on !== false).sort((a, b) => a.hour - b.hour)[0];
   return `<button class="of-desk${k === OF_EMP ? ' on' : ''}" data-oe="${k}" aria-pressed="${k === OF_EMP}">${ofAv(k)}<span class="of-nm"><b>${esc(e.name)}</b><small>${esc(e.role)}</small></span><span class="of-st ${sc}">${sl}</span>
     <span class="of-now">${f ? `${esc(f.text)} <time>${esc(String(f.at).slice(11, 16))}</time>` : esc(e.job)}</span>${nx ? `<span class="of-nx">${svg('log')} ${esc(nx.title)} · ${esc(ofSched(nx))}</span>` : ''}</button>`; }
+// مخطط المكتب المرسوم (من الأعلى): غرفة الاجتماعات ومكتبا الإدارة، والصالة المفتوحة بمكاتب الفريق، وكل موظف جالس على مكتبه بحالته
+const OF_SEATS = { ceo: [855, 78], coo: [595, 78], support: [130, 318], sales: [270, 318], accountant: [470, 318], legal: [610, 318], ideas: [745, 318], marketing: [885, 318], coder: [745, 478], ops: [885, 478] };
+function ofPerson(k, x, y) { const e = ofEmp(k); const [sc] = ofStat(k); const n = OFC.drafts.filter(d => d.emp === k && d.status === 'new').length; const on = k === OF_EMP; const t = OF_EMPS[k].tint || 'info';
+  return `<g class="ofp-u${on ? ' on' : ''}${sc === 'busy' ? ' busy' : ''}" data-oe="${k}" role="button" tabindex="0" aria-label="${esc(e.name)}، ${esc(e.role)}: ${esc(ofStat(k)[1])}">
+    <rect class="ofp-desk" x="${x - 58}" y="${y}" width="116" height="46" rx="6"/><rect class="ofp-mon" x="${x - 24}" y="${y + 8}" width="48" height="7" rx="2"/><rect class="ofp-kb" x="${x - 16}" y="${y + 27}" width="32" height="9" rx="2"/>
+    <circle class="ofp-chair" cx="${x}" cy="${y + 82}" r="22"/><ellipse class="ofp-body t${t}" cx="${x}" cy="${y + 72}" rx="27" ry="14"/>
+    ${on ? `<circle class="ofp-ring" cx="${x}" cy="${y + 61}" r="20"/>` : ''}<circle class="ofp-head" cx="${x}" cy="${y + 61}" r="15"/><text class="ofp-ini t${t}" x="${x}" y="${y + 66}">${esc(String(e.name || '؟').trim().charAt(0))}</text>
+    <text class="ofp-nm" x="${x}" y="${y + 122}">${esc(e.name)}</text><text class="ofp-rl" x="${x}" y="${y + 138}">${esc(e.role)}</text>
+    ${sc === 'busy' ? `<g class="ofp-bub"><rect x="${x + 16}" y="${y + 30}" width="38" height="20" rx="10"/><circle cx="${x + 26}" cy="${y + 40}" r="2.6"/><circle cx="${x + 35}" cy="${y + 40}" r="2.6"/><circle cx="${x + 44}" cy="${y + 40}" r="2.6"/></g>`
+      : n ? `<g class="ofp-wait"><circle cx="${x + 34}" cy="${y + 50}" r="11"/><text x="${x + 34}" y="${y + 54.5}">${n > 9 ? '+9' : n}</text></g>` : ''}</g>`; }
+function renderPlan() { const m = OFC.meet; const meetToday = m && ofKsaDay(m.at) === ofKsaDay(nowIso());
+  const chairs = [[160, 72], [220, 72], [280, 72], [340, 72], [160, 196], [220, 196], [280, 196], [340, 196]];
+  const att = OF_MEETING ? (m && m.items.length ? m.items.map(i => i.emp) : ['coo', 'support', 'sales', 'accountant', 'ideas', 'legal']).concat('ceo') : [];
+  const plant = (x, y) => `<g class="ofp-plant"><circle cx="${x}" cy="${y}" r="13"/><circle cx="${x - 6}" cy="${y - 5}" r="7"/><circle cx="${x + 6}" cy="${y + 4}" r="7"/></g>`;
+  const seats = Object.keys(OF_EMPS).filter(k => OF_SEATS[k]); const extra = Object.keys(OF_EMPS).filter(k => !OF_SEATS[k]);
+  return `<div class="ofp-wrap"><svg class="ofp" viewBox="0 0 1000 650" role="group" aria-label="مخطط المكتب">
+    <rect class="ofp-floor" x="10" y="10" width="980" height="630" rx="18"/>
+    <rect class="ofp-room" x="14" y="14" width="456" height="236"/><rect class="ofp-room alt" x="474" y="14" width="244" height="236"/><rect class="ofp-room alt" x="722" y="14" width="264" height="236"/>
+    <path class="ofp-wall" d="M10 250H195M265 250H555M625 250H815M885 250H990M470 10V250M720 10V250"/>
+    <path class="ofp-door" d="M195 250a70 70 0 0 0 70 0M555 250a70 70 0 0 0 70 0M815 250a70 70 0 0 0 70 0"/>
+    <rect class="ofp-out" x="10" y="10" width="980" height="630" rx="18"/><path class="ofp-gap" d="M455 640H545"/>
+    <text class="ofp-lbl" x="242" y="40">غرفة الاجتماعات</text><text class="ofp-lbl" x="596" y="40">مكتب مدير العمليات</text><text class="ofp-lbl" x="855" y="40">مكتب المدير التنفيذي</text>
+    <g class="ofp-meet" data-omeet role="button" tabindex="0" aria-label="غرفة الاجتماعات: ${meetToday ? 'افتح محضر اليوم' : 'اعقد اجتماع اليوم'}">
+      ${chairs.map(([x, y]) => `<circle class="ofp-chair" cx="${x}" cy="${y}" r="17"/>`).join('')}<circle class="ofp-chair" cx="96" cy="134" r="17"/><circle class="ofp-chair" cx="404" cy="134" r="17"/>
+      <rect class="ofp-table" x="120" y="92" width="260" height="84" rx="42"/><rect class="ofp-screen" x="20" y="100" width="8" height="68" rx="3"/>
+      ${att.map((k, i) => { const [x, y] = i === att.length - 1 ? [96, 134] : (chairs[i] || chairs[0]); const t = (OF_EMPS[k] || {}).tint || 'info'; return `<circle class="ofp-head sm" cx="${x}" cy="${y}" r="12"/><text class="ofp-ini sm t${t}" x="${x}" y="${y + 4}">${esc(String(ofEmp(k).name || '؟').charAt(0))}</text>`; }).join('')}
+      ${meetToday && !OF_MEETING ? `<g class="ofp-note"><rect x="226" y="116" width="48" height="36" rx="4"/><path d="M234 127h32M234 134h32M234 141h20"/></g>` : ''}
+      <text class="ofp-st" x="250" y="232">${OF_MEETING ? 'الاجتماع جارٍ الآن…' : meetToday ? 'محضر اجتماع اليوم جاهز' : 'لم يُعقد اجتماع اليوم بعد'}</text></g>
+    <rect class="ofp-shelf" x="730" y="70" width="12" height="120" rx="3"/><rect class="ofp-sofa" x="935" y="120" width="40" height="100" rx="12"/>${plant(960, 45)}${plant(500, 45)}${plant(700, 225)}
+    <text class="ofp-zl" x="200" y="290">خدمة العملاء</text><text class="ofp-zl" x="540" y="290">المالية والأنظمة</text><text class="ofp-zl" x="815" y="290">النمو والمنتج</text>
+    <path class="ofp-div" d="M370 300V470M680 300V630"/>
+    <g class="ofp-lounge"><rect class="ofp-sofa" x="60" y="520" width="170" height="40" rx="14"/><rect class="ofp-sofa" x="60" y="575" width="40" height="55" rx="12"/><rect class="ofp-table" x="120" y="580" width="90" height="40" rx="10"/><circle class="ofp-cup" cx="150" cy="600" r="6"/><circle class="ofp-cup" cx="180" cy="598" r="6"/>
+      <text class="ofp-zl" x="290" y="560">الاستراحة</text>${plant(300, 610)}${plant(40, 500)}</g>
+    <text class="ofp-zl" x="500" y="625">المدخل</text>${plant(420, 600)}${plant(580, 600)}
+    ${seats.map(k => ofPerson(k, ...OF_SEATS[k])).join('')}
+  </svg></div>${extra.length ? `<div class="of-desks">${extra.map(ofDesk).join('')}</div>` : ''}
+  <div class="ofp-key"><span><i class="k-busy"></i>يعمل الآن</span><span><i class="k-wait"></i>ينتظر موافقتك</span><span><i class="k-idle"></i>متاح</span><span class="of-mut">اضغط على أي موظف لتفتح محادثته، وعلى غرفة الاجتماعات لمحضر اليوم</span></div>`; }
 function renderFloor() { const seen = new Set(OF_ZONES.flatMap(z => z[1])); const zones = OF_ZONES.map(([t, ks]) => [t, ks.filter(k => OF_EMPS[k])]); const rest = Object.keys(OF_EMPS).filter(k => !seen.has(k)); if (rest.length) zones[zones.length - 1][1].push(...rest);
   const L = ofNewSorted();
-  return `<div class="of-floor"><div class="of-fz">${renderMeet()}<div class="of-zones">${zones.map(([t, ks]) => `<section class="of-zone"><h4>${t}</h4><div class="of-desks">${ks.map(ofDesk).join('')}</div></section>`).join('')}</div></div>
+  return `<div class="of-floor"><div class="of-fz"><div class="panel of-plan">${renderPlan()}</div>${renderMeet()}</div>
     <aside class="panel of-owner"><div class="ph"><div><h3 style="margin:0">صندوق المالك</h3><small>الأهم أولاً · ${L.length} بانتظارك</small></div></div>
       <ol class="of-ol">${L.length ? L.slice(0, 8).map(d => { const [pl, pc] = OF_PL(ofPrio(d)); return `<li><button class="of-oi" data-odid="${esc(d.id)}">${ofAv(d.emp)}<span><b>${esc(d.title || (OF_KIND[d.kind] || [d.kind])[0])}</b><small>${esc(ofEmp(d.emp).name)} · ${esc((OF_KIND[d.kind] || [d.kind])[0])}${d.targetName ? ' · ' + esc(d.targetName) : ''}</small></span><span class="pill ${pc}">${pl}</span></button></li>`; }).join('') : '<li class="of-mut">لا شيء بانتظارك الآن.</li>'}</ol>
       ${L.length > 8 ? `<button class="btn sm" data-of-f="new" style="margin:0 16px 14px">عرض الكل (${L.length})</button>` : ''}</aside></div>`; }
@@ -2003,7 +2058,7 @@ async function renderOffice() {
   box.innerHTML = views + `
   <div class="of-hero"><div><b>${allNew ? `${allNew} مسودة بانتظار اعتمادك` : 'لا شيء بانتظارك الآن'}</b><small>الموظفون يقرؤون بيانات المنصة ويكتبون المسودات، ولا يُرسل شيء لأي عميل إلا بضغطة منك.</small></div>
     <div class="of-hs"><span><b>${u.n}</b> مهمة اليوم</span><span><b>${OFC.queue.filter(x => x.status === 'queued').length}</b> في طابور البرمجة</span><button class="btn sm pri" id="ofDay" ${OF_BUSY.ceo ? 'disabled' : ''} title="ماجد يقرأ الوضع ويكلّف الفريق، والخبراء يراجعون كل مسودة">ابدأ يوم العمل</button><button class="btn sm" id="ofAll">تقرير من الجميع</button><button class="ib" id="ofAuto" title="إعدادات التشغيل التلقائي" aria-label="إعدادات التشغيل التلقائي">${svg('gear')}</button>
-    <span class="of-lay" role="group" aria-label="طريقة العرض">${[['cards', 'بطاقات'], ['floor', 'مكاتب افتراضية']].map(([k, l]) => `<button data-olay="${k}" aria-pressed="${OF_LAYOUT === k}" class="${OF_LAYOUT === k ? 'on' : ''}">${l}</button>`).join('')}</span></div></div>
+    <span class="of-lay" role="group" aria-label="طريقة العرض">${[['cards', 'بطاقات'], ['floor', 'المكتب']].map(([k, l]) => `<button data-olay="${k}" aria-pressed="${OF_LAYOUT === k}" class="${OF_LAYOUT === k ? 'on' : ''}">${l}</button>`).join('')}</span></div></div>
   ${OF_LAYOUT === 'floor' ? renderFloor() : [['الإدارة', k => OF_EMPS[k].mgmt], ['الفريق', k => !OF_EMPS[k].mgmt]].map(([g, f]) => `<div class="of-gl">${g}</div><div class="of-team${g === 'الإدارة' ? ' mg' : ''}">${Object.keys(OF_EMPS).filter(f).map(k => { const e = ofEmp(k); const n = pend(k); return `<button class="of-card${k === OF_EMP ? ' on' : ''}" data-oe="${k}">
     ${ofAv(k)}<span class="of-nm"><b>${esc(e.name)}</b><small>${esc(e.role)}</small></span>${OF_BUSY[k] ? '<span class="of-st busy">يعمل الآن</span>' : n ? `<span class="of-st">${n} مسودة</span>` : '<span class="of-st idle">متاح</span>'}
     <span class="of-job">${esc(e.job)}</span>${OFC.reviews[k] ? `<span class="of-sc ${OFC.reviews[k].score >= 8 ? 'ok' : OFC.reviews[k].score >= 5 ? 'warn' : 'crit'}" title="آخر تقييم خبير">تقييم الخبير ${OFC.reviews[k].score}/10</span>` : ''}</button>`; }).join('')}</div>`).join('') + renderMeet()}
@@ -2127,6 +2182,7 @@ $('#t-office').addEventListener('click', e => {
   if (e.target.closest('#ofMsgAll')) { OF_MSGALL = !OF_MSGALL; return renderOffice(); }
   const ly = e.target.closest('[data-olay]'); if (ly) { OF_LAYOUT = ly.dataset.olay; try { localStorage.setItem('ofLayout', OF_LAYOUT); } catch (x) {} return renderOffice(); }
   if (e.target.closest('#ofMeetNow')) return ofMeetNow();
+  if (e.target.closest('[data-omeet]')) { const m = OFC.meet; if (m && ofKsaDay(m.at) === ofKsaDay(nowIso())) { OF_MEETOPEN = true; renderOffice(); const d = $('.of-meet'); if (d) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; } if (!OF_MEETING) return ofMeetNow(); return; }
   const od = e.target.closest('[data-odid]'); if (od) { OF_F = 'new'; renderOffice(); const a = document.querySelector(`[data-did="${CSS.escape(od.dataset.odid)}"]`); if (a) { a.scrollIntoView({ behavior: 'smooth', block: 'center' }); a.classList.add('flash'); setTimeout(() => a.classList.remove('flash'), 1600); } return; }
   if (e.target.closest('#ofAuto')) { const hrs = Array.from({ length: 24 }, (_, h) => h); const f = dialog(`<h3>التشغيل التلقائي</h3><p class="of-mut">كل ما يصل للعملاء يبقى مسودة بانتظار اعتمادك، عدا ما تسمح به أدناه لسارة. ولا يعدّل أي موظف سياسة أو نظاماً بنفسه.</p>${Object.entries(OF_AUTO_L).map(([k, l]) => `<label class="of-tg"><input type="checkbox" name="${k}"${OFC.auto[k] ? ' checked' : ''}> ${l}</label>`).join('')}
     <h4>العمل على مدار الساعة</h4>
@@ -2174,6 +2230,7 @@ $('#t-office').addEventListener('click', e => {
     const a = b.dataset.od; if (a === 'wa' || a === 'mail') { d.body = ed ? ed.value : d.body; return; } ofAct(d, a, ed ? ed.value.trim() : d.body); }
 });
 $('#t-office').addEventListener('change', e => { if (e.target.id === 'kbFile') { kbFile(e.target.files[0]); e.target.value = ''; } });
+$('#t-office').addEventListener('keydown', e => { const g = e.target.closest && e.target.closest('.ofp [role="button"]'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); g.dispatchEvent(new MouseEvent('click', { bubbles: true })); } });
 $('#t-office').addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('of-md')) OF_MEETOPEN = e.target.open; }, true);
 $('#t-office').addEventListener('submit', e => { if (e.target.id === 'ofMeetIn') { e.preventDefault(); const q = e.target.q.value.trim(); if (!q || !OFC.meet) return; OF_EMP = 'ceo';
   return ofAsk('ceo', 'chat', `توجيه المالك بعد اجتماع الصباح (${fmt(OFC.meet.at)}):\n${q}\n\nخلاصة الاجتماع كما كتبتها:\n${cut(OFC.meet.summary, 3000)}\n\nنفّذ التوجيه: كلّف من يلزم بمسودات assign.`); }
