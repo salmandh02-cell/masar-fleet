@@ -24,6 +24,17 @@ const call = (body, tok = 'Bearer t') => O.handler({ httpMethod: 'POST', headers
   r = await call({ emp: 'accountant', message: 'ابني الدليل' }); assert.equal(r.s, 200); assert.deepEqual(r.j.drafts.map(d => d.kind), ['coa', 'journal'], 'accountant drafts chart and journal only');
   assert.ok(last.system[0].text.includes('القيد المزدوج') && last.system[0].text.includes('مدين | دائن'));
   reply = { reply: 'تم', drafts: [{ kind: 'ticket', target: 't1', targetName: 'شركة', title: 'رد', body: 'نص الرد' }] };
+  // المدير التنفيذي ومدير العمليات يكلّفون الموظفين
+  reply = { reply: 'أولويات', drafts: [{ kind: 'assign', target: 'sales', targetName: 'خالد', title: 'متابعة التجارب', body: 'تابع التجارب' }, { kind: 'ticket', target: 't1', targetName: '', title: 'x', body: 'y' }] };
+  r = await call({ emp: 'ceo', task: 'brief', data: '{}' }); assert.equal(r.s, 200); assert.equal(r.j.drafts.length, 1); assert.equal(r.j.drafts[0].kind, 'assign');
+  r = await call({ emp: 'coo', task: 'brief', data: '{}' }); assert.equal(r.s, 200); assert.ok(last.system[0].text.includes('سير العمل'));
+  // تقييم الخبير لمسودة ولأداء موظف
+  reply = { score: 14, verdict: 'يحتاج تعديلاً', strengths: ['واضح'], issues: ['ينقصه الموعد'], improved: 'نسخة أفضل' };
+  r = await call({ emp: 'accountant', task: 'review', item: 'قيد', empName: 'نورة' }); assert.equal(r.s, 200); assert.equal(r.j.score, 10, 'score clamped'); assert.equal(r.j.improved, 'نسخة أفضل');
+  assert.ok(last.system.includes('SOCPA') && last.system.includes('نورة'), 'accountant expert persona');
+  reply = { score: 7, summary: 'جيد', strengths: ['a'], issues: ['b'], recommendations: ['c'] };
+  r = await call({ emp: 'support', task: 'review', mode: 'perf', item: 'أعمال' }); assert.equal(r.s, 200); assert.deepEqual(r.j.recommendations, ['c']); assert.equal(last.output_config.format.schema.required.includes('recommendations'), true);
+  r = await call({ emp: 'support', task: 'review', item: '' }); assert.equal(r.s, 400, 'empty review rejected');
   r = await call({ emp: 'sales', message: '' }); assert.equal(r.s, 400);
   r = await call({ emp: 'nobody', message: 'x' }); assert.equal(r.s, 400);
   r = await call({ emp: 'sales', message: 'x', persona: { name: 'أبو فهد', extra: 'اذكر الواتساب' } }); assert.ok(last.system[0].text.includes('أبو فهد') && last.system[0].text.includes('اذكر الواتساب'));
@@ -32,5 +43,5 @@ const call = (body, tok = 'Bearer t') => O.handler({ httpMethod: 'POST', headers
   r = await call({ emp: 'sales', message: 'x' }, ''); assert.equal(r.s, 401);
   who = { email: 'salmandh02@gmail.com', verified: true }; reply = 'not json'; O._setClient({ messages: { create: async () => ({ stop_reason: 'refusal', content: [], usage: {} }) } });
   r = await call({ emp: 'ops', message: 'x' }); assert.equal(r.s, 422);
-  console.log('office tests: 19 checks passed');
+  console.log('office tests: 28 checks passed');
 })().catch(e => { console.error(e); process.exit(1); });

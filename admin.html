@@ -343,7 +343,7 @@ body.va{overflow:hidden}
 .of-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .of-hero b{display:block;font:600 16px var(--f-display)}.of-hero small{color:var(--muted);font-size:13px}
 .of-hs{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)}.of-hs b{color:var(--ink);font:600 18px var(--f-display);margin-inline-end:4px}
-.of-team{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.of-team{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.of-team.mg{grid-template-columns:repeat(2,minmax(0,1fr))}.of-gl{font:600 13px var(--f-display);color:var(--muted);margin-bottom:-8px}
 .of-card{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"av nm" "st st" "job job";gap:8px 10px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);transition:border-color .15s,box-shadow .15s}
 .of-card:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
 .of-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -1642,9 +1642,9 @@ async function renderOffice() {
   box.innerHTML = `
   <div class="of-hero"><div><b>${allNew ? `${allNew} مسودة بانتظار اعتمادك` : 'لا شيء بانتظارك الآن'}</b><small>الموظفون يقرؤون بيانات المنصة ويكتبون المسودات، ولا يُرسل شيء لأي عميل إلا بضغطة منك.</small></div>
     <div class="of-hs"><span><b>${u.n}</b> مهمة اليوم</span><span><b>${OFC.queue.filter(x => x.status === 'queued').length}</b> في طابور البرمجة</span><button class="btn sm" id="ofAll">تقرير اليوم من الجميع</button></div></div>
-  <div class="of-team">${Object.keys(OF_EMPS).map(k => { const e = ofEmp(k); const n = pend(k); return `<button class="of-card${k === OF_EMP ? ' on' : ''}" data-oe="${k}">
+  ${[['الإدارة', k => OF_EMPS[k].mgmt], ['الفريق', k => !OF_EMPS[k].mgmt]].map(([g, f]) => `<div class="of-gl">${g}</div><div class="of-team${g === 'الإدارة' ? ' mg' : ''}">${Object.keys(OF_EMPS).filter(f).map(k => { const e = ofEmp(k); const n = pend(k); return `<button class="of-card${k === OF_EMP ? ' on' : ''}" data-oe="${k}">
     ${ofAv(k)}<span class="of-nm"><b>${esc(e.name)}</b><small>${esc(e.role)}</small></span>${OF_BUSY[k] ? '<span class="of-st busy">يعمل الآن</span>' : n ? `<span class="of-st">${n} مسودة</span>` : '<span class="of-st idle">متاح</span>'}
-    <span class="of-job">${esc(e.job)}</span>${OFC.reviews[k] ? `<span class="of-sc ${OFC.reviews[k].score >= 8 ? 'ok' : OFC.reviews[k].score >= 5 ? 'warn' : 'crit'}" title="آخر تقييم خبير">تقييم الخبير ${OFC.reviews[k].score}/10</span>` : ''}</button>`; }).join('')}</div>
+    <span class="of-job">${esc(e.job)}</span>${OFC.reviews[k] ? `<span class="of-sc ${OFC.reviews[k].score >= 8 ? 'ok' : OFC.reviews[k].score >= 5 ? 'warn' : 'crit'}" title="آخر تقييم خبير">تقييم الخبير ${OFC.reviews[k].score}/10</span>` : ''}</button>`; }).join('')}</div>`).join('')}
   <div class="of-main">
     <div class="panel of-chat"><div class="ph">${ofAv(OF_EMP, 1)}<div style="flex:1;min-width:0"><h3 style="margin:0">${esc(E.name)} · ${esc(E.role)}</h3><small>${esc(E.job)}</small></div>
       <button class="btn sm" id="ofBrief" ${OF_BUSY[OF_EMP] ? 'disabled' : ''}>تقرير اليوم</button><button class="btn sm" id="ofPerf" ${OF_RV['p-' + OF_EMP] ? 'disabled' : ''}>${OF_RV['p-' + OF_EMP] ? 'الخبير يقيّم…' : 'تقييم أداء'}</button><button class="ib" id="ofSet" title="تخصيص الموظف" aria-label="تخصيص الموظف">${svg('gear')}</button>${chat.length ? `<button class="ib" id="ofClr" title="محادثة جديدة" aria-label="محادثة جديدة">${svg('log')}</button>` : ''}</div>
