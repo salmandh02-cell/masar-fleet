@@ -8,6 +8,7 @@ const MODEL = () => process.env.OFFICE_MODEL || 'claude-opus-5-5';
 let client = null;
 const ai = () => client || (client = new (Anthropic.default || Anthropic)({ apiKey: process.env.ANTHROPIC_API_KEY, maxRetries: 1, timeout: 55000 }));
 exports._setClient = c => { client = c; };
+exports._hasClient = () => !!client;
 
 // الموظفون: الدور وما يُنتجه وأنواع المسودات المسموحة
 const EMPS = {
@@ -84,6 +85,7 @@ ${sop ? `دليل العمل المعتمد لوظيفتك (التزم بخطو�
 - اعتمد على البيانات المرفقة${refs ? ' والمراجع المعتمدة' : ''}${E.research ? ' وعلى ما تجده في بحث الويب' : ' فقط'}، وإذا لم تكفِ فقل ذلك في الرد ولا تخترع أسماء أو أرقاماً أو سياسات.
 ${refs ? '- المراجع المعتمدة من المالك مقدَّمة على معلوماتك العامة. إذا استندت إلى مرجع فاذكر اسمه بين «»، وإذا تعارض الطلب مع مرجع أو مع دليل العمل فنبّه المالك.\n' : ''}${E.kinds.includes('handoff') ? '- ما كان من اختصاص زميل فأحِله إليه بمسودة handoff ولا تؤدِّه بنفسك.\n' : ''}
 - لا ترسل شيئاً بنفسك: كل ما يُرسل لعميل أو يُنشر يكون مسودة في drafts، والمالك يراجعه ويعتمده.
+- لا تعدّل أي سياسة أو نظام أو مرجع معتمد بنفسك: أي تعديل مقترح يكون مسودة بانتظار موافقة المالك.
 - reply: ردك على المالك بالعربية الفصحى المختصرة، بصيغة Markdown (عناوين قصيرة وقوائم)، يبدأ بالخلاصة.
 - drafts: صفر أو أكثر (حتى 10). أنواعها المسموحة لك:
 ${kinds}
@@ -175,3 +177,31 @@ async function extract(req) {
   const u = r.usage || {};
   return { title: String(o.title || f.name || 'مرجع').slice(0, 120), text: String(o.text || '').slice(0, 60000), cut: r.stop_reason === 'max_tokens', usage: { in: u.input_tokens || 0, out: u.output_tokens || 0 } };
 }
+
+// ---------- سارة: تذكرة واحدة فور وصولها (التشغيل التلقائي على مدار الساعة) ----------
+// تصنّف التذكرة وتكتب الرد. يُرسل الرد تلقائياً فقط إذا كان سؤال شرح استخدام وجوابه في المراجع المعتمدة،
+// وما عدا ذلك (مال، استرداد، عطل، غيره) يبقى مسودة بانتظار المالك
+async function ticketReply(req) {
+  const sop = String(req.sop || '').trim().slice(0, 8000); const refs = String(req.refs || '').trim().slice(0, 100000);
+  const schema = obj({ type: { type: 'string', enum: ['howto', 'billing', 'fault', 'feature', 'other'] }, grounded: { type: 'boolean' }, answer: S, eta: S, note: S, bug: S });
+  const r = await ai().messages.create({
+    model: MODEL(), max_tokens: 3000, output_config: { effort: 'low', format: { type: 'json_schema', schema } },
+    system: [{ type: 'text', text: `أنت «${String(req.name || 'سارة').slice(0, 60)}»، موظفة الدعم الفني بالذكاء الاصطناعي في منصة «${P.APP()}» لإدارة أساطيل المركبات في السعودية. وصلت تذكرة من شركة مشتركة.
+${sop ? `دليل العمل المعتمد لوظيفتك:\n${sop}\n` : ''}المطلوب:
+- type: howto إذا كانت سؤالاً عن طريقة استخدام النظام أو شرح ميزة، وbilling للفواتير والاشتراك والدفع والاسترداد والخصومات، وfault إذا كان خللاً في النظام، وfeature لطلب ميزة، وother لغير ذلك.
+- grounded: true فقط إذا كان جوابك مأخوذاً من المراجع المعتمدة أو قائمة مزايا النظام المرفقة، وfalse إذا خمّنت أو احتجت معلومة غير موجودة.
+- answer: الرد الجاهز للعميل بالعربية الفصحى المبسطة، مهذب ومختصر، بلا Markdown. لا تعِد بميزة غير موجودة ولا بموعد غير مؤكد، ولا تذكر سعراً أو خصماً أو استرداداً، ولا تستشهد بمواد الأنظمة.
+- eta: المدة المتوقعة للحل (مثل «خلال 4 ساعات»، «خلال يوم عمل») أو فارغ إذا كان الرد يحلها.
+- note: ملاحظة قصيرة للمالك (لماذا لا يُرسل الرد تلقائياً، أو ما يحتاجه منه).
+- bug: إذا كان type = fault فاكتب وصف الخلل للمبرمج (ما يحدث، وأين، وكيف يتكرر، والشركة)، وإلا فارغ.
+تاريخ اليوم ${new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 10)}.` },
+    { type: 'text', text: `${refs ? `المراجع المعتمدة من المالك:\n${refs}\n\n` : ''}مزايا النظام:\n${String(req.features || '').slice(0, 4000)}`, cache_control: { type: 'ephemeral' } }],
+    messages: [{ role: 'user', content: `التذكرة:\n${String(req.ticket || '').slice(0, 20000)}` }]
+  });
+  if (r.stop_reason === 'refusal') { const e = new Error('refusal'); e.refusal = true; throw e; }
+  let o = {}; try { o = JSON.parse(r.content.filter(b => b.type === 'text').map(b => b.text).join('').trim()); } catch (e) { throw bad('تعذر قراءة رد الدعم'); }
+  const u = r.usage || {};
+  return { type: o.type || 'other', grounded: o.grounded === true, answer: String(o.answer || '').slice(0, 3000), eta: String(o.eta || '').slice(0, 120), note: String(o.note || '').slice(0, 600), bug: String(o.bug || '').slice(0, 3000),
+    usage: { in: (u.input_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0), out: u.output_tokens || 0 } };
+}
+Object.assign(exports, { _work: work, _review: review, _ticketReply: ticketReply, EMPS });

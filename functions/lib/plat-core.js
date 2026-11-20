@@ -56,6 +56,12 @@ async function upsert(tok, path, data) {
   const r = await fetch(`${ROOT()}/${path}?${mask}`, { method: 'PATCH', headers: H(tok), body: JSON.stringify({ fields: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, enc(v)])) }) });
   if (!r.ok) throw new Error(`upsert ${path} ${r.status}`);
 }
+// إنشاء مستند بمعرّف محدد مرة واحدة فقط: يعيد false إذا كان موجوداً (يمنع تكرار المهمة المجدولة)
+async function claim(tok, path, data) {
+  const r = await fetch(`${ROOT()}/${path}?currentDocument.exists=false`, { method: 'PATCH', headers: H(tok), body: JSON.stringify({ fields: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, enc(v)])) }) });
+  if (r.ok) return true; if (r.status === 400 || r.status === 409 || r.status === 403) return false;
+  throw new Error(`claim ${path} ${r.status}`);
+}
 async function create(tok, col, data) {
   const r = await fetch(`${ROOT()}/${col}`, { method: 'POST', headers: H(tok), body: JSON.stringify({ fields: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, enc(v)])) }) });
   if (!r.ok) throw new Error(`create ${col} ${r.status}`);
@@ -68,6 +74,7 @@ async function whoIs(idToken) {
   return u ? { email: String(u.email || '').toLowerCase(), verified: !!u.emailVerified } : null;
 }
 async function sys() { return (await systemLogin(true)).token; }
+const sysLogin = () => systemLogin(true);
 
 // ---------- البريد ----------
 let tx = null;
@@ -117,4 +124,4 @@ async function notifyCompanyUser(tok, cid, email, msg) {
     return await pushSubs(tok, subs, msg);
   } catch (e) { return 0; }
 }
-module.exports = { get, list, patch, upsert, create, whoIs, sys, mail, esc, btn, pushSubs, notifyStaff, notifyCompanyUser, SUPER, APP, SITE };
+module.exports = { get, list, patch, upsert, claim, create, whoIs, sys, sysLogin, mail, esc, btn, pushSubs, notifyStaff, notifyCompanyUser, SUPER, APP, SITE };

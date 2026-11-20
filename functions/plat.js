@@ -82,6 +82,8 @@ exports.handler = async (event) => {
         const mailed = await P.mail(t.by, `رد على تذكرتك: ${t.subject}`, `<p>وصلك رد من فريق الدعم الفني على تذكرة «${P.esc(t.subject)}».</p>${req.text ? `<p style="background:#F6F8F7;padding:10px;border-radius:8px">${P.esc(String(req.text).slice(0, 1500))}</p>` : ''}${P.btn(site + '/#support', 'فتح التذكرة')}`);
         return J(200, { pushed, mailed });
       }
+      // سارة تبدأ فوراً على مدار الساعة (دالة خلفية: لا ننتظر انتهاءها)
+      try { await fetch(`${site}/.netlify/functions/office-run-background`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ticket: req.ticketId }) }); } catch (e) { console.warn('office trigger', e.message); }
       return J(200, await P.notifyStaff(s, ['manager', 'support'], { title: req.reply ? 'رد على تذكرة دعم' : 'تذكرة دعم جديدة', body: `${t.companyName} · ${t.subject}`, url: 'admin.html#support', tag: 'tk-' + req.ticketId },
         `${req.reply ? 'رد على تذكرة' : 'تذكرة دعم جديدة'}: ${t.subject}`, `<p><b>${P.esc(t.companyName)}</b> · ${P.esc(t.byName || t.by)}</p><p><b>${P.esc(t.subject)}</b></p><p style="background:#F6F8F7;padding:10px;border-radius:8px">${P.esc(String(req.text || t.body || '').slice(0, 1500))}</p>${P.btn(site + '/admin.html', 'فتح الدعم الفني')}`));
     }
