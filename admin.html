@@ -385,7 +385,7 @@ body.va{overflow:hidden}
 .of-foot{color:var(--muted);font-size:12px;margin:0}
 @media (max-width:1200px){.of-team{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:1000px){.of-main{grid-template-columns:1fr}}
-@media (max-width:640px){.of-team{grid-template-columns:1fr 1fr}.of-job{display:none}.of-msgs{max-height:60vh}.of-chat{min-height:0}.of-m{max-width:96%}}
+@media (max-width:640px){.of-team{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;scroll-snap-type:x mandatory}.of-card{flex:0 0 152px;padding:10px;gap:6px 8px;scroll-snap-align:start}.of-job{display:none}.of-chat .ph{flex-wrap:wrap}.of-chat .ph>div{flex-basis:calc(100% - 60px)!important}.of-hero{padding:12px 14px}.of-msgs{max-height:60vh}.of-chat{min-height:0}.of-m{max-width:96%}}
 </style>
 </head>
 <body>
@@ -689,6 +689,7 @@ async function loadAll() {
   } catch (e) { console.error(e); $('#rows').innerHTML = `<tr><td colspan="8" class="empty">تعذر تحميل الشركات: ${esc(e.code || e.message)}</td></tr>`; return; }
   try { const s = await F.getDocs(F.collection(fs, 'invoices')); INVS = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.seq || 0) - (a.seq || 0)); } catch (e) { INVS = []; }
   render(); renderInv(); loadStats(); if (canHealth()) loadHealthLite();
+  if (ME.super) { if (TAB === 'office') renderOffice(); else if (OFC === null) loadOffice().then(() => badge('ofBadge', OFC.drafts.filter(d => d.status === 'new').length, true)); }
   if (ME.super) backfillCustomerNo();
   await Promise.all(COS.filter(c => !isOpen(c)).map(async c => { try { c.vehicles = (await F.getCountFromServer(F.collection(fs, 'companies', c.id, 'vehicles'))).data().count; } catch (e) { c.vehicles = '؟'; } }));
   render(); if (TAB === 'home') renderHome();
@@ -1193,7 +1194,7 @@ const TKS_ST = { open: ['بانتظار الرد', 'p-unpaid'], answered: ['تم
 async function loadTk() {
   try { const s = await F.getDocs(F.collection(fs, 'tickets')); TKS = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(b.lastAt).localeCompare(String(a.lastAt))); } catch (e) { TKS = []; }
   const n = TKS.filter(t => t.status !== 'closed' && t.unreadPlat).length; badge('tkBadge', n);
-  if (TAB === 'support') renderTk(); if (TAB === 'home') renderHome(); else decBadge();
+  if (TAB === 'support') renderTk(); if (TAB === 'home') renderHome(); else decBadge(); if (TAB === 'office' && OFC) renderOffice();
 }
 function renderTk() {
   const q = $('#tq').value.trim().toLowerCase(), f = $('#tfs').value;
@@ -1472,9 +1473,10 @@ const OF_EMPS = {
     sug: ['من الشركات المعرضة لعدم التجديد ولماذا؟', 'أي شركة تحتاج تدريباً؟', 'لخّص استخدام النظام هذا الأسبوع'] }
 };
 const OF_KIND = { ticket: ['رد على تذكرة', 'p-info'], message: ['رسالة لعميل', 'p-ok'], note: ['ملاحظة في ملف الشركة', 'p-off'], post: ['محتوى تسويقي', 'p-pending'], task: ['مهمة مقترحة', 'p-warn'], report: ['تقرير', 'p-off'] };
-let OFC = null, OF_EMP = 'support', OF_F = 'new', OF_BUSY = {};
+let OF_LOAD = null; let OFC = null, OF_EMP = 'support', OF_F = 'new', OF_BUSY = {};
 const ofEmp = k => ({ ...OF_EMPS[k], ...((OFC && OFC.persona && OFC.persona[k]) || {}) });
-async function loadOffice() {
+async function loadOffice() { return OF_LOAD || (OF_LOAD = loadOffice0()); }
+async function loadOffice0() {
   try { const s = await F.getDoc(F.doc(fs, 'platform', 'office')); OFC = s.exists() ? s.data() : {}; } catch (e) { OFC = {}; toast('تعذر تحميل المكتب'); }
   OFC.drafts = OFC.drafts || []; OFC.chats = OFC.chats || {}; OFC.persona = OFC.persona || {}; OFC.usage = OFC.usage || {};
 }
@@ -1613,7 +1615,7 @@ function ofDraft(d) {
   }
   return `<article class="of-d${done ? ' done' : ''}" data-did="${esc(d.id)}"><header>${ofAv(d.emp)}<div><span class="pill ${kc}">${kl}</span> <b>${esc(d.title || '')}</b><small>${esc(e.name)} · ${esc(d.targetName || (c && c.name) || (tk && tk.companyName) || '')} · ${esc(String(d.at || '').slice(0, 16).replace('T', ' '))}</small></div>
     ${done ? `<span class="pill ${d.status === 'skip' ? 'p-off' : 'p-ok'}">${d.status === 'skip' ? 'تم تجاهلها' : 'معتمدة'}</span>` : ''}</header>
-    ${done ? `<div class="of-body">${esc(d.body)}</div>` : `<textarea class="of-ed" rows="${Math.min(9, Math.max(3, Math.ceil(String(d.body).length / 70)))}">${esc(d.body)}</textarea>`}
+    ${done ? `<div class="of-body">${esc(d.body)}</div>` : `<textarea class="of-ed" rows="${Math.min(10, Math.max(3, String(d.body).split("\n").length + Math.ceil(String(d.body).length / 80)))}">${esc(d.body)}</textarea>`}
     ${acts ? `<div class="of-acts">${acts}</div>` : ''}</article>`;
 }
 async function ofAct(d, a, body) {
