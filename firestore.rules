@@ -23,7 +23,8 @@ service cloud.firestore {
       'support':    ['view', 'data', 'note'],
       'viewer':     ['view'],
       // الحساب الآلي: إشعارات، إيقاف تلقائي عند الانتهاء، وتسجيل الدفع الإلكتروني
-      'system':     ['view', 'status', 'invoices', 'notify']
+      // office: تشغيل موظفي المكتب آلياً، وnote: رد الدعم الآلي على أسئلة الشرح
+      'system':     ['view', 'status', 'invoices', 'notify', 'note', 'office']
     }; }
     function platCan(p) { return isSuper() || (signedIn() && exists(stfPath()) && get(stfPath()).data.active == true && p in platPerms().get(get(stfPath()).data.get('role', ''), [])); }
 
@@ -277,6 +278,16 @@ service cloud.firestore {
       allow write: if isSuper() || platCan('notify');
     }
     // إحصاءات نشاط كل شركة: يحسبها الحساب الآلي، ويقرؤها فريق المنصة
+    // مكتب الموظفين: نتائج التشغيل الآلي تنتظر لوحة المالك لتدمجها ثم تحذفها، وعلامات المهام المنفذة حتى لا تتكرر
+    match /officeinbox/{id} {
+      allow read, delete: if isSuper();
+      allow create: if platCan('office');
+    }
+    match /officerun/{id} {
+      allow read: if isSuper() || platCan('office');
+      allow create: if platCan('office');
+      allow delete: if isSuper();
+    }
     match /platstats/{cid} {
       allow read: if platCan('view');
       allow write: if isSuper() || platCan('notify');
