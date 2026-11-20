@@ -377,7 +377,7 @@ body.va{overflow:hidden}
 .ofp-ini.tinfo{fill:#1F3F6B}.ofp-ini.tok{fill:#1A5B35}.ofp-ini.twarn{fill:#6E4609}.ofp-ini.tviolet{fill:#46298C}.ofp-ini.tcrit{fill:#7A1F1F}
 .ofp-nm{fill:var(--ink);font-size:15px;font-weight:700;text-anchor:middle}.ofp-rl{fill:var(--muted);font-size:12px;text-anchor:middle}
 .ofp-u,.ofp-meet{cursor:pointer;outline:none}.ofp-u:hover .ofp-desk,.ofp-u:focus-visible .ofp-desk{stroke:var(--accent);stroke-width:2.5}.ofp-meet:hover .ofp-table,.ofp-meet:focus-visible .ofp-table{stroke:var(--accent);stroke-width:2.5}
-.ofp-ring{fill:none;stroke:var(--accent);stroke-width:3}.ofp-u.on .ofp-desk{stroke:var(--accent);stroke-width:2.5}.ofp-u.busy .ofp-mon{fill:var(--info)}
+.ofp-ring{fill:color-mix(in srgb,var(--accent) 12%,transparent);stroke:var(--accent);stroke-width:2.5}.ofp-cloth{stroke:#BDB7AA;stroke-width:.8}.ofp-u.on .ofp-desk{stroke:var(--accent);stroke-width:2.5}.ofp-u.busy .ofp-mon{fill:var(--info)}
 .ofp-bub rect{fill:var(--surface);stroke:var(--info);stroke-width:1.5}.ofp-bub circle{fill:var(--info);animation:ofpDot 1.2s infinite}.ofp-bub circle:nth-child(3){animation-delay:.2s}.ofp-bub circle:nth-child(4){animation-delay:.4s}
 @keyframes ofpDot{0%,80%,100%{opacity:.25}40%{opacity:1}}@media (prefers-reduced-motion:reduce){.ofp-bub circle{animation:none}}
 .ofp-wait circle{fill:var(--gold);stroke:var(--surface);stroke-width:2}.ofp-wait text{fill:#2A1F08;font-size:12px;font-weight:700;text-anchor:middle}
@@ -1984,11 +1984,22 @@ function ofDesk(k) { const e = ofEmp(k); const [sc, sl] = ofStat(k); const f = O
     <span class="of-now">${f ? `${esc(f.text)} <time>${esc(String(f.at).slice(11, 16))}</time>` : esc(e.job)}</span>${nx ? `<span class="of-nx">${svg('log')} ${esc(nx.title)} · ${esc(ofSched(nx))}</span>` : ''}</button>`; }
 // مخطط المكتب المرسوم (من الأعلى): غرفة الاجتماعات ومكتبا الإدارة، والصالة المفتوحة بمكاتب الفريق، وكل موظف جالس على مكتبه بحالته
 const OF_SEATS = { ceo: [855, 78], coo: [595, 78], support: [130, 318], sales: [270, 318], accountant: [470, 318], legal: [610, 318], ideas: [745, 318], marketing: [885, 318], coder: [745, 478], ops: [885, 478] };
+// هيئة كل موظف من الأعلى: شماغ أو غترة وثوب، أو حجاب، أو شعر وقميص (تُعدَّل هنا)
+const OF_LOOK = { ceo: ['shm'], sales: ['gh'], legal: ['shm'], ideas: ['gh'], marketing: ['hair', '#2F5D8A'], coder: ['hair', '#3A3F4B'], coo: ['hj', '#1F2937', '#3D4A5C'], support: ['hj', '#7A2E3A', '#E9E2D6'], accountant: ['hj', '#2E3D5C', '#1E1E24'], ops: ['hj', '#6B5440', '#C9B79C'] };
+// الشكل حول الرأس عند (0,0) متجهاً للأعلى (اليدان نحو المكتب)
+function ofFig(k, cx, cy, sc = 1, rot = 0) { const [t, c1, c2] = OF_LOOK[k] || ['hair', '#4B5563']; const skin = '#D9A47E';
+  const thobe = t === 'shm' || t === 'gh'; const top = thobe ? '#F4F2EC' : t === 'hj' ? (c2 || '#1E1E24') : c1;
+  const head = t === 'shm' ? `<path class="ofp-cloth" d="M-17 -4Q-20 14 -26 23H26Q20 14 17 -4Z" fill="url(#ofpShm)"/><circle class="ofp-cloth" r="13.5" fill="url(#ofpShm)"/><circle r="8" fill="none" stroke="#141414" stroke-width="3.2"/>`
+    : t === 'gh' ? `<path class="ofp-cloth" d="M-17 -4Q-20 14 -26 23H26Q20 14 17 -4Z" fill="#FBFBF8"/><circle class="ofp-cloth" r="13.5" fill="#FBFBF8"/><circle r="8" fill="none" stroke="#141414" stroke-width="3.2"/>`
+    : t === 'hj' ? `<path d="M-16 -2Q-18 13 -23 19H23Q18 13 16 -2Z" fill="${c1}"/><circle r="14" fill="${c1}"/><circle cx="-4" cy="-5" r="6" fill="#fff" opacity=".12"/>`
+    : `<circle cx="-13" cy="1" r="3.5" fill="${skin}"/><circle cx="13" cy="1" r="3.5" fill="${skin}"/><circle r="13" fill="#2B1D14"/><path d="M-3 -12Q0 -2 2 6" stroke="#4A3527" stroke-width="1.6" fill="none"/>`;
+  return `<g transform="translate(${cx} ${cy}) rotate(${rot}) scale(${sc})"><rect class="ofp-chair" x="-25" y="6" width="50" height="34" rx="13"/>
+    <path d="M-23 10L-19 -21M23 10L19 -21" stroke="${top}" stroke-width="9" stroke-linecap="round"${thobe ? ' class="ofp-cloth"' : ''}/><circle cx="-19" cy="-24" r="4.6" fill="${skin}"/><circle cx="19" cy="-24" r="4.6" fill="${skin}"/>
+    <path d="M-31 18Q-31 3 -16 1H16Q31 3 31 18Q31 29 0 29Q-31 29 -31 18Z" fill="${top}"${thobe ? ' class="ofp-cloth"' : ''}/>${head}</g>`; }
 function ofPerson(k, x, y) { const e = ofEmp(k); const [sc] = ofStat(k); const n = OFC.drafts.filter(d => d.emp === k && d.status === 'new').length; const on = k === OF_EMP; const t = OF_EMPS[k].tint || 'info';
   return `<g class="ofp-u${on ? ' on' : ''}${sc === 'busy' ? ' busy' : ''}" data-oe="${k}" role="button" tabindex="0" aria-label="${esc(e.name)}، ${esc(e.role)}: ${esc(ofStat(k)[1])}">
     <rect class="ofp-desk" x="${x - 58}" y="${y}" width="116" height="46" rx="6"/><rect class="ofp-mon" x="${x - 24}" y="${y + 8}" width="48" height="7" rx="2"/><rect class="ofp-kb" x="${x - 16}" y="${y + 27}" width="32" height="9" rx="2"/>
-    <circle class="ofp-chair" cx="${x}" cy="${y + 82}" r="22"/><ellipse class="ofp-body t${t}" cx="${x}" cy="${y + 72}" rx="27" ry="14"/>
-    ${on ? `<circle class="ofp-ring" cx="${x}" cy="${y + 61}" r="20"/>` : ''}<circle class="ofp-head" cx="${x}" cy="${y + 61}" r="15"/><text class="ofp-ini t${t}" x="${x}" y="${y + 66}">${esc(String(e.name || '؟').trim().charAt(0))}</text>
+    ${on ? `<ellipse class="ofp-ring" cx="${x}" cy="${y + 68}" rx="40" ry="34"/>` : ''}${ofFig(k, x, y + 62)}
     <text class="ofp-nm" x="${x}" y="${y + 122}">${esc(e.name)}</text><text class="ofp-rl" x="${x}" y="${y + 138}">${esc(e.role)}</text>
     ${sc === 'busy' ? `<g class="ofp-bub"><rect x="${x + 16}" y="${y + 30}" width="38" height="20" rx="10"/><circle cx="${x + 26}" cy="${y + 40}" r="2.6"/><circle cx="${x + 35}" cy="${y + 40}" r="2.6"/><circle cx="${x + 44}" cy="${y + 40}" r="2.6"/></g>`
       : n ? `<g class="ofp-wait"><circle cx="${x + 34}" cy="${y + 50}" r="11"/><text x="${x + 34}" y="${y + 54.5}">${n > 9 ? '+9' : n}</text></g>` : ''}</g>`; }
@@ -1998,6 +2009,7 @@ function renderPlan() { const m = OFC.meet; const meetToday = m && ofKsaDay(m.at
   const plant = (x, y) => `<g class="ofp-plant"><circle cx="${x}" cy="${y}" r="13"/><circle cx="${x - 6}" cy="${y - 5}" r="7"/><circle cx="${x + 6}" cy="${y + 4}" r="7"/></g>`;
   const seats = Object.keys(OF_EMPS).filter(k => OF_SEATS[k]); const extra = Object.keys(OF_EMPS).filter(k => !OF_SEATS[k]);
   return `<div class="ofp-wrap"><svg class="ofp" viewBox="0 0 1000 650" role="group" aria-label="مخطط المكتب">
+    <defs><pattern id="ofpShm" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#FBFAF7"/><path d="M0 0H7M0 3.5H7M0 0V7M3.5 0V7" stroke="#C0182D" stroke-width="1.3"/></pattern></defs>
     <rect class="ofp-floor" x="10" y="10" width="980" height="630" rx="18"/>
     <rect class="ofp-room" x="14" y="14" width="456" height="236"/><rect class="ofp-room alt" x="474" y="14" width="244" height="236"/><rect class="ofp-room alt" x="722" y="14" width="264" height="236"/>
     <path class="ofp-wall" d="M10 250H195M265 250H555M625 250H815M885 250H990M470 10V250M720 10V250"/>
@@ -2007,7 +2019,7 @@ function renderPlan() { const m = OFC.meet; const meetToday = m && ofKsaDay(m.at
     <g class="ofp-meet" data-omeet role="button" tabindex="0" aria-label="غرفة الاجتماعات: ${meetToday ? 'افتح محضر اليوم' : 'اعقد اجتماع اليوم'}">
       ${chairs.map(([x, y]) => `<circle class="ofp-chair" cx="${x}" cy="${y}" r="17"/>`).join('')}<circle class="ofp-chair" cx="96" cy="134" r="17"/><circle class="ofp-chair" cx="404" cy="134" r="17"/>
       <rect class="ofp-table" x="120" y="92" width="260" height="84" rx="42"/><rect class="ofp-screen" x="20" y="100" width="8" height="68" rx="3"/>
-      ${att.map((k, i) => { const [x, y] = i === att.length - 1 ? [96, 134] : (chairs[i] || chairs[0]); const t = (OF_EMPS[k] || {}).tint || 'info'; return `<circle class="ofp-head sm" cx="${x}" cy="${y}" r="12"/><text class="ofp-ini sm t${t}" x="${x}" y="${y + 4}">${esc(String(ofEmp(k).name || '؟').charAt(0))}</text>`; }).join('')}
+      ${att.map((k, i) => { const [x, y] = i === att.length - 1 ? [96, 134] : (chairs[i] || chairs[0]); const t = (OF_EMPS[k] || {}).tint || 'info'; return ofFig(k, x, y, .62, x === 96 ? 90 : y < 134 ? 180 : 0); }).join('')}
       ${meetToday && !OF_MEETING ? `<g class="ofp-note"><rect x="226" y="116" width="48" height="36" rx="4"/><path d="M234 127h32M234 134h32M234 141h20"/></g>` : ''}
       <text class="ofp-st" x="250" y="232">${OF_MEETING ? 'الاجتماع جارٍ الآن…' : meetToday ? 'محضر اجتماع اليوم جاهز' : 'لم يُعقد اجتماع اليوم بعد'}</text></g>
     <rect class="ofp-shelf" x="730" y="70" width="12" height="120" rx="3"/><rect class="ofp-sofa" x="935" y="120" width="40" height="100" rx="12"/>${plant(960, 45)}${plant(500, 45)}${plant(700, 225)}
